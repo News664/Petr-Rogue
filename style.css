@@ -855,7 +855,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .petrify-mask {
   position: absolute;
   inset: 0;
-  background: rgba(148, 138, 125, 0.82);
+  background: rgba(90, 82, 75, 0.91);
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;

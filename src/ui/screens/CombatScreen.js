@@ -51,8 +51,13 @@ function _renderSpriteArea(player) {
   const pct      = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
   const charId   = player.characterId ?? 'mint';
   const spriteUrl = `assets/${charId}/sprite.png`;
-  // mask-image uses sprite's own alpha channel so transparent pixels stay clear
-  const maskStyle = `height:${pct}%;mask-image:url(${spriteUrl});-webkit-mask-image:url(${spriteUrl})`;
+  // clip-path reveals the bottom pct% of the full-height overlay;
+  // mask-image uses the sprite's alpha so transparent areas stay clear.
+  const maskStyle = [
+    `clip-path:inset(${100 - pct}% 0 0 0)`,
+    `mask-image:url(${spriteUrl})`,
+    `-webkit-mask-image:url(${spriteUrl})`,
+  ].join(';');
   return `
     <div class="player-sprite-area">
       <div class="sprite-wrap">

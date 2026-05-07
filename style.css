@@ -850,19 +850,18 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   object-fit: fill;
   display: block;
 }
-/* Uses sprite's own alpha channel via mask-image (set inline) — transparent pixels stay clear */
+/* Overlay sits at full height; clip-path reveals bottom pct% (set inline);
+   mask-image (set inline) reads sprite alpha so transparent pixels stay clear. */
 .petrify-mask {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(148, 138, 125, 0.78);
+  inset: 0;
+  background: rgba(148, 138, 125, 0.82);
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   pointer-events: none;
-  transition: height 0.5s ease;
+  transition: clip-path 0.4s ease;
 }
 .enemies-area {
   flex: 1;

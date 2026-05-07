@@ -218,7 +218,7 @@ export const cardDefs = {
       effect(state) { applyStatus(state.player, 'stoneCoat', 14); } },
   },
   sacred_ground: {
-    id: 'sacred_ground', name: 'Sacred Ground', cost: 3, type: 'power', targetType: 'none',
+    id: 'sacred_ground', name: 'Sacred Ground', cost: 2, type: 'power', targetType: 'none',
     description: 'Each time you play a Skill card this combat, deal 3 damage to all enemies.',
     effect(state) {
       state.combat.activePowers.push({

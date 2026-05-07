@@ -3,7 +3,7 @@ import { applyStatus } from '../systems/StatusSystem.js';
 
 // ── Intent builders ───────────────────────────────────────────────────────────
 
-const atk   = (label, dmg)   => ({ label, icon: '⚔️',  action: (e, p) => applyDamage(p, dmg, e) });
+const atk   = (label, dmg)   => ({ label, icon: '⚔️',  damage: dmg, action: (e, p) => applyDamage(p, dmg, e) });
 const petr  = (label, amt)   => ({ label, icon: '🪨',  action: (e, p) => gainPetrify(p, amt) });
 const blk   = (label, amt)   => ({ label, icon: '🛡️', action: (e)    => applyBlock(e, amt) });
 const numb  = (label, stks)  => ({ label, icon: '🫧',  action: (e, p) => applyStatus(p, 'numbing', stks) });
@@ -11,7 +11,7 @@ const calc  = (label, stks)  => ({ label, icon: '⛏️', action: (e, p) => appl
 const vuln  = (label, stks)  => ({ label, icon: '💔',  action: (e, p) => applyStatus(p, 'vulnerable', stks) });
 
 const atkP  = (label, dmg, pt) => ({
-  label, icon: '⚔️🪨',
+  label, icon: '⚔️🪨', damage: dmg,
   action: (e, p) => { applyDamage(p, dmg, e); gainPetrify(p, pt); },
 });
 

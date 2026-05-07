@@ -48,16 +48,16 @@ function _renderPortrait(player) {
 }
 
 function _renderSpriteArea(player) {
-  const pct    = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
-  const charId = player.characterId ?? 'mint';
+  const pct      = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
+  const charId   = player.characterId ?? 'mint';
+  const spriteUrl = `assets/${charId}/sprite.png`;
+  // mask-image uses sprite's own alpha channel so transparent pixels stay clear
+  const maskStyle = `height:${pct}%;mask-image:url(${spriteUrl});-webkit-mask-image:url(${spriteUrl})`;
   return `
     <div class="player-sprite-area">
       <div class="sprite-wrap">
-        <img class="sprite-img"
-             src="assets/${charId}/sprite.png"
-             alt=""
-             onerror="this.style.visibility='hidden'">
-        <div class="petrify-mask" style="height:${pct}%"></div>
+        <img class="sprite-img" src="${spriteUrl}" alt="" onerror="this.style.visibility='hidden'">
+        <div class="petrify-mask" style="${maskStyle}"></div>
       </div>
     </div>
   `;
@@ -77,7 +77,7 @@ function _render() {
         <div class="combat-field">
           ${_renderSpriteArea(player)}
           <div class="enemies-area">
-            ${enemies.map((e, i) => renderEnemy(e, i)).join('')}
+            ${enemies.map((e, i) => renderEnemy(e, i, player)).join('')}
           </div>
         </div>
         ${renderHUD(player)}

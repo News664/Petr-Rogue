@@ -11,9 +11,9 @@ export function applyDamage(target, amount, attacker = null) {
   const unblocked = actual - absorbed;
   target.hp      -= unblocked;
 
-  // Calcified: mirror unblocked HP damage as Petrify gain
+  // Calcified: mirror unblocked HP damage as Petrify gain (routed through gainPetrify so Stone Coat applies)
   if (unblocked > 0 && (target.statusEffects?.calcified ?? 0) > 0) {
-    target.petrify = (target.petrify || 0) + unblocked;
+    gainPetrify(target, unblocked);
   }
 
   return unblocked;

@@ -14,6 +14,7 @@ function _log(state, msg) {
 
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
+  state.player.statusEffects = {};
   state.combat = {
     enemies: enemyIds.map(createEnemyInstance),
     deckState: createDeckState(state.player.deck),

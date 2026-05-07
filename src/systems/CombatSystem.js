@@ -14,6 +14,7 @@ function _log(state, msg) {
 
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
+  state.player.statusEffects = {};
   state.combat = {
     enemies: enemyIds.map(createEnemyInstance),
     deckState: createDeckState(state.player.deck),
@@ -26,6 +27,9 @@ export function startCombat(state, enemyIds) {
     activePowers: [],
   };
   triggerRelics('onCombatStart', state);
+  for (const card of state.player.deck) {
+    if (card.onCombatStart) card.onCombatStart(state);
+  }
   return _startPlayerTurn(state);
 }
 

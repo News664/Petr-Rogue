@@ -21,14 +21,30 @@ export function drawCards(deckState, count) {
   }
 }
 
+// Insert a card at a random position in the draw pile (used for mid-combat status cards).
+export function addCardToDraw(deckState, card) {
+  const i = Math.floor(Math.random() * (deckState.draw.length + 1));
+  deckState.draw.splice(i, 0, card);
+}
+
 export function discardCard(deckState, handIndex) {
   const [card] = deckState.hand.splice(handIndex, 1);
-  deckState.discard.push(card);
+  if (card.ethereal) {
+    deckState.exhaust.push(card);
+  } else {
+    deckState.discard.push(card);
+  }
   return card;
 }
 
 export function discardHand(deckState) {
-  deckState.discard.push(...deckState.hand);
+  for (const card of deckState.hand) {
+    if (card.ethereal) {
+      deckState.exhaust.push(card);
+    } else {
+      deckState.discard.push(card);
+    }
+  }
   deckState.hand = [];
 }
 

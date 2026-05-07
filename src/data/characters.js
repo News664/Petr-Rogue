@@ -18,16 +18,18 @@ export const characterDefs = {
         'holy_light',
       ].map(makeCard);
     },
-    // Cards that can appear in reward/shop pools for this character
+    // Cards that can appear in reward/shop pools for this character.
+    // Shared commons first, then Mint-unique by rarity.
     cardPool: [
-      // Shared pool
-      'bash', 'stone_strike', 'stone_skin', 'shatter', 'calcify',
-      'purify', 'petrify_surge', 'gravel_shot', 'fortify',
-      'stone_will', 'controlled_calcify',
-      // Mint unique
-      'purifying_touch', 'holy_light', 'holy_surge', 'purifying_nova',
-      'stone_tithe', 'consecrate', 'sanctuary', 'petrify_ward',
-      'stone_coat', 'sacred_ground',
+      // Shared
+      'bash', 'gravel_shot', 'stone_skin', 'shatter',
+      'purify', 'fortify', 'stone_will', 'controlled_calcify',
+      // Mint common (×4)
+      'purifying_touch', 'holy_light', 'petrify_ward', 'consecrate',
+      // Mint uncommon (×2)
+      'stone_coat', 'holy_surge',
+      // Mint rare (×2)
+      'purifying_nova', 'sacred_ground',
     ],
   },
 };

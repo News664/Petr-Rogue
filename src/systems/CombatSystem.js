@@ -27,6 +27,9 @@ export function startCombat(state, enemyIds) {
     activePowers: [],
   };
   triggerRelics('onCombatStart', state);
+  for (const card of state.player.deck) {
+    if (card.onCombatStart) card.onCombatStart(state);
+  }
   return _startPlayerTurn(state);
 }
 

@@ -71,16 +71,16 @@ function _renderSpriteArea(player) {
 function _renderHand(hand, energy, TYPE_COLOR) {
   const n = hand.length;
   return hand.map((card, i) => {
-    const disabled = card.cost > energy;
-    const selected = i === _selectedHandIndex;
+    const unplayable = !!card.unplayable;
+    const disabled = unplayable || card.cost > energy;
+    const selected = !unplayable && i === _selectedHandIndex;
     const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
-    // Arc: spread cards evenly across ±12° rotation, pivoting from bottom center.
-    // Vertical offset follows a parabola so outer cards drop naturally.
+    const extraCls = (card.isStatus ? ' card-status' : '') + (card.isCurse ? ' card-curse' : '');
     const norm = n > 1 ? (i / (n - 1) - 0.5) : 0;
     const rot  = (norm * 24).toFixed(1);
     const yo   = (norm * norm * 36).toFixed(1);
     return `
-      <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}"
+      <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}${extraCls}"
            data-index="${i}"
            style="--card-color:${color};--rot:${rot}deg;--yo:${yo}px">
         <div class="card-art">
@@ -91,7 +91,7 @@ function _renderHand(hand, energy, TYPE_COLOR) {
           <div class="card-cost">${card.cost}</div>
           <div class="card-name">${card.name}</div>
         </div>
-        <div class="card-type">${card.type}</div>
+        <div class="card-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
         <div class="card-desc">${card.description}</div>
       </div>
     `;
@@ -102,7 +102,10 @@ function _render() {
   const { player, combat } = GameState;
   const { enemies, deckState, energy, maxEnergy, log, activePowers } = combat;
 
-  const TYPE_COLOR = { attack: 'var(--card-attack)', skill: 'var(--card-skill)', power: 'var(--card-power)' };
+  const TYPE_COLOR = {
+    attack: 'var(--card-attack)', skill: 'var(--card-skill)',
+    power:  'var(--card-power)',  status: 'var(--card-status)', curse: 'var(--card-curse)',
+  };
   const logEntries = log.slice(-7);
 
   _container.innerHTML = `
@@ -143,7 +146,7 @@ function _render() {
 }
 
 function _attachEvents() {
-  _container.querySelectorAll('.card:not(.card-disabled)').forEach(el => {
+  _container.querySelectorAll('.card:not(.card-disabled):not(.card-status):not(.card-curse)').forEach(el => {
     el.addEventListener('click', () => _onCardClick(Number(el.dataset.index)));
   });
   _container.querySelectorAll('.enemy:not(.dead)').forEach(el => {

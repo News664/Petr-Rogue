@@ -68,6 +68,36 @@ function _renderSpriteArea(player) {
   `;
 }
 
+function _renderHand(hand, energy, TYPE_COLOR) {
+  const n = hand.length;
+  return hand.map((card, i) => {
+    const disabled = card.cost > energy;
+    const selected = i === _selectedHandIndex;
+    const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
+    // Arc: spread cards evenly across ±12° rotation, pivoting from bottom center.
+    // Vertical offset follows a parabola so outer cards drop naturally.
+    const norm = n > 1 ? (i / (n - 1) - 0.5) : 0;
+    const rot  = (norm * 24).toFixed(1);
+    const yo   = (norm * norm * 36).toFixed(1);
+    return `
+      <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}"
+           data-index="${i}"
+           style="--card-color:${color};--rot:${rot}deg;--yo:${yo}px">
+        <div class="card-art">
+          <img src="assets/cards/${card.id}.png" alt="" draggable="false"
+               onerror="this.parentElement.classList.add('card-art-missing')">
+        </div>
+        <div class="card-header">
+          <div class="card-cost">${card.cost}</div>
+          <div class="card-name">${card.name}</div>
+        </div>
+        <div class="card-type">${card.type}</div>
+        <div class="card-desc">${card.description}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 function _render() {
   const { player, combat } = GameState;
   const { enemies, deckState, energy, maxEnergy, log, activePowers } = combat;
@@ -91,20 +121,7 @@ function _render() {
           ${activePowers.length ? activePowers.map(p => `<span class="power-badge">${p.name}</span>`).join('') : ''}
         </div>
         <div class="hand-area">
-          ${deckState.hand.map((card, i) => {
-            const disabled = card.cost > energy;
-            const selected = i === _selectedHandIndex;
-            const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
-            return `
-              <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}"
-                   data-index="${i}" style="--card-color:${color}">
-                <div class="card-cost">${card.cost}</div>
-                <div class="card-name">${card.name}</div>
-                <div class="card-type">${card.type}</div>
-                <div class="card-desc">${card.description}</div>
-              </div>
-            `;
-          }).join('')}
+          ${_renderHand(deckState.hand, energy, TYPE_COLOR)}
         </div>
         <div class="combat-actions">
           <button id="end-turn">End Turn</button>

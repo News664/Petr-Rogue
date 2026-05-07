@@ -1,3 +1,5 @@
+export const HAND_CAP = 10;
+
 export function createDeckState(cards) {
   return {
     draw: shuffle([...cards]),
@@ -9,6 +11,7 @@ export function createDeckState(cards) {
 
 export function drawCards(deckState, count) {
   for (let i = 0; i < count; i++) {
+    if (deckState.hand.length >= HAND_CAP) break;
     if (deckState.draw.length === 0) {
       if (deckState.discard.length === 0) break;
       deckState.draw = shuffle([...deckState.discard]);

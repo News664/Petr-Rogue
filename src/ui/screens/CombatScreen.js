@@ -68,7 +68,7 @@ function _renderSpriteArea(player) {
   `;
 }
 
-function _renderHand(hand, energy, TYPE_COLOR) {
+function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
   const n = hand.length;
   return hand.map((card, i) => {
     const unplayable = !!card.unplayable;
@@ -84,8 +84,8 @@ function _renderHand(hand, energy, TYPE_COLOR) {
            data-index="${i}"
            style="--card-color:${color};--rot:${rot}deg;--yo:${yo}px">
         <div class="card-art">
-          <img src="assets/cards/${card.id}.png" alt="" draggable="false"
-               onerror="this.parentElement.classList.add('card-art-missing')">
+          <img src="assets/cards/${charId}/${card.id}.png" alt="" draggable="false"
+               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.parentElement.classList.add('card-art-missing')">
         </div>
         <div class="card-header">
           <div class="card-cost">${card.cost}</div>
@@ -124,7 +124,7 @@ function _render() {
           ${activePowers.length ? activePowers.map(p => `<span class="power-badge">${p.name}</span>`).join('') : ''}
         </div>
         <div class="hand-area">
-          ${_renderHand(deckState.hand, energy, TYPE_COLOR)}
+          ${_renderHand(deckState.hand, energy, TYPE_COLOR, player.characterId)}
         </div>
         <div class="combat-actions">
           <button id="end-turn">End Turn</button>

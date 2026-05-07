@@ -22,47 +22,57 @@ export const CombatScreen = {
 
 function _render() {
   const { player, combat } = GameState;
-  const { enemies, deckState, energy, maxEnergy, lastLog, activePowers } = combat;
+  const { enemies, deckState, energy, maxEnergy, log, activePowers } = combat;
 
   const TYPE_COLOR = { attack: 'var(--card-attack)', skill: 'var(--card-skill)', power: 'var(--card-power)' };
+  // Show last 7 log entries, oldest at top, newest at bottom
+  const logEntries = log.slice(-7);
 
   _container.innerHTML = `
     <div class="combat-screen">
-      <div class="enemies-area">
-        ${enemies.map((e, i) => renderEnemy(e, i)).join('')}
+      <div class="combat-main">
+        <div class="enemies-area">
+          ${enemies.map((e, i) => renderEnemy(e, i)).join('')}
+        </div>
+        ${renderHUD(player)}
+        <div class="energy-bar">
+          <span class="energy-display">⚡ ${energy} / ${maxEnergy}</span>
+          ${activePowers.length ? activePowers.map(p => `<span class="power-badge">${p.name}</span>`).join('') : ''}
+        </div>
+        <div class="hand-area">
+          ${deckState.hand.map((card, i) => {
+            const disabled = card.cost > energy;
+            const selected = i === _selectedHandIndex;
+            const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
+            return `
+              <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}"
+                   data-index="${i}" style="--card-color:${color}">
+                <div class="card-cost">${card.cost}</div>
+                <div class="card-name">${card.name}</div>
+                <div class="card-type">${card.type}</div>
+                <div class="card-desc">${card.description}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="combat-actions">
+          <button id="end-turn">End Turn</button>
+          <span class="deck-counts">Draw: ${deckState.draw.length} · Discard: ${deckState.discard.length} · Exhaust: ${deckState.exhaust.length}</span>
+        </div>
       </div>
-      ${renderHUD(player)}
-      <div class="energy-display">
-        ⚡ ${energy} / ${maxEnergy} Energy
-        ${activePowers.length ? `&nbsp;|&nbsp; ${activePowers.map(p => `<span class="power-badge">${p.name}</span>`).join(' ')}` : ''}
-      </div>
-      <div class="combat-log">${lastLog || '&nbsp;'}</div>
-      <div class="hand-area">
-        ${deckState.hand.map((card, i) => {
-          const disabled  = card.cost > energy;
-          const selected  = i === _selectedHandIndex;
-          const color     = TYPE_COLOR[card.type] ?? 'var(--border)';
-          return `
-            <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}"
-                 data-index="${i}" style="--card-color:${color}">
-              <div class="card-cost">${card.cost}</div>
-              <div class="card-name">${card.name}${card.isUpgraded ? '' : ''}</div>
-              <div class="card-type">${card.type}</div>
-              <div class="card-desc">${card.description}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-      <div class="combat-actions">
-        <button id="end-turn">End Turn</button>
-      </div>
-      <div class="deck-counts">
-        Draw: ${deckState.draw.length} &nbsp;|&nbsp; Discard: ${deckState.discard.length} &nbsp;|&nbsp; Exhaust: ${deckState.exhaust.length}
+      <div class="battle-log" id="battle-log">
+        <div class="battle-log-title">Battle Log</div>
+        <div class="battle-log-entries" id="log-entries">
+          ${logEntries.map((e, i) => `<div class="log-entry${i === logEntries.length - 1 ? ' log-latest' : ''}">${e}</div>`).join('')}
+        </div>
       </div>
     </div>
   `;
 
   _attachEvents();
+  // Scroll log to bottom so most recent entry is always visible
+  const logEl = _container.querySelector('#log-entries');
+  if (logEl) logEl.scrollTop = logEl.scrollHeight;
 }
 
 function _attachEvents() {

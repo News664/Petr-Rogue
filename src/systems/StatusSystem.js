@@ -7,38 +7,34 @@ export function applyStatus(entity, status, stacks) {
   entity.statusEffects[status] = (entity.statusEffects[status] || 0) + stacks;
 }
 
-// ── Tick — call at start of the affected entity's turn ───────────────────────
+// ── Tick ─────────────────────────────────────────────────────────────────────
 
 export function tickPlayerStatuses(player) {
   const s = player.statusEffects;
   if (!s) return;
-
-  // Numbing: gain Petrify equal to current stacks, then decrement (like StS Poison)
   if (s.numbing > 0) {
     gainPetrify(player, s.numbing);
     s.numbing = Math.max(0, s.numbing - 1);
   }
-
-  // Duration-based statuses decrement each turn
-  if (s.calcified > 0)   s.calcified--;
-  if (s.vulnerable > 0)  s.vulnerable--;
+  if (s.calcified > 0)  s.calcified--;
+  if (s.vulnerable > 0) s.vulnerable--;
 }
 
 export function tickEnemyStatuses(enemy) {
   const s = enemy.statusEffects;
   if (!s) return;
-  if (s.weak > 0)        s.weak--;
-  if (s.vulnerable > 0)  s.vulnerable--;
+  if (s.weak > 0)       s.weak--;
+  if (s.vulnerable > 0) s.vulnerable--;
 }
 
 // ── Display ──────────────────────────────────────────────────────────────────
 
 const STATUS_META = {
-  weak:       { icon: '🩸', label: 'Weak' },
-  vulnerable: { icon: '💔', label: 'Vuln' },
-  numbing:    { icon: '🫧', label: 'Numb' },
-  calcified:  { icon: '⛏️', label: 'Calc' },
-  stoneCoat:  { icon: '🪨', label: 'Coat' },
+  weak:       { icon: '🩸', label: 'Weak',        tooltip: n => `Weak ${n}: Deals 25% less damage. Decrements each turn.` },
+  vulnerable: { icon: '💔', label: 'Vulnerable',  tooltip: n => `Vulnerable ${n}: Takes 50% more damage. Decrements each turn.` },
+  numbing:    { icon: '🫧', label: 'Numbing',     tooltip: n => `Numbing ${n}: Gain ${n} Petrify at start of your turn, then decrement.` },
+  calcified:  { icon: '⛏️', label: 'Calcified',  tooltip: n => `Calcified ${n}: Unblocked HP damage also inflicts equal Petrify. ${n} turn(s) remaining.` },
+  stoneCoat:  { icon: '🪨', label: 'Stone Coat', tooltip: n => `Stone Coat ${n}: Next ${n} Petrify you would gain becomes Block instead.` },
 };
 
 export function formatStatuses(statusEffects) {
@@ -47,7 +43,9 @@ export function formatStatuses(statusEffects) {
     .filter(([, v]) => v > 0)
     .map(([k, v]) => {
       const meta = STATUS_META[k];
-      return meta ? `<span class="status-badge status-${k}" title="${meta.label} ${v}">${meta.icon}${v}</span>` : '';
+      if (!meta) return '';
+      const tip = meta.tooltip(v).replace(/"/g, '&quot;');
+      return `<span class="status-badge status-${k}" data-tooltip="${tip}">${meta.icon}${v}</span>`;
     })
     .join('');
 }

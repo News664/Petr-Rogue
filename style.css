@@ -568,3 +568,223 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   z-index: 10;
   margin-top: 20px;
 }
+
+/* ── Persistent status bar ── */
+#status-bar { width: 100%; }
+#status-bar.hidden { display: none; }
+
+.sbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.sbar-danger { border-bottom-color: var(--danger); }
+.sbar-vitals { flex: 1; min-width: 180px; }
+.sbar-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 3px;
+}
+.sbar-labels {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+.sbar-relics { display: flex; gap: 4px; flex-wrap: wrap; }
+.sbar-deck-btn {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* ── Status badge tooltips ── */
+.status-badge {
+  position: relative;
+  cursor: help;
+}
+.status-badge[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  padding: 5px 9px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 4px 12px #00000060;
+}
+
+/* ── Deck overlay / viewer ── */
+.deck-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.deck-overlay.hidden { display: none; }
+.dv-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #00000090;
+}
+.dv-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: min(95vw, 860px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  overflow: hidden;
+}
+.dv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.dv-header h2 { color: var(--accent); font-size: 1.2rem; }
+.dv-close { padding: 4px 12px; }
+.dv-body {
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.dv-group-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.dv-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dv-card {
+  width: 100px;
+  min-height: 130px;
+  background: var(--surface2);
+  border: 2px solid var(--card-color, var(--border));
+  border-radius: 5px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dv-card-cost {
+  width: 18px; height: 18px;
+  background: var(--energy);
+  color: var(--bg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: bold;
+}
+.dv-card-name { font-size: 0.72rem; font-weight: bold; }
+.dv-card-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: auto; line-height: 1.3; }
+.upgraded-mark { color: var(--accent); font-size: 0.65rem; }
+
+/* ── Combat layout with side log ── */
+.combat-screen {
+  display: flex;
+  min-height: 100vh;
+}
+.combat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.energy-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.energy-display { color: var(--energy); }
+.combat-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.deck-counts { font-size: 0.75rem; color: var(--text-muted); }
+
+/* ── Battle log panel ── */
+.battle-log {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+}
+.battle-log-title {
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.battle-log-entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.log-entry {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--border);
+}
+.log-latest { color: var(--text); }
+.log-entry:last-child { border-bottom: none; }
+
+/* ── Map SVG connection layer ── */
+.map-grid { position: relative; }
+.map-svg  { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+.map-floor-row { display: flex; align-items: center; gap: 4px; }
+.map-floor-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Deck overlay z-index for hidden class ── */
+.hidden { display: none !important; }

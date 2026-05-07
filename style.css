@@ -747,7 +747,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: clip;   /* clip arc-hand cards horizontally without creating a scroll container */
+  overflow-y: visible; /* allow status tooltips to escape upward */
 }
 .energy-bar {
   display: flex;

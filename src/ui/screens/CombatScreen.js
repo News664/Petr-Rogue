@@ -8,6 +8,46 @@ let _container = null;
 let _selectedHandIndex = null;
 let _source = 'combat'; // 'combat' | 'elite' | 'boss'
 
+// Cache of sprite content bounds per charId: { top: 0..1, bottom: 0..1 }
+// top/bottom are the fraction of transparent rows at top and bottom of the sprite.
+const _spriteBounds = {};
+
+function _scanSpriteBounds(charId, url) {
+  if (_spriteBounds[charId]) return;
+  _spriteBounds[charId] = { top: 0, bottom: 0 }; // default: no trim
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas');
+      // Scan at reduced resolution for performance
+      const scale = Math.min(1, 128 / img.naturalHeight);
+      canvas.width  = Math.round(img.naturalWidth  * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const h = canvas.height, w = canvas.width;
+      const alphaThreshold = 10;
+      let topRow = 0, bottomRow = h - 1;
+      outer: for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > alphaThreshold) { topRow = y; break outer; }
+        }
+      }
+      outer2: for (let y = h - 1; y >= 0; y--) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > alphaThreshold) { bottomRow = y; break outer2; }
+        }
+      }
+      _spriteBounds[charId] = { top: topRow / h, bottom: (h - 1 - bottomRow) / h };
+      // Re-render to apply corrected clip-path
+      if (_container) _render();
+    } catch (_) { /* tainted canvas on local file:// — bounds stay at default */ }
+  };
+  img.src = url;
+}
+
 export const CombatScreen = {
   init(el, { enemyIds, source = 'combat' }) {
     _container = el;
@@ -47,13 +87,22 @@ function _renderPortrait(player) {
 }
 
 function _renderSpriteArea(player) {
-  const pct      = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
+  const ratio    = player.petrify / Math.max(1, player.hp);
+  const pct      = Math.min(1, ratio);
   const charId   = player.characterId ?? 'mint';
   const spriteUrl = `assets/${charId}/sprite.png`;
-  // clip-path reveals the bottom pct% of the full-height overlay;
-  // mask-image uses the sprite's alpha so transparent areas stay clear.
+
+  // Scan sprite alpha on first encounter to find non-transparent content bounds.
+  _scanSpriteBounds(charId, spriteUrl);
+  const bounds = _spriteBounds[charId] ?? { top: 0, bottom: 0 };
+
+  // Map petrify% within the content region only so transparent padding is ignored.
+  const contentTop    = bounds.top * 100;
+  const contentBottom = (1 - bounds.bottom) * 100;
+  const clipTop       = contentBottom - pct * (contentBottom - contentTop);
+
   const maskStyle = [
-    `clip-path:inset(${100 - pct}% 0 0 0)`,
+    `clip-path:inset(${clipTop.toFixed(1)}% 0 0 0)`,
     `mask-image:url(${spriteUrl})`,
     `-webkit-mask-image:url(${spriteUrl})`,
   ].join(';');

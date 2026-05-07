@@ -16,23 +16,14 @@ const crumble= (label, stks)  => ({ label, icon: '💨',  action: (e, p) => appl
 
 const atkP   = (label, dmg, pt) => ({
   label, icon: '⚔️🪨', damage: dmg,
-  action: (e, p) => { applyDamage(p, dmg, e); gainPetrify(p, pt); },
+  // Petrify first so Stone Coat converts it to Block, which then absorbs the damage.
+  action: (e, p) => { gainPetrify(p, pt); applyDamage(p, dmg, e); },
 });
 
 // Adds a status card to the draw pile mid-combat.
 const addShard = (label) => ({
   label, icon: '💀',
   action: (e, p, state) => addCardToDraw(state.combat.deckState, makeCard('stone_shard')),
-});
-
-// Adds a curse card to both the player's permanent deck AND current draw pile.
-const encase = (label) => ({
-  label, icon: '🕸️',
-  action(e, p, state) {
-    const c = makeCard('fossil_burden');
-    state.player.deck.push({ ...c });
-    addCardToDraw(state.combat.deckState, { ...c });
-  },
 });
 
 // ── Obsidian Sentinel phase-2 intents (defined before enemyDefs) ─────────────
@@ -97,7 +88,7 @@ export const enemyDefs = {
       calc('Calcify 2', 2),
       crumble('Web 3', 3),              // Crumbling 3: block erodes each turn
       atk('Bite 12', 12),
-      encase('Encase'),                 // adds Fossil Burden to player's deck
+      vuln('Expose 3', 3),               // strong Vulnerable to set up big Bite
     ],
   },
 

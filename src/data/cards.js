@@ -26,21 +26,21 @@ export const cardDefs = {
   // ── Shared reward pool ────────────────────────────────────────────────────
 
   bash: {
-    id: 'bash', name: 'Bash', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'common',
+    id: 'bash', name: 'Bash', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'common', colorless: true,
     description: 'Deal 10 damage.',
     effect(state, target) { applyDamage(target, 10, state.player); },
     upgrade: { name: 'Bash+', description: 'Deal 14 damage.',
       effect(state, target) { applyDamage(target, 14, state.player); } },
   },
   stone_strike: {
-    id: 'stone_strike', name: 'Stone Strike', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
+    id: 'stone_strike', name: 'Stone Strike', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common', colorless: true,
     description: 'Deal 8 damage. Gain 3 Petrify.',
     effect(state, target) { applyDamage(target, 8, state.player); gainPetrify(state.player, 3); },
     upgrade: { name: 'Stone Strike+', description: 'Deal 12 damage. Gain 2 Petrify.',
       effect(state, target) { applyDamage(target, 12, state.player); gainPetrify(state.player, 2); } },
   },
   shatter: {
-    id: 'shatter', name: 'Shatter', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
+    id: 'shatter', name: 'Shatter', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon', colorless: true,
     description: 'Deal damage equal to your Petrify. Halve your Petrify.',
     effect(state, target) {
       applyDamage(target, state.player.petrify, state.player);
@@ -53,7 +53,7 @@ export const cardDefs = {
       } },
   },
   petrify_surge: {
-    id: 'petrify_surge', name: 'Petrify Surge', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'rare',
+    id: 'petrify_surge', name: 'Petrify Surge', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'rare', colorless: true,
     description: 'Deal 2× your Petrify as damage. Gain 5 Petrify.',
     effect(state, target) {
       applyDamage(target, state.player.petrify * 2, state.player);
@@ -66,49 +66,49 @@ export const cardDefs = {
       } },
   },
   gravel_shot: {
-    id: 'gravel_shot', name: 'Gravel Shot', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
+    id: 'gravel_shot', name: 'Gravel Shot', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common', colorless: true,
     description: 'Deal 5 damage. If Petrify ≥ 15, deal 10 damage instead.',
     effect(state, target) { applyDamage(target, state.player.petrify >= 15 ? 10 : 5, state.player); },
     upgrade: { name: 'Gravel Shot+', description: 'Deal 8 damage. If Petrify ≥ 15, deal 15 instead.',
       effect(state, target) { applyDamage(target, state.player.petrify >= 15 ? 15 : 8, state.player); } },
   },
   stone_skin: {
-    id: 'stone_skin', name: 'Stone Skin', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
+    id: 'stone_skin', name: 'Stone Skin', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 5 Block. If Petrify ≥ 20, gain 12 Block instead.',
     effect(state) { applyBlock(state.player, state.player.petrify >= 20 ? 12 : 5); },
     upgrade: { name: 'Stone Skin+', description: 'Gain 7 Block. If Petrify ≥ 20, gain 16 Block instead.',
       effect(state) { applyBlock(state.player, state.player.petrify >= 20 ? 16 : 7); } },
   },
   calcify: {
-    id: 'calcify', name: 'Calcify', cost: 0, type: 'skill', targetType: 'none', rarity: 'common',
+    id: 'calcify', name: 'Calcify', cost: 0, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 3 Petrify. Draw 2 cards.',
     effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 2); },
     upgrade: { name: 'Calcify+', description: 'Gain 3 Petrify. Draw 3 cards.',
       effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 3); } },
   },
   purify: {
-    id: 'purify', name: 'Purify', cost: 2, type: 'skill', targetType: 'none', rarity: 'uncommon',
+    id: 'purify', name: 'Purify', cost: 2, type: 'skill', targetType: 'none', rarity: 'uncommon', colorless: true,
     description: 'Reduce Petrify by 10.',
     effect(state) { reducePetrify(state.player, 10); },
     upgrade: { name: 'Purify+', description: 'Reduce Petrify by 15.',
       effect(state) { reducePetrify(state.player, 15); } },
   },
   fortify: {
-    id: 'fortify', name: 'Fortify', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
+    id: 'fortify', name: 'Fortify', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 8 Block.',
     effect(state) { applyBlock(state.player, 8); },
     upgrade: { name: 'Fortify+', description: 'Gain 11 Block.',
       effect(state) { applyBlock(state.player, 11); } },
   },
   stone_will: {
-    id: 'stone_will', name: 'Stone Will', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
+    id: 'stone_will', name: 'Stone Will', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Reduce Petrify by 5. Gain 4 Block.',
     effect(state) { reducePetrify(state.player, 5); applyBlock(state.player, 4); },
     upgrade: { name: 'Stone Will+', description: 'Reduce Petrify by 7. Gain 6 Block.',
       effect(state) { reducePetrify(state.player, 7); applyBlock(state.player, 6); } },
   },
   controlled_calcify: {
-    id: 'controlled_calcify', name: 'Controlled Calcify', cost: 1, type: 'skill', targetType: 'none', rarity: 'uncommon',
+    id: 'controlled_calcify', name: 'Controlled Calcify', cost: 1, type: 'skill', targetType: 'none', rarity: 'uncommon', colorless: true,
     description: 'Gain 6 Petrify. Gain Block equal to amount gained.',
     effect(state) { gainPetrify(state.player, 6); applyBlock(state.player, 6); },
     upgrade: { name: 'Controlled Calcify+', description: 'Gain 9 Petrify. Gain Block equal to amount gained.',

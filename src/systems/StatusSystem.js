@@ -16,14 +16,19 @@ export function tickPlayerStatuses(player) {
     gainPetrify(player, s.numbing);
     s.numbing = Math.max(0, s.numbing - 1);
   }
-  if (s.calcified > 0)  s.calcified--;
+  if (s.crumbling > 0) {
+    player.block = Math.max(0, (player.block || 0) - s.crumbling);
+    s.crumbling--;
+  }
+  if (s.calcified  > 0) s.calcified--;
   if (s.vulnerable > 0) s.vulnerable--;
+  if (s.anchored   > 0) s.anchored--;
 }
 
 export function tickEnemyStatuses(enemy) {
   const s = enemy.statusEffects;
   if (!s) return;
-  if (s.weak > 0)       s.weak--;
+  if (s.weak       > 0) s.weak--;
   if (s.vulnerable > 0) s.vulnerable--;
 }
 
@@ -35,6 +40,8 @@ const STATUS_META = {
   numbing:    { icon: '🫧', label: 'Numbing',     tooltip: n => `Numbing ${n}: Gain ${n} Petrify at start of your turn, then decrement.` },
   calcified:  { icon: '⛏️', label: 'Calcified',  tooltip: n => `Calcified ${n}: Unblocked HP damage also inflicts equal Petrify. ${n} turn(s) remaining.` },
   stoneCoat:  { icon: '🪨', label: 'Stone Coat', tooltip: n => `Stone Coat ${n}: Next ${n} Petrify you would gain becomes Block instead.` },
+  anchored:   { icon: '⚓', label: 'Anchored',   tooltip: n => `Anchored ${n}: Cannot reduce Petrify for ${n} more turn(s). Decrements each turn.` },
+  crumbling:  { icon: '💨', label: 'Crumbling',  tooltip: n => `Crumbling ${n}: Lose ${n} Block at the start of your turn. Decrements each turn.` },
 };
 
 export function formatStatuses(statusEffects) {

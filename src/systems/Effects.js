@@ -37,6 +37,7 @@ export function gainPetrify(player, amount) {
 }
 
 export function reducePetrify(player, amount) {
+  if ((player.statusEffects?.anchored ?? 0) > 0) return; // Anchored blocks all Petrify reduction
   player.petrify = Math.max(0, (player.petrify || 0) - amount);
 }
 

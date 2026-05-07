@@ -54,8 +54,13 @@ export function playCard(state, handIndex, targetIndex = 0) {
   }
   _log(state, msg);
 
-  if (card.exhaust) exhaustCard(combat.deckState, handIndex);
-  else              discardCard(combat.deckState, handIndex);
+  // Re-find card by reference: effects like Sanctify may splice the hand,
+  // invalidating the original handIndex.
+  const newIdx = combat.deckState.hand.indexOf(card);
+  if (newIdx !== -1) {
+    if (card.exhaust) exhaustCard(combat.deckState, newIdx);
+    else              discardCard(combat.deckState, newIdx);
+  }
 
   triggerRelics('onCardPlayed', state, { card });
   _triggerPowers(state, 'onCardPlayed', { card });

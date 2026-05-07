@@ -25,7 +25,7 @@ export const CharacterSelectScreen = {
                 <span class="deck-preview-label">Starter deck:</span>
                 ${_deckPreview(c)}
               </div>
-              <button class="btn-primary char-select-btn" data-id="${c.id}">Select ${c.name}</button>
+              <button class="btn-primary char-select-btn" data-id="${c.id}">Play as ${c.name}</button>
             </div>
           `).join('')}
           <div class="char-card char-locked">

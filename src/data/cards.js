@@ -126,7 +126,7 @@ export const cardDefs = {
       effect(state) { gainPetrify(state.player, 9); applyBlock(state.player, 9); } },
   },
 
-  // ── Sister Vael unique ────────────────────────────────────────────────────
+  // ── Mint unique ───────────────────────────────────────────────────────────
 
   purifying_touch: {
     id: 'purifying_touch', name: 'Purifying Touch', cost: 1, type: 'attack', targetType: 'enemy',

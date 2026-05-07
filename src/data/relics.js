@@ -2,7 +2,7 @@ import { reducePetrify, applyBlock, gainPetrify } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 
 export const relicDefs = {
-  // ── Sister Vael's starting relic ─────────────────────────────────────────
+  // ── Mint's starting relic ────────────────────────────────────────────────
   stone_veil: {
     id: 'stone_veil',
     name: 'Stone Veil',

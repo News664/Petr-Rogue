@@ -22,6 +22,7 @@ export const CombatScreen = {
 
 function _petrifyStage(player) {
   const ratio = player.petrify / Math.max(1, player.hp);
+  if (ratio >= 0.90) return 100;
   if (ratio >= 0.75) return 75;
   if (ratio >= 0.50) return 50;
   if (ratio >= 0.25) return 25;
@@ -30,7 +31,7 @@ function _petrifyStage(player) {
 
 function _renderPortrait(player) {
   const stage  = _petrifyStage(player);
-  const charId = player.characterId ?? 'vael';
+  const charId = player.characterId ?? 'mint';
   const pct    = Math.round(player.petrify / Math.max(1, player.hp) * 100);
   const cls    = pct >= 75 ? 'portrait-danger' : pct >= 50 ? 'portrait-warn' : '';
   return `
@@ -48,7 +49,7 @@ function _renderPortrait(player) {
 
 function _renderSpriteArea(player) {
   const pct    = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
-  const charId = player.characterId ?? 'vael';
+  const charId = player.characterId ?? 'mint';
   return `
     <div class="player-sprite-area">
       <div class="sprite-wrap">

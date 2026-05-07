@@ -2,9 +2,9 @@ import { makeCard } from './cards.js';
 import { makeRelic } from './relics.js';
 
 export const characterDefs = {
-  vael: {
-    id: 'vael',
-    name: 'Sister Vael',
+  mint: {
+    id: 'mint',
+    name: 'Mint',
     title: 'The Purifier',
     flavor: 'A former stone-cult priestess who turned the rites against themselves. She converts petrification into power — damage through cleansing.',
     hp: 68,
@@ -24,7 +24,7 @@ export const characterDefs = {
       'bash', 'stone_strike', 'stone_skin', 'shatter', 'calcify',
       'purify', 'petrify_surge', 'gravel_shot', 'fortify',
       'stone_will', 'controlled_calcify',
-      // Vael unique
+      // Mint unique
       'purifying_touch', 'holy_light', 'holy_surge', 'purifying_nova',
       'stone_tithe', 'consecrate', 'sanctuary', 'petrify_ward',
       'stone_coat', 'sacred_ground',

@@ -13,7 +13,8 @@ export const CombatScreen = {
     _container = el;
     _selectedHandIndex = null;
     _source = source;
-    startCombat(GameState, enemyIds);
+    const startResult = startCombat(GameState, enemyIds);
+    if (startResult?.event === 'game_over') { _handleResult(startResult); return; }
     _render();
   },
   teardown() { _container = null; _selectedHandIndex = null; },

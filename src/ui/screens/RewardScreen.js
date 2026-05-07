@@ -48,8 +48,6 @@ function _render(source) {
       addRelicToPlayer(GameState, _relic);
       _relic = null;
       _container.querySelector('.relic-reward').innerHTML =
-        `<p class="relic-taken">✅ ${_relic === null ? 'Relic added to your collection.' : ''}</p>`;
-      _container.querySelector('.relic-reward').innerHTML =
         `<p class="relic-taken">✅ Relic added to your collection.</p>`;
     });
   }

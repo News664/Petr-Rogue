@@ -17,7 +17,7 @@ export function startCombat(state, enemyIds) {
     activePowers: [],
   };
   triggerRelics('onCombatStart', state);
-  _startPlayerTurn(state);
+  return _startPlayerTurn(state); // propagates game_over if Numbing kills on turn 1
 }
 
 export function playCard(state, handIndex, targetIndex = 0) {
@@ -93,7 +93,8 @@ function _runEnemyTurn(state) {
 
   if (combat.enemies.every(e => e.hp <= 0)) return { event: 'victory' };
 
-  _startPlayerTurn(state);
+  const turnResult = _startPlayerTurn(state);
+  if (turnResult?.event === 'game_over') return turnResult;
   return { event: 'player_turn' };
 }
 

@@ -181,13 +181,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .reward-cards .card-desc, .shop-cards .card-desc  { font-size: 0.8rem; }
 
 /* ── Enemies ── */
-.enemies-area {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  padding: 24px 16px 16px;
-  min-height: 160px;
-}
 .enemy {
   display: flex;
   flex-direction: column;
@@ -788,3 +781,98 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Deck overlay z-index for hidden class ── */
 .hidden { display: none !important; }
+
+/* ── Portrait panel (left of combat screen) ── */
+.portrait-panel {
+  width: 190px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 12px 8px 8px;
+  gap: 8px;
+}
+.portrait-img-wrap {
+  width: 170px;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--surface2);
+  min-height: 260px;
+}
+.portrait-img {
+  width: 170px;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  border-radius: 4px;
+  transition: opacity 0.4s;
+}
+.portrait-pct {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: bold;
+  text-align: center;
+  min-height: 18px;
+  letter-spacing: 0.5px;
+}
+.portrait-warn   { color: var(--petrify); }
+.portrait-danger { color: var(--danger); animation: danger-pulse 0.8s ease-in-out infinite alternate; }
+
+/* ── Combat field: player sprite beside enemies ── */
+.combat-field {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  min-height: 200px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.player-sprite-area {
+  width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px 8px 0;
+}
+.sprite-wrap {
+  position: relative;
+  width: 130px;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sprite-img {
+  width: 130px;
+  height: 200px;
+  object-fit: contain;
+  object-position: bottom;
+  display: block;
+}
+.petrify-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(140, 130, 120, 0.58);
+  mix-blend-mode: luminosity;
+  pointer-events: none;
+  transition: height 0.5s ease;
+  border-radius: 0 0 2px 2px;
+}
+.enemies-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 20px 16px 16px;
+  min-height: 200px;
+}

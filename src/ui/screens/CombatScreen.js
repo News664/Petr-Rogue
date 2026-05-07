@@ -20,19 +20,64 @@ export const CombatScreen = {
   teardown() { _container = null; _selectedHandIndex = null; },
 };
 
+function _petrifyStage(player) {
+  const ratio = player.petrify / Math.max(1, player.hp);
+  if (ratio >= 0.75) return 75;
+  if (ratio >= 0.50) return 50;
+  if (ratio >= 0.25) return 25;
+  return 0;
+}
+
+function _renderPortrait(player) {
+  const stage  = _petrifyStage(player);
+  const charId = player.characterId ?? 'vael';
+  const pct    = Math.round(player.petrify / Math.max(1, player.hp) * 100);
+  const cls    = pct >= 75 ? 'portrait-danger' : pct >= 50 ? 'portrait-warn' : '';
+  return `
+    <div class="portrait-panel">
+      <div class="portrait-img-wrap">
+        <img class="portrait-img"
+             src="assets/${charId}/Portrait_${stage}.png"
+             alt="portrait"
+             onerror="this.style.visibility='hidden'">
+      </div>
+      <div class="portrait-pct ${cls}">${pct > 0 ? `Petrify ${pct}%` : ''}</div>
+    </div>
+  `;
+}
+
+function _renderSpriteArea(player) {
+  const pct    = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
+  const charId = player.characterId ?? 'vael';
+  return `
+    <div class="player-sprite-area">
+      <div class="sprite-wrap">
+        <img class="sprite-img"
+             src="assets/${charId}/sprite.png"
+             alt=""
+             onerror="this.style.visibility='hidden'">
+        <div class="petrify-mask" style="height:${pct}%"></div>
+      </div>
+    </div>
+  `;
+}
+
 function _render() {
   const { player, combat } = GameState;
   const { enemies, deckState, energy, maxEnergy, log, activePowers } = combat;
 
   const TYPE_COLOR = { attack: 'var(--card-attack)', skill: 'var(--card-skill)', power: 'var(--card-power)' };
-  // Show last 7 log entries, oldest at top, newest at bottom
   const logEntries = log.slice(-7);
 
   _container.innerHTML = `
     <div class="combat-screen">
+      ${_renderPortrait(player)}
       <div class="combat-main">
-        <div class="enemies-area">
-          ${enemies.map((e, i) => renderEnemy(e, i)).join('')}
+        <div class="combat-field">
+          ${_renderSpriteArea(player)}
+          <div class="enemies-area">
+            ${enemies.map((e, i) => renderEnemy(e, i)).join('')}
+          </div>
         </div>
         ${renderHUD(player)}
         <div class="energy-bar">
@@ -70,7 +115,6 @@ function _render() {
   `;
 
   _attachEvents();
-  // Scroll log to bottom so most recent entry is always visible
   const logEl = _container.querySelector('#log-entries');
   if (logEl) logEl.scrollTop = logEl.scrollHeight;
 }

@@ -6,6 +6,16 @@ import { eventDefs } from '../../data/events.js';
 
 let _container = null;
 
+// Node type accent colors
+const NODE_COLORS = {
+  combat: { bg: '#3a1a1a', border: '#8b3a3a', glow: '#8b3a3a' },
+  elite:  { bg: '#2a1a3a', border: '#7a4aaa', glow: '#9b5abf' },
+  rest:   { bg: '#2a2010', border: '#b07830', glow: '#c89040' },
+  shop:   { bg: '#1a2a1a', border: '#4a8a4a', glow: '#60aa60' },
+  event:  { bg: '#102030', border: '#3a7aaa', glow: '#4a9acd' },
+  boss:   { bg: '#3a0808', border: '#cc2222', glow: '#ff3333' },
+};
+
 export const MapScreen = {
   init(el) { _container = el; _render(); },
   teardown() { _container = null; },
@@ -15,52 +25,72 @@ function _render() {
   const { map } = GameState;
   const available     = getAvailableNodes(map);
   const availableKeys = new Set(available.map(n => `${n.floor},${n.col}`));
+  const floor = map.currentCol === null ? -1 : map.currentFloor;
 
-  let html = `
+  _container.innerHTML = `
     <div class="map-screen">
-      <h2>Map</h2>
-      <div class="map-grid" id="map-grid">
+      <div class="map-header">
+        <span class="map-title">⛰️ The Descent</span>
+        <span class="map-floor-info">${floor >= 0 ? `Floor ${floor + 1} / ${FLOORS}` : 'Choose your first path'}</span>
+      </div>
+      <div class="map-scroll" id="map-scroll">
+        <div class="map-grid" id="map-grid">
+          ${_buildRows(map, availableKeys)}
+        </div>
+      </div>
+    </div>
   `;
 
-  // Render top-to-bottom (boss at top, floor 0 at bottom)
+  _container.querySelectorAll('.map-node.available').forEach(el => {
+    el.addEventListener('click', () => _enterNode(Number(el.dataset.floor), Number(el.dataset.col)));
+  });
+
+  requestAnimationFrame(() => {
+    _drawConnections(map, availableKeys);
+    // Scroll so the player sees their current position (bottom = start)
+    const scroll = _container.querySelector('#map-scroll');
+    if (scroll) scroll.scrollTop = scroll.scrollHeight;
+  });
+}
+
+function _buildRows(map, availableKeys) {
+  let html = '';
   for (let f = map.floors.length - 1; f >= 0; f--) {
-    html += `<div class="map-floor-row" data-floor="${f}"><div class="map-floor-label">F${f + 1}</div><div class="map-row">`;
+    html += `<div class="map-floor-row" data-floor="${f}">`;
+    html += `<div class="map-floor-label">F${f + 1}</div>`;
+    html += `<div class="map-row">`;
     for (const node of map.floors[f]) {
       const key       = `${node.floor},${node.col}`;
       const isAvail   = availableKeys.has(key);
       const isVisited = map.visitedNodes.includes(key);
       const isCurrent = map.currentCol !== null && node.floor === map.currentFloor && node.col === map.currentCol;
       const meta      = NODE_META[node.type] ?? { icon: '?', label: node.type };
-      const cls = ['map-node',
+      const colors    = NODE_COLORS[node.type] ?? NODE_COLORS.combat;
+      const cls = ['map-node', node.type,
         isAvail   ? 'available' : '',
         isVisited ? 'visited'   : '',
         isCurrent ? 'current'   : '',
       ].filter(Boolean).join(' ');
-      html += `<div class="${cls}" data-floor="${node.floor}" data-col="${node.col}" title="${meta.label}">${meta.icon}</div>`;
+      const style = isAvail || isCurrent
+        ? `--nb:${colors.border};--ng:${colors.glow};--nbg:${colors.bg}`
+        : '';
+      html += `<div class="${cls}" data-floor="${node.floor}" data-col="${node.col}"
+                    data-tooltip="${meta.label}" style="${style}">
+                 <span class="node-icon">${meta.icon}</span>
+               </div>`;
     }
-    html += '</div></div>';
+    html += `</div></div>`;
   }
-
-  html += '</div></div>';
-  _container.innerHTML = html;
-
-  _container.querySelectorAll('.map-node.available').forEach(el => {
-    el.addEventListener('click', () => _enterNode(Number(el.dataset.floor), Number(el.dataset.col)));
-  });
-
-  // Draw connection lines after layout has been calculated
-  requestAnimationFrame(_drawConnections);
+  return html;
 }
 
-function _drawConnections() {
+function _drawConnections(map, availableKeys) {
   const grid = _container?.querySelector('#map-grid');
   if (!grid) return;
+  grid.querySelector('.map-svg')?.remove();
 
   const gridRect = grid.getBoundingClientRect();
   if (gridRect.width === 0) return;
-
-  // Remove any existing SVG
-  grid.querySelector('.map-svg')?.remove();
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('map-svg');
@@ -70,9 +100,14 @@ function _drawConnections() {
   grid.style.position = 'relative';
   grid.insertBefore(svg, grid.firstChild);
 
-  const { map } = GameState;
-  const available     = getAvailableNodes(map);
-  const availableKeys = new Set(available.map(n => `${n.floor},${n.col}`));
+  // Defs for glow filter
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <filter id="line-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+  svg.appendChild(defs);
 
   for (let f = 0; f < map.floors.length - 1; f++) {
     for (const node of map.floors[f]) {
@@ -83,25 +118,33 @@ function _drawConnections() {
 
         const fr = fromEl.getBoundingClientRect();
         const tr = toEl.getBoundingClientRect();
-
         const x1 = fr.left - gridRect.left + fr.width  / 2;
         const y1 = fr.top  - gridRect.top  + fr.height / 2;
         const x2 = tr.left - gridRect.left + tr.width  / 2;
         const y2 = tr.top  - gridRect.top  + tr.height / 2;
 
-        // Determine line style based on node state
         const fromKey = `${f},${node.col}`;
         const toKey   = `${conn.floor},${conn.col}`;
-        const isActive = availableKeys.has(toKey) && (map.visitedNodes.includes(fromKey) || map.currentCol === null);
         const isVisited = map.visitedNodes.includes(fromKey) && map.visitedNodes.includes(toKey);
+        const isActive  = availableKeys.has(toKey) && (map.visitedNodes.includes(fromKey) || map.currentCol === null);
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', isVisited ? '#5a5248' : isActive ? '#27ae60' : '#2e2a26');
-        line.setAttribute('stroke-width', isActive ? '2' : '1.5');
-        if (!isVisited && !isActive) line.setAttribute('stroke-dasharray', '4 3');
-        svg.appendChild(line);
+        // Bezier curve — control point arcs slightly sideways
+        const mx = (x1 + x2) / 2 + (x2 - x1) * 0.15;
+        const my = (y1 + y2) / 2;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M${x1},${y1} Q${mx},${my} ${x2},${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-width', isActive ? '2.5' : '1.5');
+        if (isVisited) {
+          path.setAttribute('stroke', '#5a5248');
+        } else if (isActive) {
+          path.setAttribute('stroke', '#c8a96e');
+          path.setAttribute('filter', 'url(#line-glow)');
+        } else {
+          path.setAttribute('stroke', '#2e2a26');
+          path.setAttribute('stroke-dasharray', '5 4');
+        }
+        svg.appendChild(path);
       }
     }
   }

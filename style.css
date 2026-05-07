@@ -316,51 +316,94 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .game-over p, .victory-screen p { color: var(--text-muted); max-width: 480px; line-height: 1.6; font-style: italic; }
 
 /* ── Map ── */
+/* ── Map Screen ── */
 .map-screen {
-  padding: 20px;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 100%, #1a1410 0%, #0d0b09 100%);
 }
-.map-screen h2 { color: var(--accent); margin-bottom: 4px; }
-.map-subtitle  { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+.map-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 24px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1a1610 0%, transparent 100%);
+}
+.map-title      { font-size: 1.2rem; color: var(--accent); font-weight: bold; letter-spacing: 1px; }
+.map-floor-info { font-size: 0.8rem; color: var(--text-muted); }
+.map-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 0 32px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
 .map-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  align-items: center;
+}
+.map-floor-row  { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
+.map-floor-label {
+  font-size: 0.58rem;
+  color: #4a4540;
+  width: 22px;
+  text-align: right;
+  flex-shrink: 0;
 }
 .map-row {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
 }
 .map-node {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
   background: var(--surface2);
-  font-size: 1.1rem;
   cursor: default;
-  opacity: 0.35;
-  transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+  opacity: 0.28;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
   position: relative;
 }
-.map-node.visited { opacity: 0.5; border-color: var(--text-muted); }
-.map-node.current { opacity: 1; border-color: var(--accent); box-shadow: 0 0 8px #c8a96e60; }
+.node-icon { font-size: 1.3rem; line-height: 1; }
+.map-node.visited {
+  opacity: 0.45;
+  border-color: #3a3530;
+}
+.map-node.current {
+  opacity: 1;
+  border-color: var(--nb, var(--accent));
+  background: var(--nbg, var(--surface2));
+  box-shadow: 0 0 12px var(--ng, var(--accent)), inset 0 0 8px #ffffff08;
+  animation: node-pulse 1.6s ease-in-out infinite alternate;
+}
 .map-node.available {
   opacity: 1;
   cursor: pointer;
-  border-color: var(--hp-green);
-  box-shadow: 0 0 6px #27ae6050;
+  border-color: var(--nb, var(--border));
+  background: var(--nbg, var(--surface2));
+  box-shadow: 0 0 8px var(--ng, transparent);
 }
-.map-node.available:hover { transform: scale(1.15); border-color: var(--accent); }
-.map-floor-label {
-  text-align: center;
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  margin-bottom: 2px;
+.map-node.available:hover {
+  transform: scale(1.18);
+  box-shadow: 0 0 18px var(--ng, var(--accent));
+  z-index: 2;
+}
+@keyframes node-pulse {
+  from { box-shadow: 0 0 8px var(--ng, var(--accent)); }
+  to   { box-shadow: 0 0 22px var(--ng, var(--accent)), 0 0 4px #ffffff30; }
 }
 
 /* ── Reward Screen ── */
@@ -639,17 +682,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   white-space: nowrap;
 }
 
-/* ── Status badge tooltips ── */
-.status-badge {
-  position: relative;
-  cursor: help;
-}
-.status-badge[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+/* ── Status badge tooltips (global fixed div — see main.js) ── */
+.status-badge { cursor: help; }
+
+.global-tooltip {
+  position: fixed;
+  z-index: 9999;
   background: var(--surface);
   border: 1px solid var(--accent);
   padding: 5px 9px;
@@ -657,10 +695,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   font-size: 0.72rem;
   color: var(--text);
   white-space: nowrap;
-  z-index: 200;
   pointer-events: none;
   box-shadow: 0 4px 12px #00000060;
+  opacity: 0;
+  transition: opacity 0.1s;
 }
+.global-tooltip.visible { opacity: 1; }
 
 /* ── Deck overlay / viewer ── */
 .deck-overlay {
@@ -811,14 +851,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 /* ── Map SVG connection layer ── */
 .map-grid { position: relative; }
 .map-svg  { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
-.map-floor-row { display: flex; align-items: center; gap: 4px; }
-.map-floor-label {
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  width: 24px;
-  text-align: right;
-  flex-shrink: 0;
-}
 
 /* ── Deck overlay z-index for hidden class ── */
 .hidden { display: none !important; }

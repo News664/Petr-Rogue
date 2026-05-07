@@ -11,6 +11,26 @@ import { updateStatusBar }       from './ui/components/StatusBar.js';
 const container   = document.getElementById('screen-container');
 const statusBarEl = document.getElementById('status-bar');
 
+// Global tooltip: fixed-position div so it is never clipped by any overflow ancestor.
+const _tip = document.getElementById('global-tooltip');
+document.addEventListener('mouseover', e => {
+  const badge = e.target.closest('[data-tooltip]');
+  if (!badge) return;
+  _tip.textContent = badge.dataset.tooltip;
+  _tip.classList.add('visible');
+});
+document.addEventListener('mousemove', e => {
+  if (!_tip.classList.contains('visible')) return;
+  const x = e.clientX, y = e.clientY;
+  const tw = _tip.offsetWidth, th = _tip.offsetHeight;
+  _tip.style.left = `${Math.min(x - tw / 2, window.innerWidth - tw - 8)}px`;
+  _tip.style.top  = `${y - th - 10}px`;
+});
+document.addEventListener('mouseout', e => {
+  if (!e.target.closest('[data-tooltip]')) return;
+  _tip.classList.remove('visible');
+});
+
 initRouter(container, {
   CharacterSelectScreen,
   MapScreen,

@@ -1,12 +1,14 @@
-// Renders the player status bar — the three-segment petrify/HP visualization
+import { formatStatuses } from '../../systems/StatusSystem.js';
+
 export function renderHUD(player) {
-  const { hp, maxHp, petrify, block, gold } = player;
+  const { hp, maxHp, petrify, block, gold, statusEffects } = player;
 
   const pctPetrify = Math.min(100, (petrify / maxHp) * 100);
-  const pctSafe    = Math.max(0, ((hp - petrify) / maxHp) * 100);
-  const pctMissing = Math.max(0, 100 - pctPetrify - pctSafe);
+  const pctSafe    = Math.max(0,   ((hp - petrify) / maxHp) * 100);
+  const pctMissing = Math.max(0,   100 - pctPetrify - pctSafe);
+  const danger     = petrify > 0 && (hp - petrify) <= 10;
 
-  const danger = petrify > 0 && (hp - petrify) <= 10;
+  const statuses = formatStatuses(statusEffects);
 
   return `
     <div class="hud${danger ? ' hud-danger' : ''}">
@@ -24,6 +26,7 @@ export function renderHUD(player) {
       <div class="hud-stats">
         ${block > 0 ? `<span class="stat-block">🛡️ ${block}</span>` : ''}
         <span class="stat-gold">💰 ${gold}</span>
+        ${statuses ? `<span class="hud-statuses">${statuses}</span>` : ''}
       </div>
     </div>
   `;

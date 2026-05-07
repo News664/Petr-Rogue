@@ -415,3 +415,156 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 .event-choice strong { color: var(--text); }
 .event-choice span   { color: var(--text-muted); font-size: 0.8rem; }
+
+/* ── Status badges ── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  padding: 1px 5px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  margin-right: 3px;
+  font-weight: bold;
+}
+.status-weak       { border-color: #e74c3c; color: #e74c3c; }
+.status-vulnerable { border-color: #e67e22; color: #e67e22; }
+.status-numbing    { border-color: #85c1e9; color: #85c1e9; }
+.status-calcified  { border-color: var(--petrify); color: var(--petrify); }
+.status-stoneCoat  { border-color: #52be80; color: #52be80; }
+
+.hud-statuses       { display: inline-flex; flex-wrap: wrap; gap: 3px; }
+.enemy-statuses     { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-bottom: 2px; }
+
+.hud-danger .hud-bar { animation: danger-pulse 0.8s ease-in-out infinite alternate; }
+@keyframes danger-pulse { from { box-shadow: 0 0 0 0 transparent; } to { box-shadow: 0 0 6px 2px #c0392b80; } }
+
+/* ── Power badge (active powers in combat) ── */
+.power-badge {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--card-power);
+  color: #e0d0ff;
+  border: 1px solid #8e44ad;
+}
+
+/* ── Character select ── */
+.char-select-screen {
+  padding: 30px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.char-select-screen h1 { color: var(--accent); font-size: 2rem; }
+.char-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+.char-card {
+  width: 260px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+.char-card:hover:not(.char-locked) { border-color: var(--accent); }
+.char-locked { opacity: 0.4; }
+.char-portrait { font-size: 3rem; text-align: center; }
+.char-name  { font-size: 1.2rem; font-weight: bold; color: var(--accent); text-align: center; }
+.char-title { font-size: 0.8rem; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+.char-flavor { font-size: 0.8rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
+.char-stats { display: flex; gap: 12px; font-size: 0.85rem; justify-content: center; }
+.char-relic-hint { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+.char-deck-preview { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.deck-pip {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.deck-preview-label { font-size: 0.7rem; color: var(--text-muted); width: 100%; text-align: center; }
+.char-select-btn { margin-top: 8px; width: 100%; }
+
+/* ── Upgrade / remove card picker ── */
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+}
+.upgrade-item {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 2px 10px;
+  padding: 10px 14px;
+  text-align: left;
+  align-items: center;
+}
+.upgrade-from  { font-weight: bold; color: var(--text-muted); }
+.upgrade-arrow { color: var(--accent); font-size: 1.1rem; }
+.upgrade-to    { font-weight: bold; color: var(--accent); }
+.upgrade-desc  { grid-column: 1 / -1; font-size: 0.75rem; color: var(--text-muted); }
+
+/* ── Reward screen relic section ── */
+.relic-reward { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.relic-reward h3 { color: var(--accent); }
+.relic-card {
+  background: var(--surface2);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 14px 20px;
+  cursor: pointer;
+  text-align: center;
+  max-width: 300px;
+  transition: box-shadow 0.2s;
+}
+.relic-card:hover { box-shadow: 0 0 12px #c8a96e60; }
+.relic-name { font-size: 1rem; font-weight: bold; color: var(--accent); margin-bottom: 4px; }
+.relic-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+.relic-taken { color: var(--hp-green); font-size: 0.9rem; }
+
+/* ── Relic display strip (HUD extension for run-wide relics) ── */
+.relic-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.relic-pip {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  color: var(--accent);
+  cursor: default;
+}
+.relic-pip:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 10;
+  margin-top: 20px;
+}

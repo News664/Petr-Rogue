@@ -1,17 +1,16 @@
 import { initRouter, navigate } from './router.js';
-import { MapScreen } from './ui/screens/MapScreen.js';
-import { CombatScreen } from './ui/screens/CombatScreen.js';
-import { RewardScreen } from './ui/screens/RewardScreen.js';
-import { RestScreen } from './ui/screens/RestScreen.js';
-import { ShopScreen } from './ui/screens/ShopScreen.js';
-import { EventScreen } from './ui/screens/EventScreen.js';
-import { GameState } from './state/GameState.js';
-import { createPlayer } from './state/Player.js';
-import { generateMap } from './systems/MapSystem.js';
+import { CharacterSelectScreen } from './ui/screens/CharacterSelectScreen.js';
+import { MapScreen }             from './ui/screens/MapScreen.js';
+import { CombatScreen }          from './ui/screens/CombatScreen.js';
+import { RewardScreen }          from './ui/screens/RewardScreen.js';
+import { RestScreen }            from './ui/screens/RestScreen.js';
+import { ShopScreen }            from './ui/screens/ShopScreen.js';
+import { EventScreen }           from './ui/screens/EventScreen.js';
 
 const container = document.getElementById('screen-container');
 
 initRouter(container, {
+  CharacterSelectScreen,
   MapScreen,
   CombatScreen,
   RewardScreen,
@@ -29,14 +28,9 @@ function showMenu() {
       <button id="new-run" class="btn-primary">New Run</button>
     </div>
   `;
-  document.getElementById('new-run').addEventListener('click', startNewRun);
-}
-
-function startNewRun() {
-  GameState.player = createPlayer();
-  GameState.map = generateMap();
-  GameState.combat = null;
-  navigate('MapScreen');
+  document.getElementById('new-run').addEventListener('click', () => {
+    navigate('CharacterSelectScreen');
+  });
 }
 
 showMenu();

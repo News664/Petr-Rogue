@@ -1,5 +1,7 @@
 import { gainPetrify, reducePetrify, healPlayer } from '../systems/Effects.js';
+import { applyStatus } from '../systems/StatusSystem.js';
 import { makeCard } from './cards.js';
+import { makeRelic, relicDropPool } from './relics.js';
 
 export const eventDefs = [
   {
@@ -117,6 +119,49 @@ export const eventDefs = [
           state.player.gold += 15;
           gainPetrify(state.player, 6);
         },
+      },
+    ],
+  },
+  {
+    id: 'stone_shrine',
+    title: 'Stone Shrine',
+    text: 'A small shrine of polished obsidian stands untouched amid the rubble. A single relic rests on its surface, waiting. Taking it feels like a pact.',
+    choices: [
+      {
+        label: 'Take the relic (+10 Petrify)',
+        description: 'Gain a random relic. Gain 10 Petrify.',
+        effect(state) {
+          const id = relicDropPool[Math.floor(Math.random() * relicDropPool.length)];
+          state.player.relics.push(makeRelic(id));
+          gainPetrify(state.player, 10);
+        },
+      },
+      {
+        label: 'Smash the shrine (+30 Gold)',
+        description: 'Gain 30 Gold.',
+        effect(state) { state.player.gold += 30; },
+      },
+      {
+        label: 'Leave it',
+        description: 'Nothing happens.',
+        effect() {},
+      },
+    ],
+  },
+  {
+    id: 'numbing_fog',
+    title: 'Numbing Fog',
+    text: 'A grey mist fills the corridor ahead. You can push through quickly or wait for it to pass — but waiting costs time, and something stirs in the dark behind you.',
+    choices: [
+      {
+        label: 'Push through (Numbing 3)',
+        description: 'Gain Numbing 3 — you will gain 3 Petrify at the start of your next three turns.',
+        effect(state) { applyStatus(state.player, 'numbing', 3); },
+      },
+      {
+        label: 'Wait it out (lose 10 HP)',
+        description: 'Take 10 damage to avoid the fog.',
+        effect(state) { state.player.hp = Math.max(1, state.player.hp - 10); },
       },
     ],
   },

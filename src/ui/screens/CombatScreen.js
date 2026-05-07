@@ -22,7 +22,6 @@ export const CombatScreen = {
 
 function _petrifyStage(player) {
   const ratio = player.petrify / Math.max(1, player.hp);
-  if (ratio >= 0.90) return 100;
   if (ratio >= 0.75) return 75;
   if (ratio >= 0.50) return 50;
   if (ratio >= 0.25) return 25;
@@ -202,8 +201,13 @@ function _showGameOver(cause) {
     petrify: { title: 'Fully Petrified',   body: 'Stone crept through your veins until nothing remained but a silent statue. You will stand here forever, deep beneath the earth.' },
   };
   const { title, body } = msg[cause] ?? msg.hp;
+  const charId = GameState.player?.characterId ?? 'mint';
+  const portrait = cause === 'petrify'
+    ? `<img class="game-over-portrait" src="assets/${charId}/Portrait_100.png" alt="" onerror="this.style.display='none'">`
+    : '';
   _container.innerHTML = `
     <div class="game-over">
+      ${portrait}
       <h1>${title}</h1>
       <p>${body}</p>
       <button id="restart">Return to Menu</button>

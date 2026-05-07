@@ -310,6 +310,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   text-align: center;
   padding: 40px;
 }
+.game-over-portrait { width: 220px; border-radius: 8px; opacity: 0.9; }
 .game-over h1   { font-size: 3rem; color: var(--danger); }
 .victory-screen h1 { font-size: 3rem; color: var(--accent); }
 .game-over p, .victory-screen p { color: var(--text-muted); max-width: 480px; line-height: 1.6; font-style: italic; }

@@ -1,7 +1,7 @@
 import { checkDeathCause } from '../state/Player.js';
 import { createDeckState, drawCards, discardCard, discardHand, exhaustCard } from './DeckSystem.js';
 import { triggerRelics } from './RelicSystem.js';
-import { tickPlayerStatuses, tickEnemyStatuses } from './StatusSystem.js';
+import { tickPlayerStatuses, tickEnemyStatuses, tickCrumblingOnEnemyTurn } from './StatusSystem.js';
 import { createEnemyInstance } from '../data/enemies.js';
 
 const LOG_LIMIT = 40;
@@ -46,7 +46,6 @@ export function playCard(state, handIndex, targetIndex = 0) {
   const hpBefore      = target?.hp;
   card.effect(state, target);
 
-  // Build a human-readable log entry
   let msg = `You played ${card.name}.`;
   if (target && hpBefore !== undefined) {
     const dmgDealt = hpBefore - Math.max(0, target.hp);
@@ -58,8 +57,6 @@ export function playCard(state, handIndex, targetIndex = 0) {
   }
   _log(state, msg);
 
-  // Re-find card by reference: effects like Sanctify may splice the hand,
-  // invalidating the original handIndex.
   const newIdx = combat.deckState.hand.indexOf(card);
   if (newIdx !== -1) {
     if (card.exhaust) exhaustCard(combat.deckState, newIdx);
@@ -105,7 +102,7 @@ function _startPlayerTurn(state) {
   if (cause) return { event: 'game_over', cause };
 
   _log(state, `— Turn ${combat.turn} —`);
-  drawCards(combat.deckState, 5);
+  drawCards(combat.deckState, 5, state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }
@@ -114,10 +111,16 @@ function _runEnemyTurn(state) {
   const { combat, player } = state;
   combat.phase = 'enemy';
 
+  // Crumbling bites into block the player built this turn.
+  tickCrumblingOnEnemyTurn(player);
+
   for (const enemy of combat.enemies) {
     if (enemy.hp <= 0) continue;
     enemy.block = 0;
     tickEnemyStatuses(enemy);
+
+    // HP-threshold phase transitions checked every turn (not only via intent).
+    if (enemy.onPhaseCheck) enemy.onPhaseCheck(enemy, player, state);
 
     const intent     = enemy.intents[enemy.intentIndex];
     const hpBefore   = player.hp;

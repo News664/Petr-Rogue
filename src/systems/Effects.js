@@ -4,6 +4,7 @@
 export function applyDamage(target, amount, attacker = null) {
   let actual = amount;
   if (attacker?.statusEffects?.weak > 0)       actual = Math.floor(actual * 0.75);
+  if (attacker?._strength > 0)                 actual += attacker._strength;
   if (target.statusEffects?.vulnerable > 0)    actual = Math.floor(actual * 1.5);
 
   const absorbed  = Math.min(target.block || 0, actual);
@@ -11,7 +12,6 @@ export function applyDamage(target, amount, attacker = null) {
   const unblocked = actual - absorbed;
   target.hp      -= unblocked;
 
-  // Calcified: mirror unblocked HP damage as Petrify gain (routed through gainPetrify so Stone Coat applies)
   if (unblocked > 0 && (target.statusEffects?.calcified ?? 0) > 0) {
     gainPetrify(target, unblocked);
   }
@@ -24,8 +24,8 @@ export function applyBlock(entity, amount) {
 }
 
 // Stone Coat intercepts Petrify gain and converts stacks to Block first
-export function gainPetrify(player, amount) {
-  let remaining = amount;
+export function gainPetrify(player, amount, source = null) {
+  let remaining = amount + (source?._petrifyPower ?? 0);
   const coat = player.statusEffects?.stoneCoat ?? 0;
   if (remaining > 0 && coat > 0) {
     const absorbed = Math.min(coat, remaining);
@@ -37,7 +37,7 @@ export function gainPetrify(player, amount) {
 }
 
 export function reducePetrify(player, amount) {
-  if ((player.statusEffects?.anchored ?? 0) > 0) return; // Anchored blocks all Petrify reduction
+  if ((player.statusEffects?.anchored ?? 0) > 0) return;
   player.petrify = Math.max(0, (player.petrify || 0) - amount);
 }
 

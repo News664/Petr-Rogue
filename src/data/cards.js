@@ -42,6 +42,7 @@ export const cardDefs = {
   shatter: {
     id: 'shatter', name: 'Shatter', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon', colorless: true,
     description: 'Deal damage equal to your Petrify. Halve your Petrify.',
+    shortDescription: 'Deal Petrify as dmg. Halve Petrify.',
     effect(state, target) {
       applyDamage(target, state.player.petrify, state.player);
       reducePetrify(state.player, Math.floor(state.player.petrify / 2));
@@ -68,6 +69,7 @@ export const cardDefs = {
   gravel_shot: {
     id: 'gravel_shot', name: 'Gravel Shot', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common', colorless: true,
     description: 'Deal 5 damage. If Petrify ≥ 15, deal 10 damage instead.',
+    shortDescription: 'Deal 5 dmg (10 if Petrify ≥ 15).',
     effect(state, target) { applyDamage(target, state.player.petrify >= 15 ? 10 : 5, state.player); },
     upgrade: { name: 'Gravel Shot+', description: 'Deal 8 damage. If Petrify ≥ 15, deal 15 instead.',
       effect(state, target) { applyDamage(target, state.player.petrify >= 15 ? 15 : 8, state.player); } },
@@ -75,6 +77,7 @@ export const cardDefs = {
   stone_skin: {
     id: 'stone_skin', name: 'Stone Skin', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 5 Block. If Petrify ≥ 20, gain 12 Block instead.',
+    shortDescription: 'Gain 5 Block (12 if Petrify ≥ 20).',
     effect(state) { applyBlock(state.player, state.player.petrify >= 20 ? 12 : 5); },
     upgrade: { name: 'Stone Skin+', description: 'Gain 7 Block. If Petrify ≥ 20, gain 16 Block instead.',
       effect(state) { applyBlock(state.player, state.player.petrify >= 20 ? 16 : 7); } },
@@ -110,6 +113,7 @@ export const cardDefs = {
   controlled_calcify: {
     id: 'controlled_calcify', name: 'Controlled Calcify', cost: 1, type: 'skill', targetType: 'none', rarity: 'uncommon', colorless: true,
     description: 'Gain 6 Petrify. Gain Block equal to amount gained.',
+    shortDescription: 'Gain 6 Petrify + equal Block.',
     effect(state) { gainPetrify(state.player, 6); applyBlock(state.player, 6); },
     upgrade: { name: 'Controlled Calcify+', description: 'Gain 9 Petrify. Gain Block equal to amount gained.',
       effect(state) { gainPetrify(state.player, 9); applyBlock(state.player, 9); } },
@@ -141,6 +145,7 @@ export const cardDefs = {
   sanctify: {
     id: 'sanctify', name: 'Sanctify', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
     description: 'Exhaust all Status and Curse cards in your hand. Gain 2 Block per card exhausted.',
+    shortDescription: 'Exhaust Status & Curses. +2 Block each.',
     effect(state) {
       const { hand, exhaust } = state.combat.deckState;
       let n = 0;
@@ -173,6 +178,7 @@ export const cardDefs = {
   stone_coat: {
     id: 'stone_coat', name: 'Stone Coat', cost: 1, type: 'skill', targetType: 'none', rarity: 'uncommon',
     description: 'Next 8 Petrify you would gain becomes Block instead.',
+    shortDescription: 'Next 8 Petrify → Block instead.',
     effect(state) { applyStatus(state.player, 'stoneCoat', 8); },
     upgrade: { name: 'Stone Coat+', description: 'Next 14 Petrify you would gain becomes Block instead.',
       effect(state) { applyStatus(state.player, 'stoneCoat', 14); } },
@@ -180,6 +186,7 @@ export const cardDefs = {
   holy_surge: {
     id: 'holy_surge', name: 'Holy Surge', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
     description: 'Reduce Petrify by 6. Deal 6 + the amount reduced as damage.',
+    shortDescription: 'Lose 6 Petrify. Deal 6 + reduction.',
     effect(state, target) {
       const before = state.player.petrify;
       reducePetrify(state.player, 6);
@@ -195,6 +202,7 @@ export const cardDefs = {
   purifying_nova: {
     id: 'purifying_nova', name: 'Purifying Nova', cost: 2, type: 'attack', targetType: 'none', rarity: 'rare',
     description: 'Reduce Petrify by 8. Deal that damage to ALL enemies.',
+    shortDescription: 'Lose 8 Petrify. Deal that to all.',
     effect(state) {
       const before = state.player.petrify;
       reducePetrify(state.player, 8);

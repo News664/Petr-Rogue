@@ -5,8 +5,8 @@ export const characterDefs = {
   mint: {
     id: 'mint',
     name: 'Mint',
-    title: 'The Purifier',
-    flavor: 'A former stone-cult priestess who turned the rites against themselves. She converts petrification into power — damage through cleansing.',
+    title: 'The Reclaimed',
+    flavor: 'Like all her kin, Mint was born into stone — a statue in a world of statues. A wandering goddess passed through the ruins and breathed flesh back into her, for reasons she has never learned. Now she descends, carrying both the curse and its antidote.',
     hp: 68,
     energy: 3,
     startingRelicId: 'stone_veil',

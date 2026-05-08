@@ -3,7 +3,7 @@ import { startCombat, playCard, endPlayerTurn } from '../../systems/CombatSystem
 import { renderHUD } from '../components/HUD.js';
 import { renderEnemy } from '../components/EnemyView.js';
 import { navigate } from '../../router.js';
-import { FLOORS } from '../../systems/MapSystem.js';
+import { FLOORS, NUM_ACTS } from '../../systems/MapSystem.js';
 import { openDeckViewer } from '../components/DeckViewer.js';
 
 let _container = null;
@@ -142,7 +142,7 @@ function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
           <div class="card-name">${card.name}</div>
         </div>
         <div class="card-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
-        <div class="card-desc">${card.description}</div>
+        <div class="card-desc">${card.shortDescription ?? card.description}</div>
       </div>
     `;
   }).join('');
@@ -214,7 +214,10 @@ function _attachEvents() {
           <img src="assets/cards/${charId}/${card.id}.png" alt=""
                onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
         </div>
-        <div class="card-detail-name">${card.name}</div>
+        <div class="card-detail-header">
+          <div class="card-detail-cost">${card.cost}</div>
+          <div class="card-detail-name">${card.name}</div>
+        </div>
         <div class="card-detail-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
         <div class="card-detail-desc">${card.description}</div>
       `;
@@ -306,10 +309,11 @@ function _showGameOver(cause) {
 }
 
 function _showRunVictory() {
+  const actWord = NUM_ACTS === 1 ? 'the only act' : `all ${NUM_ACTS} acts`;
   _container.innerHTML = `
     <div class="victory-screen">
       <h1>Victory!</h1>
-      <p>The Obsidian Sentinel shatters. Stone dust fills the air. You have survived the depths — for now.</p>
+      <p>The final guardian crumbles to dust. A deep silence settles over the abyss. You have descended through ${actWord} and emerged — still flesh, still moving, still alive.</p>
       <button id="restart">Return to Menu</button>
     </div>`;
   _container.querySelector('#restart').addEventListener('click', () => location.reload());

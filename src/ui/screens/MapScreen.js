@@ -1,12 +1,13 @@
 import { GameState } from '../../state/GameState.js';
-import { getAvailableNodes, NODE_META, FLOORS } from '../../systems/MapSystem.js';
+import { getAvailableNodes, NODE_META, FLOORS, FLOORS_PER_ACT, NUM_ACTS, getAct } from '../../systems/MapSystem.js';
 import { navigate } from '../../router.js';
-import { combatEncounters, eliteEncounters, bossEncounters } from '../../data/enemies.js';
+import { getEncounters } from '../../data/enemies.js';
 import { eventDefs } from '../../data/events.js';
 
 let _container = null;
 
-// Node type accent colors
+const ACT_NAMES = ['Act I — Surface Ruins', 'Act II — The Deep Mines', 'Act III — The Abyss'];
+
 const NODE_COLORS = {
   combat: { bg: '#3a1a1a', border: '#8b3a3a', glow: '#8b3a3a' },
   elite:  { bg: '#2a1a3a', border: '#7a4aaa', glow: '#9b5abf' },
@@ -25,13 +26,16 @@ function _render() {
   const { map } = GameState;
   const available     = getAvailableNodes(map);
   const availableKeys = new Set(available.map(n => `${n.floor},${n.col}`));
-  const floor = map.currentCol === null ? -1 : map.currentFloor;
+  const currentAct    = map.currentCol === null ? 0 : getAct(map.currentFloor);
+  const floorLabel    = map.currentCol === null
+    ? 'Choose your first path'
+    : `${ACT_NAMES[currentAct]}  ·  Floor ${(map.currentFloor % FLOORS_PER_ACT) + 1} / ${FLOORS_PER_ACT}`;
 
   _container.innerHTML = `
     <div class="map-screen">
       <div class="map-header">
         <span class="map-title">⛰️ The Descent</span>
-        <span class="map-floor-info">${floor >= 0 ? `Floor ${floor + 1} / ${FLOORS}` : 'Choose your first path'}</span>
+        <span class="map-floor-info">${floorLabel}</span>
       </div>
       <div class="map-scroll" id="map-scroll">
         <div class="map-grid" id="map-grid">
@@ -47,7 +51,6 @@ function _render() {
 
   requestAnimationFrame(() => {
     _drawConnections(map, availableKeys);
-    // Scroll so the player sees their current position (bottom = start)
     const scroll = _container.querySelector('#map-scroll');
     if (scroll) scroll.scrollTop = scroll.scrollHeight;
   });
@@ -56,8 +59,15 @@ function _render() {
 function _buildRows(map, availableKeys) {
   let html = '';
   for (let f = map.floors.length - 1; f >= 0; f--) {
+    // Act divider above the first floor of each act (rendered in reverse, so divider appears above act start = below in DOM)
+    const posInAct = f % FLOORS_PER_ACT;
+    if (posInAct === FLOORS_PER_ACT - 1 && f < map.floors.length - 1) {
+      const act = getAct(f);
+      html += `<div class="map-act-divider"><span>${ACT_NAMES[act]}</span></div>`;
+    }
+
     html += `<div class="map-floor-row" data-floor="${f}">`;
-    html += `<div class="map-floor-label">F${f + 1}</div>`;
+    html += `<div class="map-floor-label">F${posInAct + 1}</div>`;
     html += `<div class="map-row">`;
     for (const node of map.floors[f]) {
       const key       = `${node.floor},${node.col}`;
@@ -80,6 +90,12 @@ function _buildRows(map, availableKeys) {
                </div>`;
     }
     html += `</div></div>`;
+
+    // Bottom-of-act label (first floor of each act, rendered at the bottom when reversed)
+    if (posInAct === 0) {
+      const act = getAct(f);
+      html += `<div class="map-act-divider map-act-top"><span>${ACT_NAMES[act]}</span></div>`;
+    }
   }
   return html;
 }
@@ -100,10 +116,9 @@ function _drawConnections(map, availableKeys) {
   grid.style.position = 'relative';
   grid.insertBefore(svg, grid.firstChild);
 
-  // Defs for glow filter
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   defs.innerHTML = `
-    <filter id="line-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <filter id="line-glow">
       <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>`;
@@ -123,12 +138,11 @@ function _drawConnections(map, availableKeys) {
         const x2 = tr.left - gridRect.left + tr.width  / 2;
         const y2 = tr.top  - gridRect.top  + tr.height / 2;
 
-        const fromKey = `${f},${node.col}`;
-        const toKey   = `${conn.floor},${conn.col}`;
+        const fromKey  = `${f},${node.col}`;
+        const toKey    = `${conn.floor},${conn.col}`;
         const isVisited = map.visitedNodes.includes(fromKey) && map.visitedNodes.includes(toKey);
         const isActive  = availableKeys.has(toKey) && (map.visitedNodes.includes(fromKey) || map.currentCol === null);
 
-        // Bezier curve — control point arcs slightly sideways
         const mx = (x1 + x2) / 2 + (x2 - x1) * 0.15;
         const my = (y1 + y2) / 2;
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -157,15 +171,16 @@ function _enterNode(floor, col) {
   GameState.map.currentFloor = floor;
   GameState.map.currentCol   = col;
 
+  const act = getAct(floor);
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
   switch (node.type) {
-    case 'combat': navigate('CombatScreen', { enemyIds: _pick(combatEncounters), source: 'combat' }); break;
-    case 'elite':  navigate('CombatScreen', { enemyIds: _pick(eliteEncounters),  source: 'elite'  }); break;
-    case 'boss':   navigate('CombatScreen', { enemyIds: _pick(bossEncounters),   source: 'boss'   }); break;
+    case 'combat': navigate('CombatScreen', { enemyIds: pick(getEncounters('combat', act)), source: 'combat' }); break;
+    case 'elite':  navigate('CombatScreen', { enemyIds: pick(getEncounters('elite',  act)), source: 'elite'  }); break;
+    case 'boss':   navigate('CombatScreen', { enemyIds: pick(getEncounters('boss',   act)), source: 'boss'   }); break;
     case 'rest':   navigate('RestScreen',  {}); break;
     case 'shop':   navigate('ShopScreen',  {}); break;
-    case 'event':  navigate('EventScreen', { event: _pick(eventDefs) }); break;
-    default:       navigate('CombatScreen', { enemyIds: _pick(combatEncounters), source: 'combat' });
+    case 'event':  navigate('EventScreen', { event: pick(eventDefs) }); break;
+    default:       navigate('CombatScreen', { enemyIds: pick(getEncounters('combat', act)), source: 'combat' });
   }
 }
-
-function _pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }

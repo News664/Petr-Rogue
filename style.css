@@ -406,6 +406,24 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   from { box-shadow: 0 0 8px var(--ng, var(--accent)); }
   to   { box-shadow: 0 0 22px var(--ng, var(--accent)), 0 0 4px #ffffff30; }
 }
+.map-act-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px clamp(8px, 2vw, 24px);
+  color: #6a6058;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.map-act-divider::before, .map-act-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #3a3530, transparent);
+}
+.map-act-top { margin-top: 4px; }
 
 /* ── Reward Screen ── */
 .reward-screen {

@@ -6,7 +6,7 @@ export const characterDefs = {
     id: 'mint',
     name: 'Mint',
     title: 'The Reclaimed',
-    flavor: 'Like all her kin, Mint was born into stone — a statue in a world of statues. A wandering goddess passed through the ruins and breathed flesh back into her, for reasons she has never learned. Now she descends, carrying both the curse and its antidote.',
+    flavor: 'Mint was petrified and sealed away in these depths — by whom, and why, she does not yet know. A wandering goddess passed through and breathed life back into her. Now she descends further, carrying both the curse and its antidote, searching for answers.',
     hp: 68,
     energy: 3,
     startingRelicId: 'stone_veil',

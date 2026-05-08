@@ -9,7 +9,7 @@ export function createDeckState(cards) {
   };
 }
 
-export function drawCards(deckState, count) {
+export function drawCards(deckState, count, state = null) {
   for (let i = 0; i < count; i++) {
     if (deckState.hand.length >= HAND_CAP) break;
     if (deckState.draw.length === 0) {
@@ -17,7 +17,9 @@ export function drawCards(deckState, count) {
       deckState.draw = shuffle([...deckState.discard]);
       deckState.discard = [];
     }
-    deckState.hand.push(deckState.draw.pop());
+    const card = deckState.draw.pop();
+    deckState.hand.push(card);
+    if (card.onDraw && state) card.onDraw(state);
   }
 }
 

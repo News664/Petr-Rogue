@@ -1,7 +1,7 @@
 import { checkDeathCause } from '../state/Player.js';
 import { createDeckState, drawCards, discardCard, discardHand, exhaustCard } from './DeckSystem.js';
 import { triggerRelics } from './RelicSystem.js';
-import { tickPlayerStatuses, tickEnemyStatuses } from './StatusSystem.js';
+import { tickPlayerStatuses, tickEnemyStatuses, tickCrumblingOnEnemyTurn } from './StatusSystem.js';
 import { createEnemyInstance } from '../data/enemies.js';
 
 const LOG_LIMIT = 40;
@@ -105,7 +105,7 @@ function _startPlayerTurn(state) {
   if (cause) return { event: 'game_over', cause };
 
   _log(state, `— Turn ${combat.turn} —`);
-  drawCards(combat.deckState, 5);
+  drawCards(combat.deckState, 5, state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }
@@ -114,10 +114,16 @@ function _runEnemyTurn(state) {
   const { combat, player } = state;
   combat.phase = 'enemy';
 
+  // Crumbling bites into block the player built this turn.
+  tickCrumblingOnEnemyTurn(player);
+
   for (const enemy of combat.enemies) {
     if (enemy.hp <= 0) continue;
     enemy.block = 0;
     tickEnemyStatuses(enemy);
+
+    // HP-threshold phase transitions checked every turn (not only via intent).
+    if (enemy.onPhaseCheck) enemy.onPhaseCheck(enemy, player, state);
 
     const intent     = enemy.intents[enemy.intentIndex];
     const hpBefore   = player.hp;

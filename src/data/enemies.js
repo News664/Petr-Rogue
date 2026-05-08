@@ -5,19 +5,22 @@ import { makeCard } from './cards.js';
 
 // ── Intent builders ───────────────────────────────────────────────────────────
 
-const atk    = (label, dmg)   => ({ label, icon: '⚔️',  damage: dmg, action: (e, p) => applyDamage(p, dmg, e) });
-const petr   = (label, amt)   => ({ label, icon: '🪨',  action: (e, p) => gainPetrify(p, amt) });
-const blk    = (label, amt)   => ({ label, icon: '🛡️', action: (e)    => applyBlock(e, amt) });
-const numb   = (label, stks)  => ({ label, icon: '🫧',  action: (e, p) => applyStatus(p, 'numbing', stks) });
-const calc   = (label, stks)  => ({ label, icon: '⛏️', action: (e, p) => applyStatus(p, 'calcified', stks) });
-const vuln   = (label, stks)  => ({ label, icon: '💔',  action: (e, p) => applyStatus(p, 'vulnerable', stks) });
-const anchor = (label, stks)  => ({ label, icon: '⚓',  action: (e, p) => applyStatus(p, 'anchored', stks) });
-const crumble= (label, stks)  => ({ label, icon: '💨',  action: (e, p) => applyStatus(p, 'crumbling', stks) });
+const atk      = (label, dmg)   => ({ label, icon: '⚔️',  damage: dmg, action: (e, p) => applyDamage(p, dmg, e) });
+const petr     = (label, amt)   => ({ label, icon: '🪨',  action: (e, p) => gainPetrify(p, amt, e) });
+const blk      = (label, amt)   => ({ label, icon: '🛡️', action: (e)    => applyBlock(e, amt) });
+const numb     = (label, stks)  => ({ label, icon: '🫧',  action: (e, p) => applyStatus(p, 'numbing', stks) });
+const calc     = (label, stks)  => ({ label, icon: '⛏️', action: (e, p) => applyStatus(p, 'calcified', stks) });
+const vuln     = (label, stks)  => ({ label, icon: '💔',  action: (e, p) => applyStatus(p, 'vulnerable', stks) });
+const wkn      = (label, stks)  => ({ label, icon: '🩸',  action: (e, p) => applyStatus(p, 'weak', stks) });
+const anchor   = (label, stks)  => ({ label, icon: '⚓',  action: (e, p) => applyStatus(p, 'anchored', stks) });
+const crumble  = (label, stks)  => ({ label, icon: '💨',  action: (e, p) => applyStatus(p, 'crumbling', stks) });
+const strengthen    = (label, amt) => ({ label, icon: '💪', action: (e) => { e._strength     = (e._strength     || 0) + amt; } });
+const petrifyPower  = (label, amt) => ({ label, icon: '🔥', action: (e) => { e._petrifyPower = (e._petrifyPower || 0) + amt; } });
 
 const atkP = (label, dmg, pt) => ({
   label, icon: '⚔️🪨', damage: dmg,
   // Petrify first so Stone Coat converts it to Block, which then absorbs the damage.
-  action: (e, p) => { gainPetrify(p, pt); applyDamage(p, dmg, e); },
+  action: (e, p) => { gainPetrify(p, pt, e); applyDamage(p, dmg, e); },
 });
 
 const addShard = (label) => ({
@@ -41,10 +44,10 @@ const _sentinelP2 = [
       addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
     } },
   anchor('Seal 2', 2),
-  atk('Avalanche 26', 26),
-  numb('Numb 5', 5),
-  atk('Avalanche 26', 26),
-  crumble('Crumble 4', 4),
+  atk('Avalanche 22', 22),
+  numb('Numb 4', 4),
+  atk('Avalanche 22', 22),
+  petr('Void Tremor 6 · direct', 6),
 ];
 
 const _kingP2 = [
@@ -73,7 +76,6 @@ const _heartP2 = [
       gainPetrify(p, 8);
     } },
   numb('Deep Drain 6', 6),
-  // Phase 3 trigger at ≤33% HP
   { label: 'Phase Shift II', icon: '🌑',
     action(e, p, state) {
       if (!e._phase2done && e.hp <= e.maxHp * 0.33) {
@@ -106,7 +108,7 @@ export const enemyDefs = {
 
   stone_imp: {
     id: 'stone_imp', name: 'Stone Imp', maxHp: 22,
-    intents: [atk('Strike 6', 6), petr('Petrify 3', 3)],
+    intents: [atk('Strike 6', 6), petr('Petrify 3 · direct', 3)],
   },
   gravel_bat: {
     id: 'gravel_bat', name: 'Gravel Bat', maxHp: 18,
@@ -118,30 +120,27 @@ export const enemyDefs = {
   },
   crystal_widow: {
     id: 'crystal_widow', name: 'Crystal Widow', maxHp: 38,
-    intents: [atk('Bite 9', 9), vuln('Expose 2', 2), numb('Drain 2', 2), atk('Bite 11', 11)],
+    intents: [atk('Bite 9', 9), wkn('Weaken 2', 2), numb('Drain 2', 2), atk('Bite 11', 11)],
   },
 
   marble_knight: {
     id: 'marble_knight', name: 'Marble Knight', maxHp: 78,
     intents: [
-      blk('Guard 10', 10),
-      atkP('Pet. Slash 10+4', 10, 4),
-      addShard('Stone Curse'),
-      atk('Heavy Strike 16', 16),
-      numb('Numb 3', 3),
-      atk('Heavy Strike 18', 18),
+      wkn('Weaken 2', 2),
+      atk('Heavy Strike 14', 14),
+      strengthen('Stone Ritual +2', 2),
+      atkP('Pet. Slash 12+4', 12, 4),
       addShard('Stone Curse'),
     ],
   },
   petrified_warden: {
     id: 'petrified_warden', name: 'Petrified Warden', maxHp: 82,
     intents: [
-      atk('Stone Fist 14', 14),
       anchor('Seal 2', 2),
-      atkP('Crush 12+6', 12, 6),
-      petr('Stone Aura 8', 8),
-      anchor('Seal 1', 1),
-      atk('Stone Fist 16', 16),
+      atkP('Crush 10+5', 10, 5),
+      petrifyPower('Deepen +2', 2),
+      petr('Stone Aura 6 · direct', 6),
+      atk('Stone Fist 14', 14),
     ],
   },
 
@@ -153,19 +152,16 @@ export const enemyDefs = {
       calc('Calcify 3', 3),
       atk('Crush 20', 20),
       atkP('Pet. Slam 12+5', 12, 5),
-      numb('Numb 3', 3),
-      { label: 'Monolith Rises', icon: '🌋',
-        action(e, p, state) {
-          if (!e._enraged && e.hp <= e.maxHp * 0.5) {
-            e._enraged = true;
-            e.intents = _sentinelP2;
-            e.intentIndex = 0;
-            _log(state, '💥 The Obsidian Sentinel AWAKENS — Phase 2!');
-          } else {
-            applyBlock(e, 18);
-          }
-        } },
+      strengthen('Monolith Grows +3', 3),
     ],
+    onPhaseCheck(e, p, state) {
+      if (!e._enraged && e.hp <= e.maxHp * 0.5) {
+        e._enraged = true;
+        e.intents = _sentinelP2;
+        e.intentIndex = 0;
+        _log(state, '💥 The Obsidian Sentinel AWAKENS — Phase 2!');
+      }
+    },
   },
 
   // ── Act 2: The Deep Mines ─────────────────────────────────────────────────
@@ -217,19 +213,16 @@ export const enemyDefs = {
       atkP('Stone Fist 16+6', 16, 6),
       numb('Reign 4', 4),
       atk('Kingly Blow 22', 22),
-      { label: 'Petrify Throne', icon: '👑',
-        action(e, p, state) {
-          if (!e._enraged && e.hp <= e.maxHp * 0.5) {
-            e._enraged = true;
-            e.intents = _kingP2;
-            e.intentIndex = 0;
-            _log(state, '👑 The Petrified King rises from his throne — Phase 2!');
-          } else {
-            applyBlock(e, 20);
-            gainPetrify(p, 5);
-          }
-        } },
+      strengthen('Royal Wrath +3', 3),
     ],
+    onPhaseCheck(e, p, state) {
+      if (!e._enraged && e.hp <= e.maxHp * 0.5) {
+        e._enraged = true;
+        e.intents = _kingP2;
+        e.intentIndex = 0;
+        _log(state, '👑 The Petrified King rises from his throne — Phase 2!');
+      }
+    },
   },
 
   // ── Act 3: The Abyss ─────────────────────────────────────────────────────
@@ -281,18 +274,16 @@ export const enemyDefs = {
       atkP('Heart Crush 18+8', 18, 8),
       numb('Drain 5', 5),
       atk('Heartbeat 25', 25),
-      { label: 'Phase Shift I', icon: '🌑',
-        action(e, p, state) {
-          if (!e._enraged && e.hp <= e.maxHp * 0.66) {
-            e._enraged = true;
-            e.intents = _heartP2;
-            e.intentIndex = 0;
-            _log(state, '🌑 The Stone Heart pulses — Phase 2!');
-          } else {
-            applyBlock(e, 22);
-          }
-        } },
+      strengthen('Pulse +3', 3),
     ],
+    onPhaseCheck(e, p, state) {
+      if (!e._enraged && e.hp <= e.maxHp * 0.66) {
+        e._enraged = true;
+        e.intents = _heartP2;
+        e.intentIndex = 0;
+        _log(state, '🌑 The Stone Heart pulses — Phase 2!');
+      }
+    },
   },
 };
 
@@ -363,5 +354,5 @@ export function getEncounters(type, act) {
 export function createEnemyInstance(id) {
   const d = enemyDefs[id];
   if (!d) throw new Error(`Unknown enemy id: ${id}`);
-  return { ...d, hp: d.maxHp, block: 0, intentIndex: 0, statusEffects: {}, _enraged: false, _phase2done: false };
+  return { ...d, hp: d.maxHp, block: 0, intentIndex: 0, statusEffects: {}, _enraged: false, _phase2done: false, _strength: 0, _petrifyPower: 0 };
 }

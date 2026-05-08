@@ -3,10 +3,52 @@ import { startCombat, playCard, endPlayerTurn } from '../../systems/CombatSystem
 import { renderHUD } from '../components/HUD.js';
 import { renderEnemy } from '../components/EnemyView.js';
 import { navigate } from '../../router.js';
+import { FLOORS } from '../../systems/MapSystem.js';
+import { openDeckViewer } from '../components/DeckViewer.js';
 
 let _container = null;
 let _selectedHandIndex = null;
 let _source = 'combat'; // 'combat' | 'elite' | 'boss'
+
+// Cache of sprite content bounds per charId: { top: 0..1, bottom: 0..1 }
+// top/bottom are the fraction of transparent rows at top and bottom of the sprite.
+const _spriteBounds = {};
+
+function _scanSpriteBounds(charId, url) {
+  if (_spriteBounds[charId]) return;
+  _spriteBounds[charId] = { top: 0, bottom: 0 }; // default: no trim
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    try {
+      const canvas = document.createElement('canvas');
+      // Scan at reduced resolution for performance
+      const scale = Math.min(1, 128 / img.naturalHeight);
+      canvas.width  = Math.round(img.naturalWidth  * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const h = canvas.height, w = canvas.width;
+      const alphaThreshold = 10;
+      let topRow = 0, bottomRow = h - 1;
+      outer: for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > alphaThreshold) { topRow = y; break outer; }
+        }
+      }
+      outer2: for (let y = h - 1; y >= 0; y--) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > alphaThreshold) { bottomRow = y; break outer2; }
+        }
+      }
+      _spriteBounds[charId] = { top: topRow / h, bottom: (h - 1 - bottomRow) / h };
+      // Re-render to apply corrected clip-path
+      if (_container) _render();
+    } catch (_) { /* tainted canvas on local file:// — bounds stay at default */ }
+  };
+  img.src = url;
+}
 
 export const CombatScreen = {
   init(el, { enemyIds, source = 'combat' }) {
@@ -22,7 +64,6 @@ export const CombatScreen = {
 
 function _petrifyStage(player) {
   const ratio = player.petrify / Math.max(1, player.hp);
-  if (ratio >= 0.90) return 100;
   if (ratio >= 0.75) return 75;
   if (ratio >= 0.50) return 50;
   if (ratio >= 0.25) return 25;
@@ -48,13 +89,22 @@ function _renderPortrait(player) {
 }
 
 function _renderSpriteArea(player) {
-  const pct      = Math.min(100, Math.round(player.petrify / Math.max(1, player.hp) * 100));
+  const ratio    = player.petrify / Math.max(1, player.hp);
+  const pct      = Math.min(1, ratio);
   const charId   = player.characterId ?? 'mint';
   const spriteUrl = `assets/${charId}/sprite.png`;
-  // clip-path reveals the bottom pct% of the full-height overlay;
-  // mask-image uses the sprite's alpha so transparent areas stay clear.
+
+  // Scan sprite alpha on first encounter to find non-transparent content bounds.
+  _scanSpriteBounds(charId, spriteUrl);
+  const bounds = _spriteBounds[charId] ?? { top: 0, bottom: 0 };
+
+  // Map petrify% within the content region only so transparent padding is ignored.
+  const contentTop    = bounds.top * 100;
+  const contentBottom = (1 - bounds.bottom) * 100;
+  const clipTop       = contentBottom - pct * (contentBottom - contentTop);
+
   const maskStyle = [
-    `clip-path:inset(${100 - pct}% 0 0 0)`,
+    `clip-path:inset(${clipTop.toFixed(1)}% 0 0 0)`,
     `mask-image:url(${spriteUrl})`,
     `-webkit-mask-image:url(${spriteUrl})`,
   ].join(';');
@@ -85,7 +135,7 @@ function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
            style="--card-color:${color};--rot:${rot}deg;--yo:${yo}px">
         <div class="card-art">
           <img src="assets/cards/${charId}/${card.id}.png" alt="" draggable="false"
-               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.parentElement.classList.add('card-art-missing')">
+               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
         </div>
         <div class="card-header">
           <div class="card-cost">${card.cost}</div>
@@ -128,7 +178,11 @@ function _render() {
         </div>
         <div class="combat-actions">
           <button id="end-turn">End Turn</button>
-          <span class="deck-counts">Draw: ${deckState.draw.length} · Discard: ${deckState.discard.length} · Exhaust: ${deckState.exhaust.length}</span>
+          <span class="deck-counts">
+            <button class="pile-btn" id="btn-draw">Draw (${deckState.draw.length})</button>
+            <button class="pile-btn" id="btn-discard">Discard (${deckState.discard.length})</button>
+            <button class="pile-btn" id="btn-exhaust">Exhaust (${deckState.exhaust.length})</button>
+          </span>
         </div>
       </div>
       <div class="battle-log" id="battle-log">
@@ -136,6 +190,7 @@ function _render() {
         <div class="battle-log-entries" id="log-entries">
           ${logEntries.map((e, i) => `<div class="log-entry${i === logEntries.length - 1 ? ' log-latest' : ''}">${e}</div>`).join('')}
         </div>
+        <div class="card-detail-panel" id="card-detail"></div>
       </div>
     </div>
   `;
@@ -146,6 +201,27 @@ function _render() {
 }
 
 function _attachEvents() {
+  const detail = _container.querySelector('#card-detail');
+  const charId = GameState.player.characterId ?? 'mint';
+
+  _container.querySelectorAll('.hand-area .card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      if (!detail) return;
+      const card = GameState.combat.deckState.hand[Number(el.dataset.index)];
+      if (!card) return;
+      detail.innerHTML = `
+        <div class="card-detail-art">
+          <img src="assets/cards/${charId}/${card.id}.png" alt=""
+               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
+        </div>
+        <div class="card-detail-name">${card.name}</div>
+        <div class="card-detail-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
+        <div class="card-detail-desc">${card.description}</div>
+      `;
+    });
+    el.addEventListener('mouseleave', () => { if (detail) detail.innerHTML = ''; });
+  });
+
   _container.querySelectorAll('.card:not(.card-disabled):not(.card-status):not(.card-curse)').forEach(el => {
     el.addEventListener('click', () => _onCardClick(Number(el.dataset.index)));
   });
@@ -153,6 +229,18 @@ function _attachEvents() {
     el.addEventListener('click', () => _onEnemyClick(Number(el.dataset.index)));
   });
   _container.querySelector('#end-turn')?.addEventListener('click', _onEndTurn);
+
+  const overlay  = document.getElementById('deck-overlay');
+  const player   = GameState.player;
+  const { deckState } = GameState.combat;
+
+  const sortedDraw = [...deckState.draw].sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
+  _container.querySelector('#btn-draw')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Draw Pile (${sortedDraw.length})`, cards: sortedDraw }));
+  _container.querySelector('#btn-discard')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Discard Pile (${deckState.discard.length})`, cards: deckState.discard }));
+  _container.querySelector('#btn-exhaust')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Exhaust Pile (${deckState.exhaust.length})`, cards: deckState.exhaust }));
 }
 
 function _onCardClick(index) {
@@ -189,7 +277,8 @@ function _handleResult(result) {
 }
 
 function _onVictory() {
-  if (_source === 'boss') {
+  const isFinalBoss = _source === 'boss' && GameState.map.currentFloor === FLOORS - 1;
+  if (isFinalBoss) {
     _showRunVictory();
   } else {
     navigate('RewardScreen', { source: _source });
@@ -202,8 +291,13 @@ function _showGameOver(cause) {
     petrify: { title: 'Fully Petrified',   body: 'Stone crept through your veins until nothing remained but a silent statue. You will stand here forever, deep beneath the earth.' },
   };
   const { title, body } = msg[cause] ?? msg.hp;
+  const charId = GameState.player?.characterId ?? 'mint';
+  const portrait = cause === 'petrify'
+    ? `<img class="game-over-portrait" src="assets/${charId}/Portrait_100.png" alt="" onerror="this.style.display='none'">`
+    : '';
   _container.innerHTML = `
     <div class="game-over">
+      ${portrait}
       <h1>${title}</h1>
       <p>${body}</p>
       <button id="restart">Return to Menu</button>

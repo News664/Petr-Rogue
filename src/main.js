@@ -23,8 +23,9 @@ document.addEventListener('mousemove', e => {
   if (!_tip.classList.contains('visible')) return;
   const x = e.clientX, y = e.clientY;
   const tw = _tip.offsetWidth, th = _tip.offsetHeight;
+  const tipTop = y - th - 10;
   _tip.style.left = `${Math.min(x - tw / 2, window.innerWidth - tw - 8)}px`;
-  _tip.style.top  = `${y - th - 10}px`;
+  _tip.style.top  = `${tipTop < 0 ? y + 16 : tipTop}px`;
 });
 document.addEventListener('mouseout', e => {
   if (!e.target.closest('[data-tooltip]')) return;

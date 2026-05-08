@@ -4,45 +4,59 @@ const TYPE_COLOR = {
   power:  'var(--card-power)',
 };
 
-export function openDeckViewer(overlayEl, player) {
-  const { deck } = player;
+function _cardArtHtml(card, charId) {
+  const id = card.id;
+  const ch = charId ?? 'shared';
+  return `
+    <div class="dv-card-art">
+      <img src="assets/cards/${ch}/${id}.png" alt="" draggable="false"
+           onerror="this.src='assets/cards/${id}.png';this.onerror=()=>this.style.visibility='hidden'">
+    </div>
+  `;
+}
 
-  // Group by type
+function _renderGroup(label, cards, charId) {
+  if (!cards?.length) return '';
+  return `
+    <div class="dv-group">
+      <div class="dv-group-label">${label} (${cards.length})</div>
+      <div class="dv-cards">
+        ${cards.map(card => `
+          <div class="dv-card" style="--card-color:${TYPE_COLOR[card.type] ?? 'var(--border)'}">
+            ${_cardArtHtml(card, charId)}
+            <div class="dv-card-cost">${card.cost}</div>
+            <div class="dv-card-name">${card.name}${card.isUpgraded ? ' <span class="upgraded-mark">✦</span>' : ''}</div>
+            <div class="dv-card-desc">${card.description}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+export function openDeckViewer(overlayEl, player, { title, cards } = {}) {
+  const charId = player?.characterId;
+  const list   = cards ?? player?.deck ?? [];
+  const header = title ?? `Deck — ${list.length} cards`;
+
   const groups = { attack: [], skill: [], power: [] };
-  for (const card of deck) {
+  for (const card of list) {
     (groups[card.type] ?? (groups.other ??= [])).push(card);
   }
-
-  const renderGroup = (label, cards) => {
-    if (!cards?.length) return '';
-    return `
-      <div class="dv-group">
-        <div class="dv-group-label">${label} (${cards.length})</div>
-        <div class="dv-cards">
-          ${cards.map(card => `
-            <div class="dv-card" style="--card-color:${TYPE_COLOR[card.type] ?? 'var(--border)'}">
-              <div class="dv-card-cost">${card.cost}</div>
-              <div class="dv-card-name">${card.name}${card.isUpgraded ? ' <span class="upgraded-mark">✦</span>' : ''}</div>
-              <div class="dv-card-desc">${card.description}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  };
 
   overlayEl.innerHTML = `
     <div class="dv-backdrop"></div>
     <div class="dv-panel">
       <div class="dv-header">
-        <h2>Deck — ${deck.length} cards</h2>
+        <h2>${header}</h2>
         <button class="dv-close" id="dv-close">✕ Close</button>
       </div>
       <div class="dv-body">
-        ${renderGroup('Attacks', groups.attack)}
-        ${renderGroup('Skills', groups.skill)}
-        ${renderGroup('Powers', groups.power)}
-        ${renderGroup('Other', groups.other)}
+        ${_renderGroup('Attacks', groups.attack, charId)}
+        ${_renderGroup('Skills',  groups.skill,  charId)}
+        ${_renderGroup('Powers',  groups.power,  charId)}
+        ${_renderGroup('Other',   groups.other,  charId)}
+        ${list.length === 0 ? '<div class="dv-empty">Empty</div>' : ''}
       </div>
     </div>
   `;

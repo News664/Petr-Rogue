@@ -210,8 +210,8 @@ export const cardDefs = {
       } },
   },
   sacred_ground: {
-    id: 'sacred_ground', name: 'Sacred Ground', cost: 2, type: 'power', targetType: 'none', rarity: 'rare',
-    description: 'Each time you play a Skill card this combat, deal 3 damage to all enemies.',
+    id: 'sacred_ground', name: 'Sacred Ground', cost: 2, type: 'power', targetType: 'none', rarity: 'rare', exhaust: true,
+    description: 'When you play a Skill, deal 3 dmg to all enemies.',
     effect(state) {
       state.combat.activePowers.push({
         name: 'Sacred Ground',
@@ -225,7 +225,7 @@ export const cardDefs = {
       });
     },
     upgrade: { name: 'Sacred Ground+',
-      description: 'Each time you play a Skill card this combat, deal 5 damage to all enemies.',
+      description: 'When you play a Skill, deal 5 dmg to all enemies.',
       effect(state) {
         state.combat.activePowers.push({
           name: 'Sacred Ground+',
@@ -245,7 +245,7 @@ export const cardDefs = {
   stone_shard: {
     id: 'stone_shard', name: 'Stone Shard', cost: 0, type: 'status', targetType: 'none',
     rarity: 'status', isStatus: true, ethereal: true, unplayable: true,
-    description: 'Unplayable. Ethereal. (A fragment of petrified thought cluttering your hand.)',
+    description: 'Unplayable. Ethereal.',
     effect() {},
     upgrade: null,
   },

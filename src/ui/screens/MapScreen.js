@@ -57,14 +57,14 @@ function _render() {
 }
 
 function _buildRows(map, availableKeys) {
+  const currentAct  = map.currentCol === null ? 0 : getAct(map.currentFloor);
+  const actStart    = currentAct * FLOORS_PER_ACT;
+  const actEnd      = actStart + FLOORS_PER_ACT - 1;
+
   let html = '';
-  for (let f = map.floors.length - 1; f >= 0; f--) {
-    // Act divider above the first floor of each act (rendered in reverse, so divider appears above act start = below in DOM)
+  for (let f = actEnd; f >= actStart; f--) {
+    if (!map.floors[f]) continue;
     const posInAct = f % FLOORS_PER_ACT;
-    if (posInAct === FLOORS_PER_ACT - 1 && f < map.floors.length - 1) {
-      const act = getAct(f);
-      html += `<div class="map-act-divider"><span>${ACT_NAMES[act]}</span></div>`;
-    }
 
     html += `<div class="map-floor-row" data-floor="${f}">`;
     html += `<div class="map-floor-label">F${posInAct + 1}</div>`;
@@ -86,16 +86,10 @@ function _buildRows(map, availableKeys) {
         : '';
       html += `<div class="${cls}" data-floor="${node.floor}" data-col="${node.col}"
                     data-tooltip="${meta.label}" style="${style}">
-                 <span class="node-icon">${meta.icon}</span>
+                 <span class="node-icon">${isCurrent ? '📍' : meta.icon}</span>
                </div>`;
     }
     html += `</div></div>`;
-
-    // Bottom-of-act label (first floor of each act, rendered at the bottom when reversed)
-    if (posInAct === 0) {
-      const act = getAct(f);
-      html += `<div class="map-act-divider map-act-top"><span>${ACT_NAMES[act]}</span></div>`;
-    }
   }
   return html;
 }

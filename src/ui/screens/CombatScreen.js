@@ -4,6 +4,7 @@ import { renderHUD } from '../components/HUD.js';
 import { renderEnemy } from '../components/EnemyView.js';
 import { navigate } from '../../router.js';
 import { FLOORS } from '../../systems/MapSystem.js';
+import { openDeckViewer } from '../components/DeckViewer.js';
 
 let _container = null;
 let _selectedHandIndex = null;
@@ -177,7 +178,11 @@ function _render() {
         </div>
         <div class="combat-actions">
           <button id="end-turn">End Turn</button>
-          <span class="deck-counts">Draw: ${deckState.draw.length} · Discard: ${deckState.discard.length} · Exhaust: ${deckState.exhaust.length}</span>
+          <span class="deck-counts">
+            <button class="pile-btn" id="btn-draw">Draw (${deckState.draw.length})</button>
+            <button class="pile-btn" id="btn-discard">Discard (${deckState.discard.length})</button>
+            <button class="pile-btn" id="btn-exhaust">Exhaust (${deckState.exhaust.length})</button>
+          </span>
         </div>
       </div>
       <div class="battle-log" id="battle-log">
@@ -224,6 +229,18 @@ function _attachEvents() {
     el.addEventListener('click', () => _onEnemyClick(Number(el.dataset.index)));
   });
   _container.querySelector('#end-turn')?.addEventListener('click', _onEndTurn);
+
+  const overlay  = document.getElementById('deck-overlay');
+  const player   = GameState.player;
+  const { deckState } = GameState.combat;
+
+  const sortedDraw = [...deckState.draw].sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
+  _container.querySelector('#btn-draw')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Draw Pile (${sortedDraw.length})`, cards: sortedDraw }));
+  _container.querySelector('#btn-discard')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Discard Pile (${deckState.discard.length})`, cards: deckState.discard }));
+  _container.querySelector('#btn-exhaust')?.addEventListener('click', () =>
+    openDeckViewer(overlay, player, { title: `Exhaust Pile (${deckState.exhaust.length})`, cards: deckState.exhaust }));
 }
 
 function _onCardClick(index) {

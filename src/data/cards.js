@@ -85,9 +85,9 @@ export const cardDefs = {
   calcify: {
     id: 'calcify', name: 'Calcify', cost: 0, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 3 Petrify. Draw 2 cards.',
-    effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 2); },
+    effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 2, state); },
     upgrade: { name: 'Calcify+', description: 'Gain 3 Petrify. Draw 3 cards.',
-      effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 3); } },
+      effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 3, state); } },
   },
   purify: {
     id: 'purify', name: 'Purify', cost: 2, type: 'skill', targetType: 'none', rarity: 'uncommon', colorless: true,
@@ -131,16 +131,16 @@ export const cardDefs = {
   holy_light: {
     id: 'holy_light', name: 'Holy Light', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
     description: 'Gain 6 Block. Draw 1 card.',
-    effect(state) { applyBlock(state.player, 6); drawCards(state.combat.deckState, 1); },
+    effect(state) { applyBlock(state.player, 6); drawCards(state.combat.deckState, 1, state); },
     upgrade: { name: 'Holy Light+', description: 'Gain 9 Block. Draw 1 card.',
-      effect(state) { applyBlock(state.player, 9); drawCards(state.combat.deckState, 1); } },
+      effect(state) { applyBlock(state.player, 9); drawCards(state.combat.deckState, 1, state); } },
   },
   petrify_ward: {
     id: 'petrify_ward', name: 'Petrify Ward', cost: 0, type: 'skill', targetType: 'none', rarity: 'common',
     description: 'Reduce Petrify by 2. Draw 1 card.',
-    effect(state) { reducePetrify(state.player, 2); drawCards(state.combat.deckState, 1); },
+    effect(state) { reducePetrify(state.player, 2); drawCards(state.combat.deckState, 1, state); },
     upgrade: { name: 'Petrify Ward+', description: 'Reduce Petrify by 3. Draw 2 cards.',
-      effect(state) { reducePetrify(state.player, 3); drawCards(state.combat.deckState, 2); } },
+      effect(state) { reducePetrify(state.player, 3); drawCards(state.combat.deckState, 2, state); } },
   },
   sanctify: {
     id: 'sanctify', name: 'Sanctify', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
@@ -253,8 +253,10 @@ export const cardDefs = {
   stone_shard: {
     id: 'stone_shard', name: 'Stone Shard', cost: 0, type: 'status', targetType: 'none',
     rarity: 'status', isStatus: true, ethereal: true, unplayable: true,
-    description: 'Unplayable. Ethereal.',
+    description: 'Unplayable. Ethereal. On draw: gain 3 Petrify.',
+    shortDescription: 'Unplayable. Ethereal. +3 Petrify on draw.',
     effect() {},
+    onDraw(state) { gainPetrify(state.player, 3); },
     upgrade: null,
   },
   numbing_mist: {

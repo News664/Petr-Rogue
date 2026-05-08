@@ -15,6 +15,10 @@ export const RewardScreen = {
     _rewards   = generateCardRewards(pool, 3);
     _relic     = (source === 'elite' || source === 'boss') ? generateRelicReward() : null;
     GameState.player.gold += 15 + Math.floor(Math.random() * 15);
+    if (source === 'boss') {
+      GameState.player.hp     = GameState.player.maxHp;
+      GameState.player.petrify = 0;
+    }
     _render(source);
   },
   teardown() { _container = null; },

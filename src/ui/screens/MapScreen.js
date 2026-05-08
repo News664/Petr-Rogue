@@ -26,7 +26,10 @@ function _render() {
   const { map } = GameState;
   const available     = getAvailableNodes(map);
   const availableKeys = new Set(available.map(n => `${n.floor},${n.col}`));
-  const currentAct    = map.currentCol === null ? 0 : getAct(map.currentFloor);
+  // After a boss, available nodes are on the next act — derive act to display from them.
+  const currentAct = map.currentCol === null
+    ? 0
+    : available.length > 0 ? getAct(available[0].floor) : getAct(map.currentFloor);
   const floorLabel    = map.currentCol === null
     ? 'Choose your first path'
     : `${ACT_NAMES[currentAct]}  ·  Floor ${(map.currentFloor % FLOORS_PER_ACT) + 1} / ${FLOORS_PER_ACT}`;
@@ -39,7 +42,7 @@ function _render() {
       </div>
       <div class="map-scroll" id="map-scroll">
         <div class="map-grid" id="map-grid">
-          ${_buildRows(map, availableKeys)}
+          ${_buildRows(map, availableKeys, currentAct)}
         </div>
       </div>
     </div>
@@ -50,14 +53,13 @@ function _render() {
   });
 
   requestAnimationFrame(() => {
-    _drawConnections(map, availableKeys);
+    _drawConnections(map, availableKeys, currentAct);
     const scroll = _container.querySelector('#map-scroll');
     if (scroll) scroll.scrollTop = scroll.scrollHeight;
   });
 }
 
-function _buildRows(map, availableKeys) {
-  const currentAct  = map.currentCol === null ? 0 : getAct(map.currentFloor);
+function _buildRows(map, availableKeys, currentAct) {
   const actStart    = currentAct * FLOORS_PER_ACT;
   const actEnd      = actStart + FLOORS_PER_ACT - 1;
 
@@ -94,7 +96,9 @@ function _buildRows(map, availableKeys) {
   return html;
 }
 
-function _drawConnections(map, availableKeys) {
+function _drawConnections(map, availableKeys, currentAct) {
+  const actStart = currentAct * FLOORS_PER_ACT;
+  const actEnd   = actStart + FLOORS_PER_ACT - 1;
   const grid = _container?.querySelector('#map-grid');
   if (!grid) return;
   grid.querySelector('.map-svg')?.remove();
@@ -118,7 +122,7 @@ function _drawConnections(map, availableKeys) {
     </filter>`;
   svg.appendChild(defs);
 
-  for (let f = 0; f < map.floors.length - 1; f++) {
+  for (let f = actStart; f < actEnd; f++) {
     for (const node of map.floors[f]) {
       for (const conn of node.connections) {
         const fromEl = _container.querySelector(`.map-node[data-floor="${f}"][data-col="${node.col}"]`);

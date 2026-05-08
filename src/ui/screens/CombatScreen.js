@@ -3,6 +3,7 @@ import { startCombat, playCard, endPlayerTurn } from '../../systems/CombatSystem
 import { renderHUD } from '../components/HUD.js';
 import { renderEnemy } from '../components/EnemyView.js';
 import { navigate } from '../../router.js';
+import { FLOORS } from '../../systems/MapSystem.js';
 
 let _container = null;
 let _selectedHandIndex = null;
@@ -133,7 +134,7 @@ function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
            style="--card-color:${color};--rot:${rot}deg;--yo:${yo}px">
         <div class="card-art">
           <img src="assets/cards/${charId}/${card.id}.png" alt="" draggable="false"
-               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.parentElement.classList.add('card-art-missing')">
+               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
         </div>
         <div class="card-header">
           <div class="card-cost">${card.cost}</div>
@@ -184,6 +185,7 @@ function _render() {
         <div class="battle-log-entries" id="log-entries">
           ${logEntries.map((e, i) => `<div class="log-entry${i === logEntries.length - 1 ? ' log-latest' : ''}">${e}</div>`).join('')}
         </div>
+        <div class="card-detail-panel" id="card-detail"></div>
       </div>
     </div>
   `;
@@ -194,6 +196,27 @@ function _render() {
 }
 
 function _attachEvents() {
+  const detail = _container.querySelector('#card-detail');
+  const charId = GameState.player.characterId ?? 'mint';
+
+  _container.querySelectorAll('.hand-area .card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      if (!detail) return;
+      const card = GameState.combat.deckState.hand[Number(el.dataset.index)];
+      if (!card) return;
+      detail.innerHTML = `
+        <div class="card-detail-art">
+          <img src="assets/cards/${charId}/${card.id}.png" alt=""
+               onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
+        </div>
+        <div class="card-detail-name">${card.name}</div>
+        <div class="card-detail-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
+        <div class="card-detail-desc">${card.description}</div>
+      `;
+    });
+    el.addEventListener('mouseleave', () => { if (detail) detail.innerHTML = ''; });
+  });
+
   _container.querySelectorAll('.card:not(.card-disabled):not(.card-status):not(.card-curse)').forEach(el => {
     el.addEventListener('click', () => _onCardClick(Number(el.dataset.index)));
   });
@@ -237,7 +260,8 @@ function _handleResult(result) {
 }
 
 function _onVictory() {
-  if (_source === 'boss') {
+  const isFinalBoss = _source === 'boss' && GameState.map.currentFloor === FLOORS - 1;
+  if (isFinalBoss) {
     _showRunVictory();
   } else {
     navigate('RewardScreen', { source: _source });

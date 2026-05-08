@@ -34,7 +34,7 @@ export function updateStatusBar(el, screenName) {
         </div>
       </div>
       <div class="sbar-relics">
-        ${relics.map(r => `<span class="relic-pip" title="${r.name}: ${r.description}">${r.name.split(' ').map(w => w[0]).join('')}</span>`).join('')}
+        ${relics.map(r => `<span class="relic-pip" data-tooltip="${r.name}: ${r.description}">${r.name.split(' ').map(w => w[0]).join('')}</span>`).join('')}
       </div>
       <button class="sbar-deck-btn" id="sbar-deck-btn">📖 Deck (${deck.length})</button>
     </div>

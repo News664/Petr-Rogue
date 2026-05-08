@@ -29,6 +29,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  overflow-x: hidden;  /* prevent horizontal scroll from arc hand cards */
 }
 
 #app {
@@ -135,10 +136,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   position: relative;
 }
 .card {
-  width: 96px;
-  min-height: 144px;
+  width: clamp(72px, 7.5vw, 96px);
+  min-height: clamp(108px, 14vw, 144px);
   flex-shrink: 0;
-  margin: 0 -6px;  /* overlap neighbours for tighter fan */
+  margin: 0 clamp(-8px, -0.8vw, -4px);  /* overlap for fan */
   background: var(--surface2);
   border: 2px solid var(--card-color, var(--border));
   border-radius: 6px;
@@ -168,10 +169,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 /* ── Card art area ── */
 .card-art {
   width: 100%;
-  height: 62px;
+  height: clamp(44px, 5.5vw, 62px);
   overflow: hidden;
   border-radius: 4px 4px 0 0;
-  background: var(--surface);
+  background: #0d0b09;   /* dark placeholder when no art */
   flex-shrink: 0;
 }
 .card-art img {
@@ -181,9 +182,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   object-position: center top;
   display: block;
   pointer-events: none;
-}
-.card-art.card-art-missing {
-  display: none;  /* collapse art area when image is absent */
+  background: #0d0b09;
 }
 .card-header {
   display: flex;
@@ -660,19 +659,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   color: var(--accent);
   cursor: default;
 }
-.relic-pip:hover::after {
-  content: attr(title);
-  position: absolute;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  color: var(--text);
-  white-space: nowrap;
-  z-index: 10;
-  margin-top: 20px;
-}
+/* tooltip handled by global-tooltip via data-tooltip attribute */
 
 /* ── Persistent status bar ── */
 #status-bar { width: 100%; }
@@ -680,8 +667,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .sbar-inner {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 8px 12px;
   padding: 6px 14px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -841,8 +828,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Battle log panel ── */
 .battle-log {
-  width: clamp(160px, 18vw, 230px);
-  flex-shrink: 0;
+  width: clamp(140px, 18vw, 230px);
+  flex-shrink: 1;
+  min-width: 120px;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -876,6 +864,49 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .log-latest { color: var(--text); }
 .log-entry:last-child { border-bottom: none; }
 
+/* ── Card detail panel (below battle log) ── */
+.card-detail-panel {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  min-height: 0;
+  overflow: hidden;
+  transition: min-height 0.15s ease;
+}
+.card-detail-panel:not(:empty) { min-height: 160px; }
+.card-detail-art {
+  width: 100%;
+  height: 90px;
+  background: #0d0b09;
+  overflow: hidden;
+}
+.card-detail-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.card-detail-name {
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: var(--accent);
+  padding: 5px 8px 1px;
+}
+.card-detail-type {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 0 8px;
+}
+.card-detail-desc {
+  font-size: 0.72rem;
+  color: var(--text);
+  padding: 4px 8px 6px;
+  line-height: 1.4;
+}
+
 /* ── Map SVG connection layer ── */
 .map-grid { position: relative; }
 .map-svg  { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
@@ -885,8 +916,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Portrait panel (left of combat screen) ── */
 .portrait-panel {
-  width: clamp(140px, 16vw, 200px);
-  flex-shrink: 0;
+  width: clamp(120px, 14vw, 200px);
+  flex-shrink: 1;
+  min-width: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -53,9 +53,11 @@ function _renderShop() {
   _container.querySelectorAll('.shop-cards .card:not(.card-disabled)').forEach(el => {
     el.addEventListener('click', () => {
       if (player.gold < CARD_PRICE) return;
+      const idx = Number(el.dataset.index);
       player.gold -= CARD_PRICE;
-      addCardToDeck(GameState, _shopCards[Number(el.dataset.index)]);
-      navigate('MapScreen');
+      addCardToDeck(GameState, _shopCards[idx]);
+      _shopCards.splice(idx, 1);
+      _renderShop();
     });
   });
 
@@ -63,7 +65,7 @@ function _renderShop() {
     if (player.gold < PURIFY_PRICE) return;
     player.gold -= PURIFY_PRICE;
     reducePetrify(player, 20);
-    navigate('MapScreen');
+    _renderShop();
   });
 
   _container.querySelector('#remove-card').addEventListener('click', () => {

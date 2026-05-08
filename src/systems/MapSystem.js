@@ -21,14 +21,16 @@ export function generateMap() {
   const floors = [];
 
   for (let f = 0; f < FLOORS; f++) {
-    const isBoss = f === FLOORS - 1;
-    const numNodes = isBoss ? 1 : Math.max(2, Math.min(5, 2 + Math.floor(f / 4)));
+    const isBoss     = f === FLOORS - 1;
+    const isPreBoss  = f === FLOORS - 2;
+    const isEliteRow = !isBoss && !isPreBoss && f > 0 && f % 5 === 4;
+    const numNodes = isBoss ? 1 : isPreBoss ? 1 : Math.max(2, Math.min(5, 2 + Math.floor(f / 4)));
     const row = [];
     for (let c = 0; c < numNodes; c++) {
       row.push({
         floor: f,
         col: c,
-        type: isBoss ? 'boss' : (f > 0 && f % 5 === 4 ? 'elite' : _pickType()),
+        type: isBoss ? 'boss' : isPreBoss ? 'rest' : (isEliteRow ? 'elite' : _pickType()),
         connections: [],
       });
     }

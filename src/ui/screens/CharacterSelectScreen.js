@@ -12,7 +12,10 @@ export const CharacterSelectScreen = {
         <div class="char-list">
           ${chars.map(c => `
             <div class="char-card" data-id="${c.id}">
-              <div class="char-portrait">🧎</div>
+              <div class="char-portrait">
+                <img src="assets/${c.id}/avatar.png" alt="${c.name}" class="char-avatar"
+                     onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🧎',className:'char-avatar-fallback'}))">
+              </div>
               <div class="char-name">${c.name}</div>
               <div class="char-title">${c.title}</div>
               <div class="char-flavor">${c.flavor}</div>

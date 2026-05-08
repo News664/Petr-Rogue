@@ -339,28 +339,29 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px 0 32px;
+  padding: 24px clamp(8px, 2vw, 24px) 40px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 .map-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
-.map-floor-row  { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; }
+.map-floor-row  { display: flex; align-items: center; gap: 8px; width: 100%; }
 .map-floor-label {
   font-size: 0.58rem;
   color: #4a4540;
-  width: 22px;
+  width: 28px;
   text-align: right;
   flex-shrink: 0;
 }
 .map-row {
+  flex: 1;
   display: flex;
-  justify-content: center;
-  gap: 16px;
+  justify-content: space-evenly;
+  align-items: center;
 }
 .map-node {
   width: 52px;
@@ -556,7 +557,16 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 .char-card:hover:not(.char-locked) { border-color: var(--accent); }
 .char-locked { opacity: 0.4; }
-.char-portrait { font-size: 3rem; text-align: center; }
+.char-portrait { text-align: center; }
+.char-avatar {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 6px;
+  display: block;
+}
+.char-avatar-fallback { font-size: 3rem; display: block; text-align: center; }
 .char-name  { font-size: 1.2rem; font-weight: bold; color: var(--accent); text-align: center; }
 .char-title { font-size: 0.8rem; color: var(--text-muted); text-align: center; text-transform: uppercase; letter-spacing: 1px; }
 .char-flavor { font-size: 0.8rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
@@ -901,10 +911,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   display: flex;
   align-items: flex-end;
   flex: 0 0 auto;
-  background: var(--bg);
   border-bottom: 1px solid var(--border);
   min-height: 0;
   height: clamp(160px, 26vh, 240px);
+  background: url('assets/backgrounds/combat.png') center / cover no-repeat var(--bg);
 }
 .player-sprite-area {
   width: clamp(80px, 12vw, 140px);

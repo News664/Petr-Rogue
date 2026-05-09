@@ -123,7 +123,7 @@ function _startPlayerTurn(state) {
 
   _log(state, `— Turn ${combat.turn} —`);
   const slowed = player.statusEffects?.slowed ?? 0;
-  drawCards(combat.deckState, slowed > 0 ? 4 : 5, state);
+  drawCards(combat.deckState, 5 - (slowed > 0 ? 1 : 0), state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }

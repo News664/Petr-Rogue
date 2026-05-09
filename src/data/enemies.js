@@ -31,6 +31,11 @@ const addSliver = (label) => ({
   label, icon: '💎',
   action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state),
 });
+const slow = (label, stks) => ({ label, icon: '⏳', action: (e, p) => applyStatus(p, 'slowed', stks) });
+const addTemporalShard = (label) => ({
+  label, icon: '⌛',
+  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state),
+});
 
 function _log(state, msg) {
   state.combat.log.push(msg);
@@ -73,7 +78,9 @@ const _heartP2 = [
   anchor('Eternal Bind 4', 4),
   { label: 'Void Rain', icon: '💀',
     action(e, p, state) {
-      for (let i = 0; i < 3; i++) addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state);
       gainPetrify(p, 8);
     } },
   numb('Deep Drain 6', 6),
@@ -225,43 +232,42 @@ export const enemyDefs = {
     },
   },
 
-  // ── Act 3: The Abyss ─────────────────────────────────────────────────────
+  // ── Act 3: The Abyss — Staggering ────────────────────────────────────────
+  // Theme: enemies manipulate time, dragging fights out so they can grow
+  // stronger. New mechanics: Slowed (fewer draws) and Temporal Shard (retained
+  // status card that pulses Petrify each turn it lingers in hand).
 
-  void_stalker: {
-    id: 'void_stalker', name: 'Void Stalker', maxHp: 42,
-    intents: [atk('Rend 7', 7), atk('Rend 7', 7), numb('Drain 4', 4), vuln('Tear 2', 2), atk('Rend 9', 9)],
+  temporal_wraith: {
+    id: 'temporal_wraith', name: 'Temporal Wraith', maxHp: 45,
+    intents: [slow('Time Tear 2', 2), atk('Wraith Strike 8', 8), slow('Fade 1', 1), atk('Wraith Strike 10', 10)],
   },
-  ancient_revenant: {
-    id: 'ancient_revenant', name: 'Ancient Revenant', maxHp: 40,
-    intents: [anchor('Bind 2', 2), atk('Haunt 12', 12), blk('Coalesce 8', 8), atkP('Drain 10+4', 10, 4)],
+  void_phantom: {
+    id: 'void_phantom', name: 'Void Phantom', maxHp: 58,
+    intents: [addTemporalShard('Temporal Pulse'), atk('Phase Strike 9', 9), anchor('Void Bind 2', 2), atkP('Null Touch 8+4', 8, 4)],
   },
-  null_monolith: {
-    id: 'null_monolith', name: 'Null Monolith', maxHp: 95,
-    intents: [blk('Void Shell 14', 14), calc('Calcify 4', 4), numb('Drain 5', 5), atk('Void Slam 22', 22), crumble('Erode 4', 4)],
+  abyss_crawler: {
+    id: 'abyss_crawler', name: 'Abyss Crawler', maxHp: 88,
+    intents: [blk('Crawl 12', 12), calc('Stone Seep 4', 4), strengthen('Ancient Power +2', 2), atk('Crush 20', 20)],
   },
 
-  void_colossus: {
-    id: 'void_colossus', name: 'Void Colossus', maxHp: 148,
+  void_revenant: {
+    id: 'void_revenant', name: 'Void Revenant', maxHp: 150,
     intents: [
-      atkP('Void Crush 18+7', 18, 7),
-      numb('Drain 5', 5),
-      atk('Colossus Slam 26', 26),
-      calc('Deep Calcify 5', 5),
+      slow('Time Warp 2', 2),
+      atkP('Void Slam 15+6', 15, 6),
+      addTemporalShard('Distort'),
       anchor('Void Bind 3', 3),
-      atk('Colossus Slam 28', 28),
-      crumble('Crumble 5', 5),
+      atk('Judgment 24', 24),
     ],
   },
-  ancient_warden: {
-    id: 'ancient_warden', name: 'Ancient Warden', maxHp: 135,
+  ancient_colossus: {
+    id: 'ancient_colossus', name: 'Ancient Colossus', maxHp: 165,
     intents: [
-      anchor('Ancient Seal 3', 3),
-      atkP('Primal Strike 15+8', 15, 8),
+      blk('Stone Fortress 18', 18),
       calc('Petrify Deep 5', 5),
-      atk('Warden Blow 24', 24),
-      numb('Ancient Drain 5', 5),
-      blk('Stone Veil 16', 16),
-      atk('Warden Blow 26', 26),
+      atkP('Colossus Strike 18+8', 18, 8),
+      crumble('Erode 5', 5),
+      strengthen('Monument +3', 3),
     ],
   },
 
@@ -272,7 +278,11 @@ export const enemyDefs = {
       atk('Heartbeat 22', 22),
       calc('Calcify 5', 5),
       atkP('Heart Crush 18+8', 18, 8),
-      numb('Drain 5', 5),
+      { label: 'Temporal Pulse', icon: '⌛',
+        action(e, p, state) {
+          addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state);
+          applyStatus(p, 'slowed', 2);
+        } },
       atk('Heartbeat 25', 25),
       strengthen('Pulse +3', 3),
     ],
@@ -326,17 +336,18 @@ export const act2BossEncounters = [
 ];
 
 export const act3CombatEncounters = [
-  ['void_stalker'],
-  ['ancient_revenant', 'void_stalker'],
-  ['null_monolith'],
-  ['void_stalker', 'void_stalker'],
-  ['ancient_revenant', 'null_monolith'],
+  ['temporal_wraith'],
+  ['void_phantom', 'temporal_wraith'],
+  ['abyss_crawler'],
+  ['temporal_wraith', 'temporal_wraith'],
+  ['void_phantom', 'abyss_crawler'],
+  ['temporal_wraith', 'temporal_wraith', 'void_phantom'],
 ];
 
 export const act3EliteEncounters = [
-  ['void_colossus'],
-  ['ancient_warden'],
-  ['void_colossus', 'void_stalker'],
+  ['void_revenant'],
+  ['ancient_colossus'],
+  ['void_revenant', 'temporal_wraith'],
 ];
 
 export const act3BossEncounters = [

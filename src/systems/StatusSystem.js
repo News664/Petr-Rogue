@@ -21,6 +21,7 @@ export function tickPlayerStatuses(player) {
   if (s.vulnerable > 0) s.vulnerable--;
   if (s.anchored   > 0) s.anchored--;
   if (s.attuned    > 0) s.attuned--;
+  if (s.slowed     > 0) s.slowed--;
 }
 
 // Called at start of enemy turn (after player built block) so Crumbling actually bites.
@@ -49,6 +50,7 @@ const STATUS_META = {
   anchored:   { icon: '⚓', label: 'Anchored',   tooltip: n => `Anchored ${n}: Cannot reduce Petrify for ${n} more turn(s). Decrements each turn.` },
   crumbling:  { icon: '💨', label: 'Crumbling',  tooltip: n => `Crumbling ${n}: Lose ${n} Block at the start of the enemy's turn. Decrements each turn.` },
   attuned:    { icon: '💎', label: 'Attuned',    tooltip: n => `Attuned ${n}: All Petrify you gain (from any source) is increased by ${n}. Decrements each turn.` },
+  slowed:     { icon: '⏳', label: 'Slowed',     tooltip: n => `Slowed ${n}: Draw ${n} fewer card(s) at turn start. Decrements each turn.` },
 };
 
 export function formatStatuses(statusEffects) {

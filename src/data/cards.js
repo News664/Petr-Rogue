@@ -268,6 +268,20 @@ export const cardDefs = {
     onDraw(state) { applyStatus(state.player, 'attuned', 2); },
     upgrade: null,
   },
+  temporal_shard: {
+    id: 'temporal_shard', name: 'Temporal Shard', cost: 0, type: 'status', targetType: 'none',
+    rarity: 'status', isStatus: true, retained: true, unplayable: true,
+    description: 'Unplayable. Retained. On enter hand: gain Slowed 1. Each turn end in hand: gain Petrify 1. Exhausts after 2 turns.',
+    shortDescription: 'Unplayable. Retained. Slowed 1 on enter. +Petrify 1/turn end. Gone in 2.',
+    effect() {},
+    onDraw(state) { applyStatus(state.player, 'slowed', 1); },
+    onRetain(state) {
+      if (state) gainPetrify(state.player, 1);
+      this._retainsLeft = (this._retainsLeft ?? 2) - 1;
+      return this._retainsLeft <= 0;
+    },
+    upgrade: null,
+  },
   numbing_mist: {
     id: 'numbing_mist', name: 'Numbing Mist', cost: 0, type: 'status', targetType: 'none',
     rarity: 'status', isStatus: true, ethereal: true,

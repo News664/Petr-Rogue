@@ -87,7 +87,7 @@ export function playCard(state, handIndex, targetIndex = 0) {
 export function endPlayerTurn(state) {
   _log(state, '— End of your turn —');
   triggerRelics('onTurnEnd', state);
-  discardHand(state.combat.deckState);
+  discardHand(state.combat.deckState, state);
   return _runEnemyTurn(state);
 }
 
@@ -114,7 +114,8 @@ function _startPlayerTurn(state) {
   if (cause) return { event: 'game_over', cause };
 
   _log(state, `— Turn ${combat.turn} —`);
-  drawCards(combat.deckState, 5, state);
+  const slowed = player.statusEffects?.slowed ?? 0;
+  drawCards(combat.deckState, Math.max(1, 5 - slowed), state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }

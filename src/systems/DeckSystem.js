@@ -46,15 +46,24 @@ export function discardCard(deckState, handIndex) {
   return card;
 }
 
-export function discardHand(deckState) {
-  for (const card of deckState.hand) {
-    if (card.ethereal) {
+export function discardHand(deckState, state = null) {
+  for (let i = deckState.hand.length - 1; i >= 0; i--) {
+    const card = deckState.hand[i];
+    if (card.retained) {
+      const exhaust = card.onRetain ? card.onRetain(state) : false;
+      if (exhaust) {
+        deckState.hand.splice(i, 1);
+        deckState.exhaust.push(card);
+      }
+      // else stays in hand for next turn
+    } else if (card.ethereal) {
+      deckState.hand.splice(i, 1);
       deckState.exhaust.push(card);
     } else {
+      deckState.hand.splice(i, 1);
       deckState.discard.push(card);
     }
   }
-  deckState.hand = [];
 }
 
 export function exhaustCard(deckState, handIndex) {

@@ -29,6 +29,13 @@ export function addCardToDraw(deckState, card) {
   deckState.draw.splice(i, 0, card);
 }
 
+// Add a card directly to hand and fire its onDraw hook immediately (for instant-threat status cards).
+export function addCardToHand(deckState, card, state = null) {
+  if (deckState.hand.length >= HAND_CAP) return;
+  deckState.hand.push(card);
+  if (card.onDraw && state) card.onDraw(state);
+}
+
 export function discardCard(deckState, handIndex) {
   const [card] = deckState.hand.splice(handIndex, 1);
   if (card.ethereal) {

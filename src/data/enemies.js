@@ -1,6 +1,6 @@
 import { applyDamage, applyBlock, gainPetrify } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
-import { addCardToDraw } from '../systems/DeckSystem.js';
+import { addCardToDraw, addCardToHand } from '../systems/DeckSystem.js';
 import { makeCard } from './cards.js';
 
 // ── Intent builders ───────────────────────────────────────────────────────────
@@ -23,9 +23,13 @@ const atkP = (label, dmg, pt) => ({
   action: (e, p) => { gainPetrify(p, pt, e); applyDamage(p, dmg, e); },
 });
 
-const addShard = (label) => ({
+const addShard  = (label) => ({
   label, icon: '💀',
   action: (e, p, state) => addCardToDraw(state.combat.deckState, makeCard('stone_shard')),
+});
+const addSliver = (label) => ({
+  label, icon: '💎',
+  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state),
 });
 
 function _log(state, msg) {
@@ -51,18 +55,15 @@ const _sentinelP2 = [
 ];
 
 const _kingP2 = [
-  atkP('Reign of Stone 20+10', 20, 10),
-  anchor('Iron Will 3', 3),
-  atk('Crushing Decree 30', 30),
-  calc('Royal Calcify 4', 4),
-  { label: 'Stone Edict', icon: '💀',
+  atkP('Reign of Stone 20+8', 20, 8),
+  atk('Crushing Decree 26', 26),
+  { label: 'Attune Edict', icon: '💎',
     action(e, p, state) {
-      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
-      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
-      gainPetrify(p, 6);
+      addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state);
+      addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state);
     } },
-  atk('Crushing Decree 32', 32),
-  crumble('Crumble 5', 5),
+  atkP('Final Judgment 18+10', 18, 10),
+  petr('Royal Wrath 8 · direct', 8),
 ];
 
 const _heartP2 = [
@@ -76,7 +77,6 @@ const _heartP2 = [
       gainPetrify(p, 8);
     } },
   numb('Deep Drain 6', 6),
-  // Phase 3 trigger at ≤33% HP
   { label: 'Phase Shift II', icon: '🌑',
     action(e, p, state) {
       if (!e._phase2done && e.hp <= e.maxHp * 0.33) {
@@ -167,54 +167,53 @@ export const enemyDefs = {
 
   // ── Act 2: The Deep Mines ─────────────────────────────────────────────────
 
-  magma_imp: {
-    id: 'magma_imp', name: 'Magma Imp', maxHp: 34,
-    intents: [atk('Scorch 8', 8), calc('Calcify 2', 2), atk('Scorch 10', 10), atkP('Burn 7+3', 7, 3)],
+  crystal_imp: {
+    id: 'crystal_imp', name: 'Crystal Imp', maxHp: 30,
+    intents: [petr('Crystal Sting 3 · direct', 3), atk('Scratch 7', 7), addShard('Shard Burst'), atk('Scratch 9', 9)],
   },
   crystal_horror: {
-    id: 'crystal_horror', name: 'Crystal Horror', maxHp: 30,
-    intents: [atk('Shard 5', 5), atk('Shard 5', 5), vuln('Expose 2', 2), atk('Shard 6', 6), addShard('Shatter')],
+    id: 'crystal_horror', name: 'Crystal Horror', maxHp: 42,
+    intents: [atk('Shard 5', 5), addSliver('Attune'), atk('Shard 6', 6), addShard('Shatter')],
   },
   void_golem: {
     id: 'void_golem', name: 'Void Golem', maxHp: 72,
-    intents: [blk('Shell 10', 10), atk('Slam 16', 16), numb('Drain 3', 3), atk('Slam 18', 18)],
+    intents: [blk('Stone Shell 10', 10), atkP('Void Crush 12+4', 12, 4), anchor('Seal 2', 2), atk('Slam 18', 18)],
   },
 
   crystal_titan: {
-    id: 'crystal_titan', name: 'Crystal Titan', maxHp: 120,
+    id: 'crystal_titan', name: 'Crystal Titan', maxHp: 110,
     intents: [
-      blk('Reinforce 12', 12),
-      atkP('Crystal Slam 14+5', 14, 5),
-      addShard('Shatter ×2'),
-      calc('Calcify 3', 3),
-      atk('Titan Crush 22', 22),
       blk('Reinforce 14', 14),
-      atkP('Crystal Slam 16+6', 16, 6),
+      atkP('Crystal Slam 14+5', 14, 5),
+      addSliver('Attune Surge'),
+      addShard('Shard Storm ×2'),
+      atk('Titan Crush 22', 22),
     ],
   },
-  molten_knight: {
-    id: 'molten_knight', name: 'Molten Knight', maxHp: 105,
+  stone_marauder: {
+    id: 'stone_marauder', name: 'Stone Marauder', maxHp: 100,
     intents: [
-      atkP('Magma Strike 12+4', 12, 4),
-      calc('Calcify 4', 4),
-      atk('Molten Blade 18', 18),
-      numb('Heat 4', 4),
-      atkP('Magma Strike 14+5', 14, 5),
-      vuln('Scorch 2', 2),
-      atk('Molten Blade 20', 20),
+      atkP('Crush 11+4', 11, 4),
+      calc('Calcify 3', 3),
+      petrifyPower('Deepen +2', 2),
+      atkP('Deep Crush 13+5', 13, 5),
+      petr('Stone Aura 6 · direct', 6),
     ],
   },
 
+  stone_royal_guard: {
+    id: 'stone_royal_guard', name: 'Stone Royal Guard', maxHp: 60,
+    isSummon: true,
+    intents: [blk('Shield Wall 12', 12), addSliver('Crystal Pulse'), atkP('Thorn Strike 7+3', 7, 3)],
+  },
   petrified_king: {
-    id: 'petrified_king', name: 'Petrified King', maxHp: 180,
+    id: 'petrified_king', name: 'Petrified King', maxHp: 190,
     intents: [
-      blk('Royal Guard 16', 16),
-      atk('Kingly Blow 20', 20),
-      calc('Calcify 4', 4),
-      atkP('Stone Fist 16+6', 16, 6),
-      numb('Reign 4', 4),
-      atk('Kingly Blow 22', 22),
+      atkP('Kingly Blow 16+5', 16, 5),
       strengthen('Royal Wrath +3', 3),
+      atk('Crushing Strike 20', 20),
+      petr('Royal Decree 6 · direct', 6),
+      calc('Calcify 3', 3),
     ],
     onPhaseCheck(e, p, state) {
       if (!e._enraged && e.hp <= e.maxHp * 0.5) {
@@ -308,21 +307,22 @@ export const bossEncounters = [
 ];
 
 export const act2CombatEncounters = [
-  ['magma_imp'],
-  ['crystal_horror', 'magma_imp'],
+  ['crystal_imp'],
+  ['crystal_horror', 'crystal_imp'],
   ['void_golem'],
   ['crystal_horror', 'crystal_horror'],
-  ['magma_imp', 'void_golem'],
+  ['crystal_imp', 'crystal_imp', 'crystal_imp'],
+  ['crystal_horror', 'void_golem'],
 ];
 
 export const act2EliteEncounters = [
   ['crystal_titan'],
-  ['molten_knight'],
-  ['void_golem', 'crystal_horror'],
+  ['stone_marauder'],
+  ['crystal_titan', 'crystal_imp'],
 ];
 
 export const act2BossEncounters = [
-  ['petrified_king'],
+  ['stone_royal_guard', 'petrified_king', 'stone_royal_guard'],
 ];
 
 export const act3CombatEncounters = [

@@ -12,6 +12,16 @@ function _log(state, msg) {
   state.combat.lastLog = msg;
 }
 
+// Summons (e.g. Stone Royal Guard) flee when all non-summon enemies are dead.
+function _checkVictory(combat) {
+  const principals = combat.enemies.filter(e => !e.isSummon);
+  if (principals.length > 0 && principals.every(e => e.hp <= 0)) {
+    for (const e of combat.enemies) e.hp = 0; // summons flee
+    return true;
+  }
+  return combat.enemies.every(e => e.hp <= 0);
+}
+
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
   state.player.statusEffects = {};
@@ -46,7 +56,6 @@ export function playCard(state, handIndex, targetIndex = 0) {
   const hpBefore      = target?.hp;
   card.effect(state, target);
 
-  // Build a human-readable log entry
   let msg = `You played ${card.name}.`;
   if (target && hpBefore !== undefined) {
     const dmgDealt = hpBefore - Math.max(0, target.hp);
@@ -58,12 +67,12 @@ export function playCard(state, handIndex, targetIndex = 0) {
   }
   _log(state, msg);
 
-  // Re-find card by reference: effects like Sanctify may splice the hand,
-  // invalidating the original handIndex.
+  // Power cards vanish (become the active effect); others exhaust or discard.
   const newIdx = combat.deckState.hand.indexOf(card);
   if (newIdx !== -1) {
-    if (card.exhaust) exhaustCard(combat.deckState, newIdx);
-    else              discardCard(combat.deckState, newIdx);
+    if (card.type === 'power') combat.deckState.hand.splice(newIdx, 1);
+    else if (card.exhaust)    exhaustCard(combat.deckState, newIdx);
+    else                      discardCard(combat.deckState, newIdx);
   }
 
   triggerRelics('onCardPlayed', state, { card });
@@ -71,7 +80,7 @@ export function playCard(state, handIndex, targetIndex = 0) {
 
   const cause = checkDeathCause(player);
   if (cause) return { ok: true, event: 'game_over', cause };
-  if (combat.enemies.every(e => e.hp <= 0)) return { ok: true, event: 'victory' };
+  if (_checkVictory(combat)) return { ok: true, event: 'victory' };
   return { ok: true };
 }
 
@@ -142,7 +151,7 @@ function _runEnemyTurn(state) {
     if (cause) return { event: 'game_over', cause };
   }
 
-  if (combat.enemies.every(e => e.hp <= 0)) return { event: 'victory' };
+  if (_checkVictory(combat)) return { event: 'victory' };
 
   const turnResult = _startPlayerTurn(state);
   if (turnResult?.event === 'game_over') return turnResult;

@@ -259,6 +259,15 @@ export const cardDefs = {
     onDraw(state) { gainPetrify(state.player, 3); },
     upgrade: null,
   },
+  crystal_sliver: {
+    id: 'crystal_sliver', name: 'Crystal Sliver', cost: 0, type: 'status', targetType: 'none',
+    rarity: 'status', isStatus: true, ethereal: true, unplayable: true,
+    description: 'Unplayable. Ethereal. On enter hand: gain Attuned 2.',
+    shortDescription: 'Unplayable. Ethereal. +Attuned 2 on enter.',
+    effect() {},
+    onDraw(state) { applyStatus(state.player, 'attuned', 2); },
+    upgrade: null,
+  },
   numbing_mist: {
     id: 'numbing_mist', name: 'Numbing Mist', cost: 0, type: 'status', targetType: 'none',
     rarity: 'status', isStatus: true, ethereal: true,

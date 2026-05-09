@@ -1,4 +1,4 @@
-export const FLOORS_PER_ACT = 5;
+export const FLOORS_PER_ACT = 10;
 export const NUM_ACTS       = 3;
 export const FLOORS         = FLOORS_PER_ACT * NUM_ACTS; // 30
 

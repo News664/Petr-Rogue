@@ -12,6 +12,16 @@ function _log(state, msg) {
   state.combat.lastLog = msg;
 }
 
+// Summons (e.g. Stone Royal Guard) flee when all non-summon enemies are dead.
+function _checkVictory(combat) {
+  const principals = combat.enemies.filter(e => !e.isSummon);
+  if (principals.length > 0 && principals.every(e => e.hp <= 0)) {
+    for (const e of combat.enemies) e.hp = 0; // summons flee
+    return true;
+  }
+  return combat.enemies.every(e => e.hp <= 0);
+}
+
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
   state.player.statusEffects = {};
@@ -33,13 +43,21 @@ export function startCombat(state, enemyIds) {
   return _startPlayerTurn(state);
 }
 
+// Non-status cards cost +1 per Stasis card in hand, capped at 3.
+function _effectiveCost(card, hand) {
+  if (card.isStatus) return card.cost;
+  const stasis = hand.filter(c => c.id === 'stasis').length;
+  return Math.min(3, card.cost + stasis);
+}
+
 export function playCard(state, handIndex, targetIndex = 0) {
   const { combat, player } = state;
   const card = combat.deckState.hand[handIndex];
   if (!card) return { ok: false, reason: 'invalid_card' };
-  if (card.cost > combat.energy) return { ok: false, reason: 'no_energy' };
+  const effectiveCost = _effectiveCost(card, combat.deckState.hand);
+  if (effectiveCost > combat.energy) return { ok: false, reason: 'no_energy' };
 
-  combat.energy -= card.cost;
+  combat.energy -= effectiveCost;
   const target = card.targetType === 'enemy' ? combat.enemies[targetIndex] : null;
 
   const petrifyBefore = player.petrify;
@@ -57,10 +75,12 @@ export function playCard(state, handIndex, targetIndex = 0) {
   }
   _log(state, msg);
 
+  // Power cards vanish (become the active effect); others exhaust or discard.
   const newIdx = combat.deckState.hand.indexOf(card);
   if (newIdx !== -1) {
-    if (card.exhaust) exhaustCard(combat.deckState, newIdx);
-    else              discardCard(combat.deckState, newIdx);
+    if (card.type === 'power') combat.deckState.hand.splice(newIdx, 1);
+    else if (card.exhaust)    exhaustCard(combat.deckState, newIdx);
+    else                      discardCard(combat.deckState, newIdx);
   }
 
   triggerRelics('onCardPlayed', state, { card });
@@ -68,14 +88,14 @@ export function playCard(state, handIndex, targetIndex = 0) {
 
   const cause = checkDeathCause(player);
   if (cause) return { ok: true, event: 'game_over', cause };
-  if (combat.enemies.every(e => e.hp <= 0)) return { ok: true, event: 'victory' };
+  if (_checkVictory(combat)) return { ok: true, event: 'victory' };
   return { ok: true };
 }
 
 export function endPlayerTurn(state) {
   _log(state, '— End of your turn —');
   triggerRelics('onTurnEnd', state);
-  discardHand(state.combat.deckState);
+  discardHand(state.combat.deckState, state);
   return _runEnemyTurn(state);
 }
 
@@ -102,7 +122,8 @@ function _startPlayerTurn(state) {
   if (cause) return { event: 'game_over', cause };
 
   _log(state, `— Turn ${combat.turn} —`);
-  drawCards(combat.deckState, 5, state);
+  const slowed = player.statusEffects?.slowed ?? 0;
+  drawCards(combat.deckState, 5 - (slowed > 0 ? 1 : 0), state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }
@@ -139,7 +160,7 @@ function _runEnemyTurn(state) {
     if (cause) return { event: 'game_over', cause };
   }
 
-  if (combat.enemies.every(e => e.hp <= 0)) return { event: 'victory' };
+  if (_checkVictory(combat)) return { event: 'victory' };
 
   const turnResult = _startPlayerTurn(state);
   if (turnResult?.event === 'game_over') return turnResult;

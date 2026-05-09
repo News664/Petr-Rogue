@@ -26,6 +26,10 @@ export function applyBlock(entity, amount) {
 // Stone Coat intercepts Petrify gain and converts stacks to Block first
 export function gainPetrify(player, amount, source = null) {
   let remaining = amount + (source?._petrifyPower ?? 0);
+  // Attuned: amplify all Petrify gain (self or enemy sourced)
+  if (remaining > 0 && (player.statusEffects?.attuned ?? 0) > 0) {
+    remaining += player.statusEffects.attuned;
+  }
   const coat = player.statusEffects?.stoneCoat ?? 0;
   if (remaining > 0 && coat > 0) {
     const absorbed = Math.min(coat, remaining);

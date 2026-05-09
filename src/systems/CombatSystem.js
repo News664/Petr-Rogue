@@ -43,13 +43,21 @@ export function startCombat(state, enemyIds) {
   return _startPlayerTurn(state);
 }
 
+// Non-status cards cost +1 per Stasis card in hand, capped at 3.
+function _effectiveCost(card, hand) {
+  if (card.isStatus) return card.cost;
+  const stasis = hand.filter(c => c.id === 'stasis').length;
+  return Math.min(3, card.cost + stasis);
+}
+
 export function playCard(state, handIndex, targetIndex = 0) {
   const { combat, player } = state;
   const card = combat.deckState.hand[handIndex];
   if (!card) return { ok: false, reason: 'invalid_card' };
-  if (card.cost > combat.energy) return { ok: false, reason: 'no_energy' };
+  const effectiveCost = _effectiveCost(card, combat.deckState.hand);
+  if (effectiveCost > combat.energy) return { ok: false, reason: 'no_energy' };
 
-  combat.energy -= card.cost;
+  combat.energy -= effectiveCost;
   const target = card.targetType === 'enemy' ? combat.enemies[targetIndex] : null;
 
   const petrifyBefore = player.petrify;
@@ -115,7 +123,7 @@ function _startPlayerTurn(state) {
 
   _log(state, `— Turn ${combat.turn} —`);
   const slowed = player.statusEffects?.slowed ?? 0;
-  drawCards(combat.deckState, Math.max(1, 5 - slowed), state);
+  drawCards(combat.deckState, slowed > 0 ? 4 : 5, state);
   triggerRelics('onTurnStart', state);
   _triggerPowers(state, 'onTurnStart', {});
 }

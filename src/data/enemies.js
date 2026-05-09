@@ -31,10 +31,10 @@ const addSliver = (label) => ({
   label, icon: '💎',
   action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state),
 });
-const slow = (label, stks) => ({ label, icon: '⏳', action: (e, p) => applyStatus(p, 'slowed', stks) });
-const addTemporalShard = (label) => ({
+const slow     = (label, stks) => ({ label, icon: '⏳', action: (e, p) => applyStatus(p, 'slowed', stks) });
+const addStasis = (label) => ({
   label, icon: '⌛',
-  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state),
+  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('stasis'), state),
 });
 
 function _log(state, msg) {
@@ -80,7 +80,7 @@ const _heartP2 = [
     action(e, p, state) {
       addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
       addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
-      addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state);
+      addCardToHand(state.combat.deckState, makeCard('stasis'), state);
       gainPetrify(p, 8);
     } },
   numb('Deep Drain 6', 6),
@@ -243,7 +243,7 @@ export const enemyDefs = {
   },
   void_phantom: {
     id: 'void_phantom', name: 'Void Phantom', maxHp: 58,
-    intents: [addTemporalShard('Temporal Pulse'), atk('Phase Strike 9', 9), anchor('Void Bind 2', 2), atkP('Null Touch 8+4', 8, 4)],
+    intents: [addStasis('Temporal Pulse'), atk('Phase Strike 9', 9), anchor('Void Bind 2', 2), atkP('Null Touch 8+4', 8, 4)],
   },
   abyss_crawler: {
     id: 'abyss_crawler', name: 'Abyss Crawler', maxHp: 88,
@@ -255,7 +255,7 @@ export const enemyDefs = {
     intents: [
       slow('Time Warp 2', 2),
       atkP('Void Slam 15+6', 15, 6),
-      addTemporalShard('Distort'),
+      addStasis('Distort'),
       anchor('Void Bind 3', 3),
       atk('Judgment 24', 24),
     ],
@@ -280,8 +280,8 @@ export const enemyDefs = {
       atkP('Heart Crush 18+8', 18, 8),
       { label: 'Temporal Pulse', icon: '⌛',
         action(e, p, state) {
-          addCardToHand(state.combat.deckState, makeCard('temporal_shard'), state);
-          applyStatus(p, 'slowed', 2);
+          addCardToHand(state.combat.deckState, makeCard('stasis'), state);
+          applyStatus(p, 'slowed', 1);
         } },
       atk('Heartbeat 25', 25),
       strengthen('Pulse +3', 3),

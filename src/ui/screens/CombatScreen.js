@@ -118,17 +118,32 @@ function _renderSpriteArea(player) {
   `;
 }
 
+function _effectiveCost(card, hand) {
+  if (card.isStatus) return card.cost;
+  const stasis = hand.filter(c => c.id === 'stasis').length;
+  return Math.min(3, card.cost + stasis);
+}
+
+function _cardTypeLabel(card) {
+  let t = card.type;
+  if (card.ethereal) t += ' · ethereal';
+  if (card.retained) t += ' · retained';
+  return t;
+}
+
 function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
   const n = hand.length;
   return hand.map((card, i) => {
+    const cost     = _effectiveCost(card, hand);
     const unplayable = !!card.unplayable;
-    const disabled = unplayable || card.cost > energy;
+    const disabled = unplayable || cost > energy;
     const selected = !unplayable && i === _selectedHandIndex;
     const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
     const extraCls = (card.isStatus ? ' card-status' : '') + (card.isCurse ? ' card-curse' : '');
     const norm = n > 1 ? (i / (n - 1) - 0.5) : 0;
     const rot  = (norm * 24).toFixed(1);
     const yo   = (norm * norm * 36).toFixed(1);
+    const costInflated = cost > card.cost;
     return `
       <div class="card${disabled ? ' card-disabled' : ''}${selected ? ' card-selected' : ''}${extraCls}"
            data-index="${i}"
@@ -138,10 +153,10 @@ function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
                onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
         </div>
         <div class="card-header">
-          <div class="card-cost">${card.cost}</div>
+          <div class="card-cost${costInflated ? ' cost-inflated' : ''}">${cost}</div>
           <div class="card-name">${card.name}</div>
         </div>
-        <div class="card-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
+        <div class="card-type">${_cardTypeLabel(card)}</div>
         <div class="card-desc">${card.shortDescription ?? card.description}</div>
       </div>
     `;
@@ -209,23 +224,25 @@ function _attachEvents() {
       if (!detail) return;
       const card = GameState.combat.deckState.hand[Number(el.dataset.index)];
       if (!card) return;
+      const detailCost = _effectiveCost(card, GameState.combat.deckState.hand);
+      const detailInflated = detailCost > card.cost;
       detail.innerHTML = `
         <div class="card-detail-art">
           <img src="assets/cards/${charId}/${card.id}.png" alt=""
                onerror="this.src='assets/cards/${card.id}.png';this.onerror=()=>this.style.visibility='hidden'">
         </div>
         <div class="card-detail-header">
-          <div class="card-detail-cost">${card.cost}</div>
+          <div class="card-detail-cost${detailInflated ? ' cost-inflated' : ''}">${detailCost}</div>
           <div class="card-detail-name">${card.name}</div>
         </div>
-        <div class="card-detail-type">${card.type}${card.ethereal ? ' · ethereal' : ''}</div>
+        <div class="card-detail-type">${_cardTypeLabel(card)}</div>
         <div class="card-detail-desc">${card.description}</div>
       `;
     });
     el.addEventListener('mouseleave', () => { if (detail) detail.innerHTML = ''; });
   });
 
-  _container.querySelectorAll('.card:not(.card-disabled):not(.card-status):not(.card-curse)').forEach(el => {
+  _container.querySelectorAll('.card:not(.card-disabled)').forEach(el => {
     el.addEventListener('click', () => _onCardClick(Number(el.dataset.index)));
   });
   _container.querySelectorAll('.enemy:not(.dead)').forEach(el => {

@@ -2,11 +2,11 @@ import { applyDamage, applyBlock, gainPetrify, reducePetrify } from '../systems/
 import { applyStatus } from '../systems/StatusSystem.js';
 import { drawCards } from '../systems/DeckSystem.js';
 
-// ── Card definitions ─────────────────────────────────────────────────────────
+// ── Card definitions ─────────────────────────────────────────────────────────────────────
 
 export const cardDefs = {
 
-  // ── Starter / shared basic ────────────────────────────────────────────────
+  // ── Starter / shared basic ────────────────────────────────────────────
 
   strike: {
     id: 'strike', name: 'Strike', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'basic',
@@ -23,7 +23,7 @@ export const cardDefs = {
       effect(state) { applyBlock(state.player, 8); } },
   },
 
-  // ── Shared reward pool ────────────────────────────────────────────────────
+  // ── Shared reward pool ────────────────────────────────────────────────
 
   bash: {
     id: 'bash', name: 'Bash', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'common', colorless: true,
@@ -119,7 +119,7 @@ export const cardDefs = {
       effect(state) { gainPetrify(state.player, 9); applyBlock(state.player, 9); } },
   },
 
-  // ── Mint unique ───────────────────────────────────────────────────────────
+  // ── Mint unique ────────────────────────────────────────────────────────────────────
 
   purifying_touch: {
     id: 'purifying_touch', name: 'Purifying Touch', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
@@ -257,6 +257,23 @@ export const cardDefs = {
     shortDescription: 'Unplayable. Ethereal. +3 Petrify on draw.',
     effect() {},
     onDraw(state) { gainPetrify(state.player, 3); },
+    upgrade: null,
+  },
+  crystal_sliver: {
+    id: 'crystal_sliver', name: 'Crystal Sliver', cost: 0, type: 'status', targetType: 'none',
+    rarity: 'status', isStatus: true, ethereal: true, unplayable: true,
+    description: 'Unplayable. Ethereal. On enter hand: gain Attuned 2.',
+    shortDescription: 'Unplayable. Ethereal. +Attuned 2 on enter.',
+    effect() {},
+    onDraw(state) { applyStatus(state.player, 'attuned', 2); },
+    upgrade: null,
+  },
+  stasis: {
+    id: 'stasis', name: 'Stasis', cost: 1, type: 'status', targetType: 'none',
+    rarity: 'status', isStatus: true, retained: true, exhaust: true,
+    description: 'Retained. Exhaust. While in hand: all non-status cards cost +1 (max 3). Play to remove.',
+    shortDescription: 'Retained. Exhaust. Non-status cards cost +1 (max 3) while held.',
+    effect() {},
     upgrade: null,
   },
   numbing_mist: {

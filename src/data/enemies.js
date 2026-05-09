@@ -1,9 +1,9 @@
 import { applyDamage, applyBlock, gainPetrify } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
-import { addCardToDraw } from '../systems/DeckSystem.js';
+import { addCardToDraw, addCardToHand } from '../systems/DeckSystem.js';
 import { makeCard } from './cards.js';
 
-// ── Intent builders ───────────────────────────────────────────────────────────
+// ── Intent builders ─────────────────────────────────────────────────────────────────────────
 
 const atk      = (label, dmg)   => ({ label, icon: '⚔️',  damage: dmg, action: (e, p) => applyDamage(p, dmg, e) });
 const petr     = (label, amt)   => ({ label, icon: '🪨',  action: (e, p) => gainPetrify(p, amt, e) });
@@ -23,9 +23,18 @@ const atkP = (label, dmg, pt) => ({
   action: (e, p) => { gainPetrify(p, pt, e); applyDamage(p, dmg, e); },
 });
 
-const addShard = (label) => ({
+const addShard  = (label) => ({
   label, icon: '💀',
   action: (e, p, state) => addCardToDraw(state.combat.deckState, makeCard('stone_shard')),
+});
+const addSliver = (label) => ({
+  label, icon: '💎',
+  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state),
+});
+const slow     = (label, stks) => ({ label, icon: '⏳', action: (e, p) => applyStatus(p, 'slowed', stks) });
+const addStasis = (label) => ({
+  label, icon: '⌛',
+  action: (e, p, state) => addCardToHand(state.combat.deckState, makeCard('stasis'), state),
 });
 
 function _log(state, msg) {
@@ -51,18 +60,15 @@ const _sentinelP2 = [
 ];
 
 const _kingP2 = [
-  atkP('Reign of Stone 20+10', 20, 10),
-  anchor('Iron Will 3', 3),
-  atk('Crushing Decree 30', 30),
-  calc('Royal Calcify 4', 4),
-  { label: 'Stone Edict', icon: '💀',
+  atkP('Reign of Stone 20+8', 20, 8),
+  atk('Crushing Decree 26', 26),
+  { label: 'Attune Edict', icon: '💎',
     action(e, p, state) {
-      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
-      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
-      gainPetrify(p, 6);
+      addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state);
+      addCardToHand(state.combat.deckState, makeCard('crystal_sliver'), state);
     } },
-  atk('Crushing Decree 32', 32),
-  crumble('Crumble 5', 5),
+  atkP('Final Judgment 18+10', 18, 10),
+  petr('Royal Wrath 8 · direct', 8),
 ];
 
 const _heartP2 = [
@@ -72,7 +78,9 @@ const _heartP2 = [
   anchor('Eternal Bind 4', 4),
   { label: 'Void Rain', icon: '💀',
     action(e, p, state) {
-      for (let i = 0; i < 3; i++) addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToDraw(state.combat.deckState, makeCard('stone_shard'));
+      addCardToHand(state.combat.deckState, makeCard('stasis'), state);
       gainPetrify(p, 8);
     } },
   numb('Deep Drain 6', 6),
@@ -100,11 +108,11 @@ const _heartP3 = [
     action(e, p) { gainPetrify(p, 15); applyDamage(p, 15, e); } },
 ];
 
-// ── Enemy definitions ─────────────────────────────────────────────────────────
+// ── Enemy definitions ────────────────────────────────────────────────────────────────────────
 
 export const enemyDefs = {
 
-  // ── Act 1: The Surface Ruins ─────────────────────────────────────────────
+  // ── Act 1: The Surface Ruins ─────────────────────────────────────────────────
 
   stone_imp: {
     id: 'stone_imp', name: 'Stone Imp', maxHp: 22,
@@ -164,56 +172,55 @@ export const enemyDefs = {
     },
   },
 
-  // ── Act 2: The Deep Mines ─────────────────────────────────────────────────
+  // ── Act 2: The Deep Mines ──────────────────────────────────────────────────
 
-  magma_imp: {
-    id: 'magma_imp', name: 'Magma Imp', maxHp: 34,
-    intents: [atk('Scorch 8', 8), calc('Calcify 2', 2), atk('Scorch 10', 10), atkP('Burn 7+3', 7, 3)],
+  crystal_imp: {
+    id: 'crystal_imp', name: 'Crystal Imp', maxHp: 30,
+    intents: [petr('Crystal Sting 3 · direct', 3), atk('Scratch 7', 7), addShard('Shard Burst'), atk('Scratch 9', 9)],
   },
   crystal_horror: {
-    id: 'crystal_horror', name: 'Crystal Horror', maxHp: 30,
-    intents: [atk('Shard 5', 5), atk('Shard 5', 5), vuln('Expose 2', 2), atk('Shard 6', 6), addShard('Shatter')],
+    id: 'crystal_horror', name: 'Crystal Horror', maxHp: 42,
+    intents: [atk('Shard 5', 5), addSliver('Attune'), atk('Shard 6', 6), addShard('Shatter')],
   },
   void_golem: {
     id: 'void_golem', name: 'Void Golem', maxHp: 72,
-    intents: [blk('Shell 10', 10), atk('Slam 16', 16), numb('Drain 3', 3), atk('Slam 18', 18)],
+    intents: [blk('Stone Shell 10', 10), atkP('Void Crush 12+4', 12, 4), anchor('Seal 2', 2), atk('Slam 18', 18)],
   },
 
   crystal_titan: {
-    id: 'crystal_titan', name: 'Crystal Titan', maxHp: 120,
+    id: 'crystal_titan', name: 'Crystal Titan', maxHp: 110,
     intents: [
-      blk('Reinforce 12', 12),
-      atkP('Crystal Slam 14+5', 14, 5),
-      addShard('Shatter ×2'),
-      calc('Calcify 3', 3),
-      atk('Titan Crush 22', 22),
       blk('Reinforce 14', 14),
-      atkP('Crystal Slam 16+6', 16, 6),
+      atkP('Crystal Slam 14+5', 14, 5),
+      addSliver('Attune Surge'),
+      addShard('Shard Storm ×2'),
+      atk('Titan Crush 22', 22),
     ],
   },
-  molten_knight: {
-    id: 'molten_knight', name: 'Molten Knight', maxHp: 105,
+  stone_marauder: {
+    id: 'stone_marauder', name: 'Stone Marauder', maxHp: 100,
     intents: [
-      atkP('Magma Strike 12+4', 12, 4),
-      calc('Calcify 4', 4),
-      atk('Molten Blade 18', 18),
-      numb('Heat 4', 4),
-      atkP('Magma Strike 14+5', 14, 5),
-      vuln('Scorch 2', 2),
-      atk('Molten Blade 20', 20),
+      atkP('Crush 11+4', 11, 4),
+      calc('Calcify 3', 3),
+      petrifyPower('Deepen +2', 2),
+      atkP('Deep Crush 13+5', 13, 5),
+      petr('Stone Aura 6 · direct', 6),
     ],
   },
 
+  stone_royal_guard: {
+    id: 'stone_royal_guard', name: 'Stone Royal Guard', maxHp: 60,
+    isSummon: true,
+    intents: [blk('Shield Wall 12', 12), addSliver('Crystal Pulse'), atkP('Thorn Strike 7+3', 7, 3)],
+  },
   petrified_king: {
-    id: 'petrified_king', name: 'Petrified King', maxHp: 180,
+    id: 'petrified_king', name: 'Petrified King', maxHp: 190,
     intents: [
-      blk('Royal Guard 16', 16),
-      atk('Kingly Blow 20', 20),
-      calc('Calcify 4', 4),
-      atkP('Stone Fist 16+6', 16, 6),
-      numb('Reign 4', 4),
-      atk('Kingly Blow 22', 22),
+      atkP('Kingly Blow 16+5', 16, 5),
       strengthen('Royal Wrath +3', 3),
+      atk('Crushing Strike 20', 20),
+      petr('Royal Decree 6 · direct', 6),
+      calc('Calcify 3', 3),
     ],
     onPhaseCheck(e, p, state) {
       if (!e._enraged && e.hp <= e.maxHp * 0.5) {
@@ -225,43 +232,42 @@ export const enemyDefs = {
     },
   },
 
-  // ── Act 3: The Abyss ─────────────────────────────────────────────────────
+  // ── Act 3: The Abyss — Staggering ────────────────────────────────────────────
+  // Theme: enemies manipulate time, dragging fights out so they can grow
+  // stronger. New mechanics: Slowed (fewer draws) and Stasis (retained
+  // status card that inflates all non-status card costs while held).
 
-  void_stalker: {
-    id: 'void_stalker', name: 'Void Stalker', maxHp: 42,
-    intents: [atk('Rend 7', 7), atk('Rend 7', 7), numb('Drain 4', 4), vuln('Tear 2', 2), atk('Rend 9', 9)],
+  temporal_wraith: {
+    id: 'temporal_wraith', name: 'Temporal Wraith', maxHp: 45,
+    intents: [slow('Time Tear 2', 2), atk('Wraith Strike 8', 8), slow('Fade 1', 1), atk('Wraith Strike 10', 10)],
   },
-  ancient_revenant: {
-    id: 'ancient_revenant', name: 'Ancient Revenant', maxHp: 40,
-    intents: [anchor('Bind 2', 2), atk('Haunt 12', 12), blk('Coalesce 8', 8), atkP('Drain 10+4', 10, 4)],
+  void_phantom: {
+    id: 'void_phantom', name: 'Void Phantom', maxHp: 58,
+    intents: [addStasis('Temporal Pulse'), atk('Phase Strike 9', 9), anchor('Void Bind 2', 2), atkP('Null Touch 8+4', 8, 4)],
   },
-  null_monolith: {
-    id: 'null_monolith', name: 'Null Monolith', maxHp: 95,
-    intents: [blk('Void Shell 14', 14), calc('Calcify 4', 4), numb('Drain 5', 5), atk('Void Slam 22', 22), crumble('Erode 4', 4)],
+  abyss_crawler: {
+    id: 'abyss_crawler', name: 'Abyss Crawler', maxHp: 88,
+    intents: [blk('Crawl 12', 12), calc('Stone Seep 4', 4), strengthen('Ancient Power +2', 2), atk('Crush 20', 20)],
   },
 
-  void_colossus: {
-    id: 'void_colossus', name: 'Void Colossus', maxHp: 148,
+  void_revenant: {
+    id: 'void_revenant', name: 'Void Revenant', maxHp: 150,
     intents: [
-      atkP('Void Crush 18+7', 18, 7),
-      numb('Drain 5', 5),
-      atk('Colossus Slam 26', 26),
-      calc('Deep Calcify 5', 5),
+      slow('Time Warp 2', 2),
+      atkP('Void Slam 15+6', 15, 6),
+      addStasis('Distort'),
       anchor('Void Bind 3', 3),
-      atk('Colossus Slam 28', 28),
-      crumble('Crumble 5', 5),
+      atk('Judgment 24', 24),
     ],
   },
-  ancient_warden: {
-    id: 'ancient_warden', name: 'Ancient Warden', maxHp: 135,
+  ancient_colossus: {
+    id: 'ancient_colossus', name: 'Ancient Colossus', maxHp: 165,
     intents: [
-      anchor('Ancient Seal 3', 3),
-      atkP('Primal Strike 15+8', 15, 8),
+      blk('Stone Fortress 18', 18),
       calc('Petrify Deep 5', 5),
-      atk('Warden Blow 24', 24),
-      numb('Ancient Drain 5', 5),
-      blk('Stone Veil 16', 16),
-      atk('Warden Blow 26', 26),
+      atkP('Colossus Strike 18+8', 18, 8),
+      crumble('Erode 5', 5),
+      strengthen('Monument +3', 3),
     ],
   },
 
@@ -272,7 +278,11 @@ export const enemyDefs = {
       atk('Heartbeat 22', 22),
       calc('Calcify 5', 5),
       atkP('Heart Crush 18+8', 18, 8),
-      numb('Drain 5', 5),
+      { label: 'Temporal Pulse', icon: '⌛',
+        action(e, p, state) {
+          addCardToHand(state.combat.deckState, makeCard('stasis'), state);
+          applyStatus(p, 'slowed', 1);
+        } },
       atk('Heartbeat 25', 25),
       strengthen('Pulse +3', 3),
     ],
@@ -287,7 +297,7 @@ export const enemyDefs = {
   },
 };
 
-// ── Encounter tables ──────────────────────────────────────────────────────────
+// ── Encounter tables ────────────────────────────────────────────────────────────────────
 
 export const combatEncounters = [
   ['stone_imp'],
@@ -307,35 +317,37 @@ export const bossEncounters = [
 ];
 
 export const act2CombatEncounters = [
-  ['magma_imp'],
-  ['crystal_horror', 'magma_imp'],
+  ['crystal_imp'],
+  ['crystal_horror', 'crystal_imp'],
   ['void_golem'],
   ['crystal_horror', 'crystal_horror'],
-  ['magma_imp', 'void_golem'],
+  ['crystal_imp', 'crystal_imp', 'crystal_imp'],
+  ['crystal_horror', 'void_golem'],
 ];
 
 export const act2EliteEncounters = [
   ['crystal_titan'],
-  ['molten_knight'],
-  ['void_golem', 'crystal_horror'],
+  ['stone_marauder'],
+  ['crystal_titan', 'crystal_imp'],
 ];
 
 export const act2BossEncounters = [
-  ['petrified_king'],
+  ['stone_royal_guard', 'petrified_king', 'stone_royal_guard'],
 ];
 
 export const act3CombatEncounters = [
-  ['void_stalker'],
-  ['ancient_revenant', 'void_stalker'],
-  ['null_monolith'],
-  ['void_stalker', 'void_stalker'],
-  ['ancient_revenant', 'null_monolith'],
+  ['temporal_wraith'],
+  ['void_phantom', 'temporal_wraith'],
+  ['abyss_crawler'],
+  ['temporal_wraith', 'temporal_wraith'],
+  ['void_phantom', 'abyss_crawler'],
+  ['temporal_wraith', 'temporal_wraith', 'void_phantom'],
 ];
 
 export const act3EliteEncounters = [
-  ['void_colossus'],
-  ['ancient_warden'],
-  ['void_colossus', 'void_stalker'],
+  ['void_revenant'],
+  ['ancient_colossus'],
+  ['void_revenant', 'temporal_wraith'],
 ];
 
 export const act3BossEncounters = [

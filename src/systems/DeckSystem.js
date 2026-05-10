@@ -1,8 +1,12 @@
 export const HAND_CAP = 10;
 
 export function createDeckState(cards) {
+  const innate = cards.filter(c => c.innate);
+  const rest   = cards.filter(c => !c.innate);
+  // Innate cards go to the top of the draw pile (end of array, since pop() draws from end)
+  // so they are guaranteed to be drawn on turn 1.
   return {
-    draw: shuffle([...cards]),
+    draw: [...shuffle([...rest]), ...innate],
     hand: [],
     discard: [],
     exhaust: [],

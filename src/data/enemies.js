@@ -112,7 +112,7 @@ const _heartP3 = [
 
 export const enemyDefs = {
 
-  // ── Act 1: The Surface Ruins ─────────────────────────────────────────────────
+  // ── Act 1: The Surface Ruins ─────────────────────────────────────────────
 
   stone_imp: {
     id: 'stone_imp', name: 'Stone Imp', maxHp: 22,
@@ -213,10 +213,10 @@ export const enemyDefs = {
     isSummon: true,
     intents: [blk('Shield Wall 12', 12), addSliver('Crystal Pulse'), atkP('Thorn Strike 7+3', 7, 3)],
   },
-  petrified_king: {
-    id: 'petrified_king', name: 'Petrified King', maxHp: 190,
+  petrified_queen: {
+    id: 'petrified_queen', name: 'Petrified Queen', maxHp: 190, isBoss: true,
     intents: [
-      atkP('Kingly Blow 16+5', 16, 5),
+      atkP('Regal Blow 16+5', 16, 5),
       strengthen('Royal Wrath +3', 3),
       atk('Crushing Strike 20', 20),
       petr('Royal Decree 6 · direct', 6),
@@ -227,7 +227,7 @@ export const enemyDefs = {
         e._enraged = true;
         e.intents = _kingP2;
         e.intentIndex = 0;
-        _log(state, '👑 The Petrified King rises from his throne — Phase 2!');
+        _log(state, '👑 The Petrified Queen rises from her throne — Phase 2!');
       }
     },
   },
@@ -272,7 +272,7 @@ export const enemyDefs = {
   },
 
   stone_heart: {
-    id: 'stone_heart', name: 'The Stone Heart', maxHp: 250,
+    id: 'stone_heart', name: 'The Stone Heart', maxHp: 250, isBoss: true,
     intents: [
       blk('Void Barrier 18', 18),
       atk('Heartbeat 22', 22),
@@ -332,7 +332,7 @@ export const act2EliteEncounters = [
 ];
 
 export const act2BossEncounters = [
-  ['stone_royal_guard', 'petrified_king', 'stone_royal_guard'],
+  ['stone_royal_guard', 'petrified_queen', 'stone_royal_guard'],
 ];
 
 export const act3CombatEncounters = [

@@ -288,17 +288,97 @@ export const cardDefs = {
 
   fossil_burden: {
     id: 'fossil_burden', name: 'Fossil Burden', cost: 0, type: 'curse', targetType: 'none',
+    rarity: 'curse', isCurse: true, unplayable: true, innate: true,
+    description: 'Unplayable. Innate. On draw: gain 2 Petrify.',
+    effect() {},
+    onDraw(state) {
+      state.player.lastPetrifySource = { type: 'curse', id: 'fossil_burden' };
+      gainPetrify(state.player, 2);
+    },
+    upgrade: null,
+  },
+
+  deadstone: {
+    id: 'deadstone', name: 'Deadstone', cost: 0, type: 'curse', targetType: 'none',
     rarity: 'curse', isCurse: true, unplayable: true,
-    description: 'Unplayable. At the start of each combat, gain 2 Petrify.',
-    onCombatStart(state) { gainPetrify(state.player, 2); },
+    description: 'Unplayable. No effect.',
     effect() {},
     upgrade: null,
   },
-  petrifying_presence: {
-    id: 'petrifying_presence', name: 'Petrifying Presence', cost: 1, type: 'curse', targetType: 'none',
-    rarity: 'curse', isCurse: true,
-    description: 'Gain 4 Petrify.',
-    effect(state) { gainPetrify(state.player, 4); },
+
+  torpor: {
+    id: 'torpor', name: 'Torpor', cost: 0, type: 'curse', targetType: 'none',
+    rarity: 'curse', isCurse: true, unplayable: true,
+    description: 'Unplayable. While in hand, you may only play 2 cards per turn.',
+    effect() {},
+    upgrade: null,
+  },
+
+  stone_debt: {
+    id: 'stone_debt', name: 'Stone Debt', cost: 0, type: 'curse', targetType: 'none',
+    rarity: 'curse', isCurse: true, unplayable: true,
+    description: 'Unplayable. On draw: gain 3 Petrify.',
+    effect() {},
+    onDraw(state) {
+      state.player.lastPetrifySource = { type: 'curse', id: 'stone_debt' };
+      gainPetrify(state.player, 3);
+    },
+    upgrade: null,
+  },
+
+  // ── Event-exclusive cards (never appear in reward or shop pools) ──────────────
+
+  stone_eruption: {
+    id: 'stone_eruption', name: 'Stone Eruption', cost: 0, type: 'attack', targetType: 'none',
+    rarity: 'special', eventOnly: true, colorless: true,
+    description: 'Deal 12 damage to ALL enemies. Gain 10 Petrify.',
+    shortDescription: 'Deal 12 to all. Gain 10 Petrify.',
+    effect(state) {
+      for (const e of state.combat.enemies) if (e.hp > 0) applyDamage(e, 12, state.player);
+      state.player.lastPetrifySource = { type: 'self', id: 'stone_eruption' };
+      gainPetrify(state.player, 10);
+    },
+    upgrade: null,
+  },
+
+  hexing_strike: {
+    id: 'hexing_strike', name: 'Hexing Strike', cost: 1, type: 'attack', targetType: 'enemy',
+    rarity: 'special', eventOnly: true, colorless: true,
+    description: 'Deal 10 damage. Apply Vulnerable 2.',
+    effect(state, target) {
+      applyDamage(target, 10, state.player);
+      applyStatus(target, 'vulnerable', 2);
+    },
+    upgrade: null,
+  },
+
+  cursed_ward: {
+    id: 'cursed_ward', name: 'Cursed Ward', cost: 1, type: 'skill', targetType: 'none',
+    rarity: 'special', eventOnly: true, colorless: true,
+    description: 'Gain 10 Block. Apply Weak 1 to all enemies.',
+    effect(state) {
+      applyBlock(state.player, 10);
+      for (const e of state.combat.enemies) if (e.hp > 0) applyStatus(e, 'weak', 1);
+    },
+    upgrade: null,
+  },
+
+  stone_dominion: {
+    id: 'stone_dominion', name: 'Stone Dominion', cost: 2, type: 'power', targetType: 'none',
+    rarity: 'special', eventOnly: true, colorless: true,
+    description: 'At the start of each turn: gain 2 Petrify and 1 Energy.',
+    effect(state) {
+      state.combat.activePowers.push({
+        name: 'Stone Dominion',
+        hooks: {
+          onTurnStart(s) {
+            s.player.lastPetrifySource = { type: 'self', id: 'stone_dominion' };
+            gainPetrify(s.player, 2);
+            s.combat.energy += 1;
+          },
+        },
+      });
+    },
     upgrade: null,
   },
 };

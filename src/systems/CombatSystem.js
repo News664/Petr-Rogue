@@ -25,6 +25,8 @@ function _checkVictory(combat) {
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
   state.player.statusEffects = {};
+  state.player.lastPetrifySource = null;
+  if (!state.enemiesDefeated) state.enemiesDefeated = 0;
   state.combat = {
     enemies: enemyIds.map(createEnemyInstance),
     deckState: createDeckState(state.player.deck),
@@ -35,6 +37,8 @@ export function startCombat(state, enemyIds) {
     lastLog: '',
     log: [],
     activePowers: [],
+    cardsPlayedThisTurn: 0,
+    lastEnemyAttacker: null,
   };
   triggerRelics('onCombatStart', state);
   for (const card of state.player.deck) {
@@ -45,23 +49,35 @@ export function startCombat(state, enemyIds) {
 
 // Non-status cards cost +1 per Stasis card in hand, capped at 3.
 function _effectiveCost(card, hand) {
-  if (card.isStatus) return card.cost;
+  if (card.isStatus || card.isCurse) return card.cost;
   const stasis = hand.filter(c => c.id === 'stasis').length;
   return Math.min(3, card.cost + stasis);
+}
+
+// Returns true if Torpor in hand blocks playing another card this turn.
+function _torporBlocked(hand, cardsPlayedThisTurn) {
+  const hasTorpor = hand.some(c => c.id === 'torpor');
+  return hasTorpor && cardsPlayedThisTurn >= 2;
 }
 
 export function playCard(state, handIndex, targetIndex = 0) {
   const { combat, player } = state;
   const card = combat.deckState.hand[handIndex];
   if (!card) return { ok: false, reason: 'invalid_card' };
+  if (card.unplayable) return { ok: false, reason: 'unplayable' };
+  if (_torporBlocked(combat.deckState.hand, combat.cardsPlayedThisTurn)) {
+    return { ok: false, reason: 'torpor_limit' };
+  }
   const effectiveCost = _effectiveCost(card, combat.deckState.hand);
   if (effectiveCost > combat.energy) return { ok: false, reason: 'no_energy' };
 
   combat.energy -= effectiveCost;
+  combat.cardsPlayedThisTurn++;
   const target = card.targetType === 'enemy' ? combat.enemies[targetIndex] : null;
 
   const petrifyBefore = player.petrify;
   const hpBefore      = target?.hp;
+  player.lastPetrifySource = { type: 'self', id: card.id };
   card.effect(state, target);
 
   let msg = `You played ${card.name}.`;
@@ -86,9 +102,12 @@ export function playCard(state, handIndex, targetIndex = 0) {
   triggerRelics('onCardPlayed', state, { card });
   _triggerPowers(state, 'onCardPlayed', { card });
 
-  const cause = checkDeathCause(player);
+  const cause = checkDeathCause(player, combat);
   if (cause) return { ok: true, event: 'game_over', cause };
-  if (_checkVictory(combat)) return { ok: true, event: 'victory' };
+  if (_checkVictory(combat)) {
+    state.enemiesDefeated += combat.enemies.filter(e => !e.isSummon).length;
+    return { ok: true, event: 'victory' };
+  }
   return { ok: true };
 }
 
@@ -109,16 +128,17 @@ function _startPlayerTurn(state) {
   const { combat, player } = state;
   combat.phase = 'player';
   combat.turn++;
+  combat.cardsPlayedThisTurn = 0;
   player.block = 0;
   combat.energy = combat.maxEnergy;
 
   const petrifyBefore = player.petrify;
-  tickPlayerStatuses(player);
+  tickPlayerStatuses(player, state);
   if (player.petrify > petrifyBefore) {
     _log(state, `Numbing: gained ${player.petrify - petrifyBefore} Petrify. (now ${player.petrify})`);
   }
 
-  const cause = checkDeathCause(player);
+  const cause = checkDeathCause(player, combat);
   if (cause) return { event: 'game_over', cause };
 
   _log(state, `— Turn ${combat.turn} —`);
@@ -146,6 +166,8 @@ function _runEnemyTurn(state) {
     const intent     = enemy.intents[enemy.intentIndex];
     const hpBefore   = player.hp;
     const petrBefore = player.petrify;
+    combat.lastEnemyAttacker = { id: enemy.id, name: enemy.name, isBoss: enemy.isBoss ?? false };
+    player.lastPetrifySource = { type: 'enemy', id: enemy.id };
     intent.action(enemy, player, state);
     enemy.intentIndex = (enemy.intentIndex + 1) % enemy.intents.length;
 
@@ -156,11 +178,14 @@ function _runEnemyTurn(state) {
     if (petr > 0) msg += ` (+${petr} Petrify)`;
     _log(state, msg);
 
-    const cause = checkDeathCause(player);
+    const cause = checkDeathCause(player, combat);
     if (cause) return { event: 'game_over', cause };
   }
 
-  if (_checkVictory(combat)) return { event: 'victory' };
+  if (_checkVictory(combat)) {
+    state.enemiesDefeated += combat.enemies.filter(e => !e.isSummon).length;
+    return { event: 'victory' };
+  }
 
   const turnResult = _startPlayerTurn(state);
   if (turnResult?.event === 'game_over') return turnResult;

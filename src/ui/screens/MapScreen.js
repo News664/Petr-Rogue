@@ -178,7 +178,31 @@ function _enterNode(floor, col) {
     case 'boss':   navigate('CombatScreen', { enemyIds: pick(getEncounters('boss',   act)), source: 'boss'   }); break;
     case 'rest':   navigate('RestScreen',  {}); break;
     case 'shop':   navigate('ShopScreen',  {}); break;
-    case 'event':  navigate('EventScreen', { event: pick(eventDefs) }); break;
+    case 'event':  navigate('EventScreen', { event: _pickEvent(act + 1, floor % FLOORS_PER_ACT) }); break;
     default:       navigate('CombatScreen', { enemyIds: pick(getEncounters('combat', act)), source: 'combat' });
   }
+}
+
+// Act-aware, tone-weighted event picker.
+// actNum is 1-indexed; floorInAct is 0-indexed position within the act.
+function _pickEvent(actNum, floorInAct) {
+  const position = floorInAct <= 3 ? 'early' : floorInAct >= 6 ? 'late' : 'any';
+
+  const eligible = eventDefs.filter(e => {
+    if (!e.acts.includes(actNum)) return false;
+    if (e.position !== 'any' && e.position !== position) return false;
+    return true;
+  });
+
+  const pool = eligible.length > 0 ? eligible : eventDefs;
+
+  const toneWeights = {
+    1: { positive: 40, neutral: 45, negative: 15 },
+    2: { positive: 25, neutral: 45, negative: 30 },
+    3: { positive: 15, neutral: 35, negative: 50 },
+  }[actNum] ?? { positive: 33, neutral: 34, negative: 33 };
+
+  // Build weighted array: each event gets weight equal to its tone's weight value.
+  const weighted = pool.flatMap(e => Array(toneWeights[e.tone] ?? 33).fill(e));
+  return weighted[Math.floor(Math.random() * weighted.length)];
 }

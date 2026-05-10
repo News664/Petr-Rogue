@@ -119,7 +119,7 @@ function _renderSpriteArea(player) {
 }
 
 function _effectiveCost(card, hand) {
-  if (card.isStatus) return card.cost;
+  if (card.isStatus || card.isCurse) return card.cost;
   const stasis = hand.filter(c => c.id === 'stasis').length;
   return Math.min(3, card.cost + stasis);
 }
@@ -131,13 +131,16 @@ function _cardTypeLabel(card) {
   return t;
 }
 
-function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared') {
+function _renderHand(hand, energy, TYPE_COLOR, charId = 'shared', cardsPlayedThisTurn = 0) {
   const n = hand.length;
+  const hasTorpor = hand.some(c => c.id === 'torpor');
+  const torporLimitReached = hasTorpor && cardsPlayedThisTurn >= 2;
   return hand.map((card, i) => {
     const cost     = _effectiveCost(card, hand);
     const unplayable = !!card.unplayable;
-    const disabled = unplayable || cost > energy;
-    const selected = !unplayable && i === _selectedHandIndex;
+    const torporBlocked = !unplayable && torporLimitReached;
+    const disabled = unplayable || cost > energy || torporBlocked;
+    const selected = !unplayable && !torporBlocked && i === _selectedHandIndex;
     const color    = TYPE_COLOR[card.type] ?? 'var(--border)';
     const extraCls = (card.isStatus ? ' card-status' : '') + (card.isCurse ? ' card-curse' : '');
     const norm = n > 1 ? (i / (n - 1) - 0.5) : 0;
@@ -189,8 +192,9 @@ function _render() {
           ${activePowers.length ? activePowers.map(p => `<span class="power-badge">${p.name}</span>`).join('') : ''}
         </div>
         <div class="hand-area">
-          ${_renderHand(deckState.hand, energy, TYPE_COLOR, player.characterId)}
+          ${_renderHand(deckState.hand, energy, TYPE_COLOR, player.characterId, combat.cardsPlayedThisTurn)}
         </div>
+        ${deckState.hand.some(c => c.id === 'torpor') ? `<div class="torpor-indicator">⛓ Torpor: ${Math.max(0, 2 - combat.cardsPlayedThisTurn)} card play(s) remaining this turn</div>` : ''}
         <div class="combat-actions">
           <button id="end-turn">End Turn</button>
           <span class="deck-counts">
@@ -305,21 +309,67 @@ function _onVictory() {
   }
 }
 
+// ── Game Over ────────────────────────────────────────────────────────────────
+// To add a new specific death screen:
+//   1. Add an entry to _DEATH_MESSAGES with the matching key (see lookup chain below).
+//   2. Place the art at assets/game-over/{key-with-hyphens}.png  (e.g. petrify-curse-stone-debt.png)
+//
+// Lookup chain (most-specific first):
+//   boss_{bossId}  →  petrify_{sourceType}_{sourceId}  →  petrify_{sourceType}  →  petrify / hp
+
+const _DEATH_MESSAGES = {
+  hp:                    { title: 'Fallen',                     body: 'Your wounds proved fatal. The dungeon closes around the fallen and does not mourn. The light from the surface grows a little darker.' },
+  petrify:               { title: 'Fully Petrified',            body: 'Stone crept through your veins until nothing remained. You will stand here in the dark forever — still, silent, a monument to how far you came.' },
+  petrify_enemy:         { title: 'Turned to Stone',            body: 'The dungeon\'s creatures carry the cold in every strike. Each blow moved it deeper. By the end, there was nowhere left for it to go.' },
+  petrify_status:        { title: 'The Slow Creep',             body: 'No single blow finished you. A status left untended, ticking through turns while you fought other things. The dungeon is patient.' },
+  petrify_curse:         { title: 'A Debt in Stone',            body: 'The curses seemed manageable, one by one. Together they added up quietly. Stone debts have a way of being collected in full.' },
+  petrify_self:          { title: 'Your Own Power',             body: 'You understood the risk. You pushed further than you should have. The stone that claimed you was something you built, slowly, with your own hands.' },
+  petrify_event:         { title: 'The Dungeon\'s Trap',        body: 'The choice seemed reasonable at the time. The dungeon has no shortage of reasonable-seeming traps, and no patience for regret.' },
+  boss_petrified_queen:  { title: 'Added to the Court',         body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Another challenger joins her court — frozen, silent, permanent.' },
+  boss_stone_heart:      { title: 'The Heart Beats On',         body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as you fell. Another challenger returned to dust at the bottom of the world.' },
+};
+
+function _deathMessageKey(cause) {
+  if (!cause) return 'hp';
+  if (cause.type === 'boss') return `boss_${cause.bossId}`;
+  if (cause.type === 'petrify') {
+    const src = cause.source;
+    const specific = `petrify_${src.type}_${src.id}`;
+    const category = `petrify_${src.type}`;
+    if (_DEATH_MESSAGES[specific]) return specific;
+    if (_DEATH_MESSAGES[category]) return category;
+    return 'petrify';
+  }
+  return 'hp';
+}
+
 function _showGameOver(cause) {
-  const msg = {
-    hp:      { title: 'You Died',          body: 'Your wounds proved fatal. The dungeon claims another soul.' },
-    petrify: { title: 'Fully Petrified',   body: 'Stone crept through your veins until nothing remained but a silent statue. You will stand here forever, deep beneath the earth.' },
-  };
-  const { title, body } = msg[cause] ?? msg.hp;
-  const charId = GameState.player?.characterId ?? 'mint';
-  const portrait = cause === 'petrify'
-    ? `<img class="game-over-portrait" src="assets/${charId}/Portrait_100.png" alt="" onerror="this.style.display='none'">`
-    : '';
+  const key = _deathMessageKey(cause);
+  const { title, body } = _DEATH_MESSAGES[key] ?? _DEATH_MESSAGES.hp;
+
+  const map  = GameState.map;
+  const act  = map ? Math.floor(map.currentFloor / 10) + 1 : 1;
+  const floorInAct = map ? (map.currentFloor % 10) + 1 : 1;
+  const enemies = GameState.enemiesDefeated ?? 0;
+  const relics  = GameState.player?.relics?.length ?? 0;
+  const gold    = GameState.player?.gold ?? 0;
+
+  const artKey = key.replace(/_/g, '-');
+
   _container.innerHTML = `
     <div class="game-over">
-      ${portrait}
+      <div class="game-over-art" data-cause="${key}">
+        <img src="assets/game-over/${artKey}.png" alt=""
+             onerror="this.style.display='none'">
+      </div>
       <h1>${title}</h1>
-      <p>${body}</p>
+      <p class="game-over-epitaph">${body}</p>
+      <div class="game-over-stats">
+        <span>Act ${act} · Floor ${floorInAct}</span>
+        <span>Enemies defeated: ${enemies}</span>
+        <span>Relics: ${relics}</span>
+        <span>Gold: ${gold}</span>
+      </div>
       <button id="restart">Return to Menu</button>
     </div>`;
   _container.querySelector('#restart').addEventListener('click', () => location.reload());

@@ -9,10 +9,11 @@ export function applyStatus(entity, status, stacks) {
 
 // ── Tick ─────────────────────────────────────────────────────────────────────
 
-export function tickPlayerStatuses(player) {
+export function tickPlayerStatuses(player, state = null) {
   const s = player.statusEffects;
   if (!s) return;
   if (s.numbing > 0) {
+    if (state) player.lastPetrifySource = { type: 'status', id: 'numbing' };
     gainPetrify(player, s.numbing);
     s.numbing = Math.max(0, s.numbing - 1);
   }

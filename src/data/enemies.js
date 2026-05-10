@@ -153,7 +153,7 @@ export const enemyDefs = {
   },
 
   obsidian_sentinel: {
-    id: 'obsidian_sentinel', name: 'Obsidian Sentinel', maxHp: 125,
+    id: 'obsidian_sentinel', name: 'Obsidian Sentinel', maxHp: 125, isBoss: true,
     intents: [
       blk('Barrier 12', 12),
       atk('Crush 18', 18),

@@ -310,23 +310,42 @@ function _onVictory() {
 }
 
 // ── Game Over ────────────────────────────────────────────────────────────────
-// To add a new specific death screen:
-//   1. Add an entry to _DEATH_MESSAGES with the matching key (see lookup chain below).
-//   2. Place the art at assets/game-over/{key-with-hyphens}.png  (e.g. petrify-curse-stone-debt.png)
-//
-// Lookup chain (most-specific first):
+// Cause key lookup chain (most-specific first):
 //   boss_{bossId}  →  petrify_{sourceType}_{sourceId}  →  petrify_{sourceType}  →  petrify / hp
+//
+// Message lookup appends _{charId} to the cause key and tries that first.
+// Art lookup: assets/game-over/{cause-key}-{charId}.png → {cause-key}.png → hidden.
+//
+// To add a new character's death screens:
+//   1. Append a block of {key}_{charId} entries to _DEATH_MESSAGES below.
+//   2. Place art at assets/game-over/{cause-key}-{charId}.png for each cause.
 
+// Generic (character-agnostic) death messages — used as fallbacks when no
+// character-specific entry exists. Keys match _deathMessageKey() output.
 const _DEATH_MESSAGES = {
-  hp:                    { title: 'Fallen',                     body: 'Your wounds proved fatal. The dungeon closes around the fallen and does not mourn. The light from the surface grows a little darker.' },
-  petrify:               { title: 'Fully Petrified',            body: 'Stone crept through your veins until nothing remained. You will stand here in the dark forever — still, silent, a monument to how far you came.' },
-  petrify_enemy:         { title: 'Turned to Stone',            body: 'The dungeon\'s creatures carry the cold in every strike. Each blow moved it deeper. By the end, there was nowhere left for it to go.' },
-  petrify_status:        { title: 'The Slow Creep',             body: 'No single blow finished you. A status left untended, ticking through turns while you fought other things. The dungeon is patient.' },
-  petrify_curse:         { title: 'A Debt in Stone',            body: 'The curses seemed manageable, one by one. Together they added up quietly. Stone debts have a way of being collected in full.' },
-  petrify_self:          { title: 'Your Own Power',             body: 'You understood the risk. You pushed further than you should have. The stone that claimed you was something you built, slowly, with your own hands.' },
-  petrify_event:         { title: 'The Dungeon\'s Trap',        body: 'The choice seemed reasonable at the time. The dungeon has no shortage of reasonable-seeming traps, and no patience for regret.' },
-  boss_petrified_queen:  { title: 'Added to the Court',         body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Another challenger joins her court — frozen, silent, permanent.' },
-  boss_stone_heart:      { title: 'The Heart Beats On',         body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as you fell. Another challenger returned to dust at the bottom of the world.' },
+  hp:                   { title: 'Fallen',           body: 'Your wounds proved fatal. The dungeon closes around the fallen and does not mourn. The light from the surface grows a little darker.' },
+  petrify:              { title: 'Fully Petrified',  body: 'Stone crept through your veins until nothing remained. You will stand here in the dark forever — still, silent, a monument to how far you came.' },
+  petrify_enemy:        { title: 'Turned to Stone',  body: 'The dungeon\'s creatures carry the cold in every strike. Each blow moved it deeper. By the end, there was nowhere left for it to go.' },
+  petrify_status:       { title: 'The Slow Creep',   body: 'No single blow finished you. A status left untended, ticking through turns while you fought other things. The dungeon is patient.' },
+  petrify_curse:        { title: 'A Debt in Stone',  body: 'The curses seemed manageable, one by one. Together they added up quietly. Stone debts have a way of being collected in full.' },
+  petrify_self:         { title: 'Your Own Power',   body: 'You understood the risk. You pushed further than you should have. The stone that claimed you was something you built, slowly, with your own hands.' },
+  petrify_event:        { title: 'The Dungeon\'s Trap', body: 'The choice seemed reasonable at the time. The dungeon has no shortage of reasonable-seeming traps, and no patience for regret.' },
+  boss_petrified_queen: { title: 'Added to the Court',  body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Another challenger joins her court — frozen, silent, permanent.' },
+  boss_stone_heart:     { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as you fell. Another challenger returned to dust at the bottom of the world.' },
+
+  // ── Mint — character-specific messages ───────────────────────────────────
+  // Art: assets/game-over/{cause-key}-mint.png  (e.g. hp-mint.png)
+  // To add a second character, append a matching block keyed with its charId.
+
+  hp_mint:                   { title: 'Fallen',           body: 'Mint\'s wounds proved fatal. The dungeon closes around the fallen and does not mourn — another reclaimed soul, lost again. Somewhere above, the light from the surface grows a little darker.' },
+  petrify_mint:              { title: 'Fully Petrified',  body: 'Stone crept through Mint\'s veins until nothing remained. She will stand here in the dark forever — still, silent. She had been freed once. The goddess does not pass through twice.' },
+  petrify_enemy_mint:        { title: 'Turned to Stone',  body: 'The dungeon\'s creatures carry the cold in every strike. Each blow moved the stone deeper into Mint. She had survived it once — sealed in silence, waiting. She did not survive it twice.' },
+  petrify_status_mint:       { title: 'The Slow Creep',   body: 'No single blow finished Mint. A status left untended, ticking quietly while she fought other things. She had been patient herself — waiting decades in stone. The dungeon out-waited her.' },
+  petrify_curse_mint:        { title: 'A Debt in Stone',  body: 'The curses seemed manageable. Mint had carried stone before — it was part of her, in a way. Together they added up quietly. Stone debts have a way of being collected in full, even from those who have already paid once.' },
+  petrify_self_mint:         { title: 'Your Own Power',   body: 'Mint understood the risk. She had felt this cold before — placed in her by someone else, without her consent. This time she chose it. The stone that claimed her this time was her own.' },
+  petrify_event_mint:        { title: 'The Dungeon\'s Trap', body: 'The choice seemed reasonable at the time. Mint had already walked blind into one trap in this dungeon — sealed away, frozen, waiting for rescue. The dungeon offered her a second chance and used it.' },
+  boss_petrified_queen_mint: { title: 'Added to the Court',  body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Mint joins her court — frozen, silent, a mirror of the fate she once escaped. No goddess wanders through the Queen\'s halls.' },
+  boss_stone_heart_mint:     { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as Mint fell. She came here for answers. At the bottom of the world, the Heart offers only silence — and stone.' },
 };
 
 function _deathMessageKey(cause) {
@@ -344,23 +363,34 @@ function _deathMessageKey(cause) {
 }
 
 function _showGameOver(cause) {
-  const key = _deathMessageKey(cause);
-  const { title, body } = _DEATH_MESSAGES[key] ?? _DEATH_MESSAGES.hp;
+  const key    = _deathMessageKey(cause);
+  const charId = GameState.player?.characterId ?? null;
 
-  const map  = GameState.map;
-  const act  = map ? Math.floor(map.currentFloor / 10) + 1 : 1;
+  // Prefer character-specific message, fall back to generic.
+  const charKey = charId ? `${key}_${charId}` : null;
+  const { title, body } =
+    (charKey && _DEATH_MESSAGES[charKey]) ? _DEATH_MESSAGES[charKey] :
+    _DEATH_MESSAGES[key] ?? _DEATH_MESSAGES.hp;
+
+  const map        = GameState.map;
+  const act        = map ? Math.floor(map.currentFloor / 10) + 1 : 1;
   const floorInAct = map ? (map.currentFloor % 10) + 1 : 1;
-  const enemies = GameState.enemiesDefeated ?? 0;
-  const relics  = GameState.player?.relics?.length ?? 0;
-  const gold    = GameState.player?.gold ?? 0;
+  const enemies    = GameState.enemiesDefeated ?? 0;
+  const relics     = GameState.player?.relics?.length ?? 0;
+  const gold       = GameState.player?.gold ?? 0;
 
-  const artKey = key.replace(/_/g, '-');
+  // Art: try {cause}-{charId}.png first, fall back to {cause}.png, then hide.
+  const baseArtKey = key.replace(/_/g, '-');
+  const charArtKey = charId ? `${baseArtKey}-${charId}` : null;
+  const artSrc     = charArtKey ? `assets/game-over/${charArtKey}.png` : `assets/game-over/${baseArtKey}.png`;
+  const artFallback = charArtKey
+    ? `this.src='assets/game-over/${baseArtKey}.png';this.onerror=()=>this.style.display='none'`
+    : `this.style.display='none'`;
 
   _container.innerHTML = `
     <div class="game-over">
-      <div class="game-over-art" data-cause="${key}">
-        <img src="assets/game-over/${artKey}.png" alt=""
-             onerror="this.style.display='none'">
+      <div class="game-over-art" data-cause="${key}" data-char="${charId ?? ''}">
+        <img src="${artSrc}" alt="" onerror="${artFallback}">
       </div>
       <h1>${title}</h1>
       <p class="game-over-epitaph">${body}</p>

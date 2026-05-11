@@ -46,9 +46,7 @@ export const relicDefs = {
     name: 'Obsidian Cap',
     description: 'Your Petrify cannot exceed 50.',
     hooks: {
-      onTurnStart(state) {
-        if (state.player.petrify > 50) state.player.petrify = 50;
-      },
+      onCombatStart(state) { state.player.petrifyCap = 50; },
     },
   },
   cracked_geode: {

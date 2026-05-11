@@ -175,7 +175,7 @@ export const eventDefs = [
       {
         label: 'Take the card (add Calcify)',
         description: 'Add Calcify to your deck.',
-        effect(state) { state.player.deck.push(makeCard('calcify')); },
+        effect(state) { state.player.deck.push(makeCard('stone_channel')); },
       },
       {
         label: 'Take the gold',
@@ -186,7 +186,7 @@ export const eventDefs = [
         label: 'Take both (+6 Petrify)',
         description: 'Add Calcify. Gain 15 Gold. Gain 6 Petrify.',
         effect(state) {
-          state.player.deck.push(makeCard('calcify'));
+          state.player.deck.push(makeCard('stone_channel'));
           state.player.gold += 15;
           state.player.lastPetrifySource = { type: 'event', id: 'petrified_adventurer' };
           gainPetrify(state.player, 6);

@@ -330,8 +330,9 @@ const _DEATH_MESSAGES = {
   petrify_curse:        { title: 'A Debt in Stone',  body: 'The curses seemed manageable, one by one. Together they added up quietly. Stone debts have a way of being collected in full.' },
   petrify_self:         { title: 'Your Own Power',   body: 'You understood the risk. You pushed further than you should have. The stone that claimed you was something you built, slowly, with your own hands.' },
   petrify_event:        { title: 'The Dungeon\'s Trap', body: 'The choice seemed reasonable at the time. The dungeon has no shortage of reasonable-seeming traps, and no patience for regret.' },
-  boss_petrified_queen: { title: 'Added to the Court',  body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Another challenger joins her court — frozen, silent, permanent.' },
-  boss_stone_heart:     { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as you fell. Another challenger returned to dust at the bottom of the world.' },
+  boss_obsidian_sentinel: { title: 'The Sentinel Stands',   body: 'It did not move. It did not speak. It simply endured — stone from the moment of its forging, patient beyond thought. Another challenger tried to break what was never breakable.' },
+  boss_petrified_queen:   { title: 'Added to the Court',    body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Another challenger joins her court — frozen, silent, permanent.' },
+  boss_stone_heart:       { title: 'The Heart Beats On',    body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as you fell. Another challenger returned to dust at the bottom of the world.' },
 
   // ── Mint — character-specific messages ───────────────────────────────────
   // Art: assets/game-over/{cause-key}-mint.png  (e.g. hp-mint.png)
@@ -344,8 +345,23 @@ const _DEATH_MESSAGES = {
   petrify_curse_mint:        { title: 'A Debt in Stone',  body: 'The curses seemed manageable. Mint had carried stone before — it was part of her, in a way. Together they added up quietly. Stone debts have a way of being collected in full, even from those who have already paid once.' },
   petrify_self_mint:         { title: 'Your Own Power',   body: 'Mint understood the risk. She had felt this cold before — placed in her by someone else, without her consent. This time she chose it. The stone that claimed her this time was her own.' },
   petrify_event_mint:        { title: 'The Dungeon\'s Trap', body: 'The choice seemed reasonable at the time. Mint had already walked blind into one trap in this dungeon — sealed away, frozen, waiting for rescue. The dungeon offered her a second chance and used it.' },
-  boss_petrified_queen_mint: { title: 'Added to the Court',  body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Mint joins her court — frozen, silent, a mirror of the fate she once escaped. No goddess wanders through the Queen\'s halls.' },
-  boss_stone_heart_mint:     { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as Mint fell. She came here for answers. At the bottom of the world, the Heart offers only silence — and stone.' },
+  boss_obsidian_sentinel_mint: { title: 'The Sentinel Stands', body: 'The Obsidian Sentinel offered Mint no answers — only weight, and stone, and a patience older than her curse. She had survived petrification once. The Sentinel does not negotiate with survivors.' },
+  boss_petrified_queen_mint:   { title: 'Added to the Court',  body: 'The Petrified Queen does not need to speak. Her stillness is command enough. Mint joins her court — frozen, silent, a mirror of the fate she once escaped. No goddess wanders through the Queen\'s halls.' },
+  boss_stone_heart_mint:       { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as Mint fell. She came here for answers. At the bottom of the world, the Heart offers only silence — and stone.' },
+
+  // ── Tharja — character-specific messages ─────────────────────────────────
+  // Art: assets/game-over/{cause-key}-tharja.png  (e.g. hp-tharja.png)
+
+  hp_tharja:                      { title: 'Not the Stone',       body: 'Tharja spent so long dancing with petrification that she forgot blades were just as final. The stone did not take her. She finds that darkly funny, wherever she is now.' },
+  petrify_tharja:                 { title: 'Too Deep',            body: 'She had felt it building for turns — that heavy, electric weight spreading through her. She chased it further than she should have. The edge found her before she found it. She had time, at the end, to appreciate the irony.' },
+  petrify_enemy_tharja:           { title: 'Outpaced',            body: 'Tharja welcomed the stone on her own terms. She did not welcome someone else pouring it into her faster than she could spend it. There is a difference between controlling the flood and drowning in it.' },
+  petrify_status_tharja:          { title: 'The Slow Burn',       body: 'She knew it was ticking. She left it, because the edge felt good, because it was feeding her. One more turn. Then one more. Tharja gambled on her own endurance. The dungeon collected its chips.' },
+  petrify_curse_tharja:           { title: 'A Debt She Owed',     body: 'She had taken from the stone willingly, turn after turn. The curses were just the stone taking back. Tharja might have respected that, if she had had time to think about it.' },
+  petrify_self_tharja:            { title: 'The Thrill, Fulfilled', body: 'There is a part of Tharja that knew exactly what she was doing. She chose the card. She played the hand. The edge was right there — and she leaned a little too far. She would not call it a mistake. Not entirely.' },
+  petrify_event_tharja:           { title: 'A Bet Gone Wrong',    body: 'The dungeon offered her a deal. Tharja has never been good at turning down deals that involve more power, more stone, more of that electric feeling. This one took more than she could pay back.' },
+  boss_obsidian_sentinel_tharja:  { title: 'An Immovable Edge',   body: 'Tharja had felt stronger stone before — inside her own veins. But the Sentinel is not a resource. It does not pulse with dark potential. It is simply weight, and mass, and patience. She found an edge she could not dance along.' },
+  boss_petrified_queen_tharja:    { title: 'A Different Court',   body: 'The Petrified Queen had mastered stone without ever choosing it. Tharja had chosen it her whole life. The Queen looked at her as a curiosity — another fool who welcomed the cold. Then she ended the curiosity, efficiently and without interest.' },
+  boss_stone_heart_tharja:        { title: 'The Source, Untapped', body: 'The Heart of the Abyss pulses with more lithic power than Tharja had ever imagined existed. She felt it calling from the moment she saw it — not as a threat, but as an invitation. She accepted. The Heart did not.' },
 };
 
 function _deathMessageKey(cause) {

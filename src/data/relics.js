@@ -12,6 +12,18 @@ export const relicDefs = {
     },
   },
 
+  // ── Tharja's starting relic ──────────────────────────────────────────────
+  stone_hunger: {
+    id: 'stone_hunger',
+    name: 'Stone Hunger',
+    description: 'At the start of your turn, if your Petrify is at least 50% of your HP, gain 1 Energy.',
+    hooks: {
+      onTurnStart(state) {
+        if (state.player.petrify >= state.player.hp * 0.5) state.combat.energy += 1;
+      },
+    },
+  },
+
   // ── Drop pool ─────────────────────────────────────────────────────────────
   stone_heart: {
     id: 'stone_heart',

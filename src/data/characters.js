@@ -26,6 +26,31 @@ export const characterDefs = {
       'purifying_nova', 'sacred_ground',
     ],
   },
+
+  tharja: {
+    id: 'tharja',
+    name: 'Tharja',
+    title: 'The Stone-Kissed',
+    flavor: 'Other mages treat petrification as a threat to be endured. Tharja learned, through years of forbidden study and careful self-experimentation, that it is something else entirely — a reservoir, humming with dark potential, waiting to be spent. She came to the dungeon to drink from the source. The risk is part of the appeal. The edge between flesh and stone is where she does her best work.',
+    hp: 72,
+    energy: 3,
+    startingRelicId: 'stone_hunger',
+    starterDeck() {
+      return [
+        'strike', 'strike', 'strike', 'strike',
+        'defend', 'defend', 'defend',
+        'stone_fang', 'stone_fang',
+        'petrify_lash',
+      ].map(makeCard);
+    },
+    cardPool: [
+      'bash', 'gravel_shot', 'stone_skin', 'shatter', 'petrify_surge',
+      'purify', 'fortify', 'stone_will', 'controlled_calcify',
+      'stone_fang', 'fracture', 'petrify_lash', 'petrify_mantle', 'void_release',
+      'void_crack', 'overload', 'stone_pact', 'stone_bastion',
+      'petrify_shroud',
+    ],
+  },
 };
 
 export function createPlayerFromCharacter(charDef) {

@@ -275,12 +275,28 @@ export const cardDefs = {
   },
   petrify_mantle: {
     id: 'petrify_mantle', name: 'Petrify Mantle', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
-    description: 'Gain 5 Petrify. Gain Block equal to Petrify ÷ 3 (min 5).',
-    shortDescription: 'Gain 5 Petrify. Gain Petrify÷3 Block (min 5).',
-    effect(state) { gainPetrify(state.player, 5); applyBlock(state.player, Math.max(5, Math.floor(state.player.petrify / 3))); },
-    upgrade: { name: 'Petrify Mantle+', description: 'Gain 5 Petrify. Gain Block equal to Petrify ÷ 2 (min 7).',
-      shortDescription: 'Gain 5 Petrify. Gain Petrify÷2 Block (min 7).',
-      effect(state) { gainPetrify(state.player, 5); applyBlock(state.player, Math.max(7, Math.floor(state.player.petrify / 2))); } },
+    description: 'If Petrify < 50% HP: gain 5 Petrify, gain Block = Petrify ÷ 3 (min 5). If Petrify ≥ 50% HP: reduce Petrify by 4, gain Block = Petrify ÷ 3 (min 8).',
+    shortDescription: 'Below threshold: +5 Petrify + Block. At threshold: −4 Petrify + Block.',
+    effect(state) {
+      if (state.player.petrify >= state.player.hp * 0.5) {
+        reducePetrify(state.player, 4);
+        applyBlock(state.player, Math.max(8, Math.floor(state.player.petrify / 3)));
+      } else {
+        gainPetrify(state.player, 5);
+        applyBlock(state.player, Math.max(5, Math.floor(state.player.petrify / 3)));
+      }
+    },
+    upgrade: { name: 'Petrify Mantle+', description: 'If Petrify < 50% HP: gain 5 Petrify, gain Block = Petrify ÷ 2 (min 7). If Petrify ≥ 50% HP: reduce Petrify by 6, gain Block = Petrify ÷ 2 (min 10).',
+      shortDescription: 'Below threshold: +5 Petrify + Block. At threshold: −6 Petrify + Block.',
+      effect(state) {
+        if (state.player.petrify >= state.player.hp * 0.5) {
+          reducePetrify(state.player, 6);
+          applyBlock(state.player, Math.max(10, Math.floor(state.player.petrify / 2)));
+        } else {
+          gainPetrify(state.player, 5);
+          applyBlock(state.player, Math.max(7, Math.floor(state.player.petrify / 2)));
+        }
+      } },
   },
   void_release: {
     id: 'void_release', name: 'Void Release', cost: 1, type: 'skill', targetType: 'enemy', rarity: 'common',
@@ -331,17 +347,25 @@ export const cardDefs = {
   },
   stone_pact: {
     id: 'stone_pact', name: 'Stone Pact', cost: 0, type: 'skill', targetType: 'none', rarity: 'uncommon',
-    description: 'Gain 6 Petrify. Draw 2 cards. If Petrify ≥ 50% HP, draw 1 additional.',
-    shortDescription: 'Gain 6 Petrify. Draw 2 (3 if at threshold).',
+    description: 'If Petrify < 50% HP: gain 6 Petrify, draw 2. If Petrify ≥ 50% HP: reduce Petrify by 4, draw 2.',
+    shortDescription: 'Below threshold: +6 Petrify + draw 2. At threshold: −4 Petrify + draw 2.',
     effect(state) {
-      gainPetrify(state.player, 6);
-      drawCards(state.combat.deckState, state.player.petrify >= state.player.hp * 0.5 ? 3 : 2, state);
-    },
-    upgrade: { name: 'Stone Pact+', description: 'Gain 6 Petrify. Draw 2 cards. If Petrify ≥ 50% HP, draw 2 additional.',
-      shortDescription: 'Gain 6 Petrify. Draw 2 (4 if at threshold).',
-      effect(state) {
+      if (state.player.petrify >= state.player.hp * 0.5) {
+        reducePetrify(state.player, 4);
+      } else {
         gainPetrify(state.player, 6);
-        drawCards(state.combat.deckState, state.player.petrify >= state.player.hp * 0.5 ? 4 : 2, state);
+      }
+      drawCards(state.combat.deckState, 2, state);
+    },
+    upgrade: { name: 'Stone Pact+', description: 'If Petrify < 50% HP: gain 6 Petrify, draw 3. If Petrify ≥ 50% HP: reduce Petrify by 6, draw 3.',
+      shortDescription: 'Below threshold: +6 Petrify + draw 3. At threshold: −6 Petrify + draw 3.',
+      effect(state) {
+        if (state.player.petrify >= state.player.hp * 0.5) {
+          reducePetrify(state.player, 6);
+        } else {
+          gainPetrify(state.player, 6);
+        }
+        drawCards(state.combat.deckState, 3, state);
       } },
   },
   stone_bastion: {

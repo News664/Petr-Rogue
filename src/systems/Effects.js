@@ -38,6 +38,10 @@ export function gainPetrify(player, amount, source = null) {
     remaining -= absorbed;
   }
   player.petrify = (player.petrify || 0) + remaining;
+  // Hard cap enforced immediately (set by Obsidian Cap relic via player.petrifyCap)
+  if (player.petrifyCap !== undefined && player.petrify > player.petrifyCap) {
+    player.petrify = player.petrifyCap;
+  }
 }
 
 export function reducePetrify(player, amount) {

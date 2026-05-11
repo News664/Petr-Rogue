@@ -1,4 +1,4 @@
-import { applyDamage, applyBlock, gainPetrify, reducePetrify } from '../systems/Effects.js';
+import { applyDamage, applyBlock, gainPetrify, reducePetrify, healPlayer } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 import { drawCards } from '../systems/DeckSystem.js';
 
@@ -82,11 +82,11 @@ export const cardDefs = {
     upgrade: { name: 'Stone Skin+', description: 'Gain 7 Block. If Petrify ≥ 20, gain 16 Block instead.',
       effect(state) { applyBlock(state.player, state.player.petrify >= 20 ? 16 : 7); } },
   },
-  calcify: {
-    id: 'calcify', name: 'Calcify', cost: 0, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
+  stone_channel: {
+    id: 'stone_channel', name: 'Stone Channel', cost: 0, type: 'skill', targetType: 'none', rarity: 'common', colorless: true,
     description: 'Gain 3 Petrify. Draw 2 cards.',
     effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 2, state); },
-    upgrade: { name: 'Calcify+', description: 'Gain 3 Petrify. Draw 3 cards.',
+    upgrade: { name: 'Stone Channel+', description: 'Gain 3 Petrify. Draw 3 cards.',
       effect(state) { gainPetrify(state.player, 3); drawCards(state.combat.deckState, 3, state); } },
   },
   purify: {
@@ -243,6 +243,147 @@ export const cardDefs = {
                 for (const e of s.combat.enemies) if (e.hp > 0) applyDamage(e, 5, s.player);
               }
             },
+          },
+        });
+      } },
+  },
+
+  // ── Tharja unique ──────────────────────────────────────────────────────────────────
+
+  stone_fang: {
+    id: 'stone_fang', name: 'Stone Fang', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
+    description: 'Deal 6 damage. Gain 6 Petrify. Heal 2 HP.',
+    effect(state, target) { applyDamage(target, 6, state.player); gainPetrify(state.player, 6); healPlayer(state.player, 2); },
+    upgrade: { name: 'Stone Fang+', description: 'Deal 8 damage. Gain 8 Petrify. Heal 3 HP.',
+      effect(state, target) { applyDamage(target, 8, state.player); gainPetrify(state.player, 8); healPlayer(state.player, 3); } },
+  },
+  fracture: {
+    id: 'fracture', name: 'Fracture', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
+    description: 'Deal 8 damage. Apply Vulnerable 1. Gain 2 Petrify.',
+    effect(state, target) { applyDamage(target, 8, state.player); applyStatus(target, 'vulnerable', 1); gainPetrify(state.player, 2); },
+    upgrade: { name: 'Fracture+', description: 'Deal 11 damage. Apply Vulnerable 2. Gain 2 Petrify.',
+      effect(state, target) { applyDamage(target, 11, state.player); applyStatus(target, 'vulnerable', 2); gainPetrify(state.player, 2); } },
+  },
+  petrify_lash: {
+    id: 'petrify_lash', name: 'Petrify Lash', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
+    description: 'Deal 5 damage. If Petrify ≥ 50% HP, deal 15 instead.',
+    shortDescription: 'Deal 5 dmg (15 if Petrify ≥ 50% HP).',
+    effect(state, target) { applyDamage(target, state.player.petrify >= state.player.hp * 0.5 ? 15 : 5, state.player); },
+    upgrade: { name: 'Petrify Lash+', description: 'Deal 7 damage. If Petrify ≥ 50% HP, deal 20 instead.',
+      shortDescription: 'Deal 7 dmg (20 if Petrify ≥ 50% HP).',
+      effect(state, target) { applyDamage(target, state.player.petrify >= state.player.hp * 0.5 ? 20 : 7, state.player); } },
+  },
+  petrify_mantle: {
+    id: 'petrify_mantle', name: 'Petrify Mantle', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
+    description: 'Gain 5 Petrify. Gain Block equal to Petrify ÷ 3 (min 5).',
+    shortDescription: 'Gain 5 Petrify. Gain Petrify÷3 Block (min 5).',
+    effect(state) { gainPetrify(state.player, 5); applyBlock(state.player, Math.max(5, Math.floor(state.player.petrify / 3))); },
+    upgrade: { name: 'Petrify Mantle+', description: 'Gain 5 Petrify. Gain Block equal to Petrify ÷ 2 (min 7).',
+      shortDescription: 'Gain 5 Petrify. Gain Petrify÷2 Block (min 7).',
+      effect(state) { gainPetrify(state.player, 5); applyBlock(state.player, Math.max(7, Math.floor(state.player.petrify / 2))); } },
+  },
+  void_release: {
+    id: 'void_release', name: 'Void Release', cost: 1, type: 'skill', targetType: 'enemy', rarity: 'common',
+    description: 'Deal 5 damage. Heal 2 HP. If Petrify ≥ 50% HP, also reduce Petrify by 8.',
+    shortDescription: 'Deal 5 dmg. Heal 2 HP. Reduce 8 Petrify if at threshold.',
+    effect(state, target) {
+      applyDamage(target, 5, state.player);
+      healPlayer(state.player, 2);
+      if (state.player.petrify >= state.player.hp * 0.5) reducePetrify(state.player, 8);
+    },
+    upgrade: { name: 'Void Release+', description: 'Deal 7 damage. Heal 3 HP. If Petrify ≥ 50% HP, also reduce Petrify by 12.',
+      shortDescription: 'Deal 7 dmg. Heal 3 HP. Reduce 12 Petrify if at threshold.',
+      effect(state, target) {
+        applyDamage(target, 7, state.player);
+        healPlayer(state.player, 3);
+        if (state.player.petrify >= state.player.hp * 0.5) reducePetrify(state.player, 12);
+      } },
+  },
+  void_crack: {
+    id: 'void_crack', name: 'Void Crack', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
+    description: 'Deal 10 damage, plus 3 per 5 Petrify.',
+    shortDescription: 'Deal 10 + 3 per 5 Petrify.',
+    effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 3, state.player); },
+    upgrade: { name: 'Void Crack+', description: 'Deal 10 damage, plus 4 per 5 Petrify.',
+      shortDescription: 'Deal 10 + 4 per 5 Petrify.',
+      effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 4, state.player); } },
+  },
+  overload: {
+    id: 'overload', name: 'Overload', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
+    description: 'Deal 10 damage. If Petrify ≥ 50% HP, deal 25 instead and gain 5 Petrify.',
+    shortDescription: 'Deal 10 dmg (25 + 5 Petrify if at threshold).',
+    effect(state, target) {
+      if (state.player.petrify >= state.player.hp * 0.5) {
+        applyDamage(target, 25, state.player); gainPetrify(state.player, 5);
+      } else {
+        applyDamage(target, 10, state.player);
+      }
+    },
+    upgrade: { name: 'Overload+', description: 'Deal 12 damage. If Petrify ≥ 50% HP, deal 30 instead and gain 4 Petrify.',
+      shortDescription: 'Deal 12 dmg (30 + 4 Petrify if at threshold).',
+      effect(state, target) {
+        if (state.player.petrify >= state.player.hp * 0.5) {
+          applyDamage(target, 30, state.player); gainPetrify(state.player, 4);
+        } else {
+          applyDamage(target, 12, state.player);
+        }
+      } },
+  },
+  stone_pact: {
+    id: 'stone_pact', name: 'Stone Pact', cost: 0, type: 'skill', targetType: 'none', rarity: 'uncommon',
+    description: 'Gain 6 Petrify. Draw 2 cards. If Petrify ≥ 50% HP, draw 1 additional.',
+    shortDescription: 'Gain 6 Petrify. Draw 2 (3 if at threshold).',
+    effect(state) {
+      gainPetrify(state.player, 6);
+      drawCards(state.combat.deckState, state.player.petrify >= state.player.hp * 0.5 ? 3 : 2, state);
+    },
+    upgrade: { name: 'Stone Pact+', description: 'Gain 6 Petrify. Draw 2 cards. If Petrify ≥ 50% HP, draw 2 additional.',
+      shortDescription: 'Gain 6 Petrify. Draw 2 (4 if at threshold).',
+      effect(state) {
+        gainPetrify(state.player, 6);
+        drawCards(state.combat.deckState, state.player.petrify >= state.player.hp * 0.5 ? 4 : 2, state);
+      } },
+  },
+  stone_bastion: {
+    id: 'stone_bastion', name: 'Stone Bastion', cost: 1, type: 'skill', targetType: 'none', rarity: 'uncommon',
+    description: 'Gain 8 Block. If Petrify ≥ 50% HP, gain 16 Block and Attuned 1 instead.',
+    shortDescription: '8 Block (16 Block + Attuned 1 if at threshold).',
+    effect(state) {
+      if (state.player.petrify >= state.player.hp * 0.5) {
+        applyBlock(state.player, 16); applyStatus(state.player, 'attuned', 1);
+      } else {
+        applyBlock(state.player, 8);
+      }
+    },
+    upgrade: { name: 'Stone Bastion+', description: 'Gain 10 Block. If Petrify ≥ 50% HP, gain 20 Block and Attuned 1 instead.',
+      shortDescription: '10 Block (20 Block + Attuned 1 if at threshold).',
+      effect(state) {
+        if (state.player.petrify >= state.player.hp * 0.5) {
+          applyBlock(state.player, 20); applyStatus(state.player, 'attuned', 1);
+        } else {
+          applyBlock(state.player, 10);
+        }
+      } },
+  },
+  petrify_shroud: {
+    id: 'petrify_shroud', name: 'Petrify Shroud', cost: 2, type: 'power', targetType: 'none', rarity: 'rare',
+    description: 'At the start of each turn, gain Block equal to Petrify ÷ 4 (min 2).',
+    shortDescription: 'Each turn: gain Petrify÷4 Block (min 2).',
+    effect(state) {
+      state.combat.activePowers.push({
+        name: 'Petrify Shroud',
+        hooks: {
+          onTurnStart(s) { applyBlock(s.player, Math.max(2, Math.floor(s.player.petrify / 4))); },
+        },
+      });
+    },
+    upgrade: { name: 'Petrify Shroud+', description: 'At the start of each turn, gain Block equal to Petrify ÷ 3 (min 3).',
+      shortDescription: 'Each turn: gain Petrify÷3 Block (min 3).',
+      effect(state) {
+        state.combat.activePowers.push({
+          name: 'Petrify Shroud+',
+          hooks: {
+            onTurnStart(s) { applyBlock(s.player, Math.max(3, Math.floor(s.player.petrify / 3))); },
           },
         });
       } },

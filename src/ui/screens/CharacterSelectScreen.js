@@ -35,12 +35,6 @@ export const CharacterSelectScreen = {
             <div class="char-portrait">🔒</div>
             <div class="char-name">???</div>
             <div class="char-title">Coming soon</div>
-            <div class="char-flavor">A dark sorceress who wields petrification as a weapon, letting the stone run deep for terrible power.</div>
-          </div>
-          <div class="char-card char-locked">
-            <div class="char-portrait">🔒</div>
-            <div class="char-name">???</div>
-            <div class="char-title">Coming soon</div>
             <div class="char-flavor">A warrior who fights the stone with raw physical force, turning hardened flesh into an unstoppable weapon.</div>
           </div>
         </div>
@@ -65,7 +59,8 @@ function _startRun(charId) {
 
 function _relicName(relicId) {
   const names = {
-    stone_veil: 'Stone Veil',
+    stone_veil:   'Stone Veil',
+    stone_hunger: 'Stone Hunger',
   };
   return names[relicId] ?? relicId;
 }

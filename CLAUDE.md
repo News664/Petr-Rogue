@@ -173,11 +173,6 @@ the player with an unannounced attack. Phase arrays are set with
 `e.intentIndex = newPhase.length - 1` so the post-turn increment wraps to 0,
 starting the new phase cleanly on the next enemy action.
 
-### Stone Pact (Tharja)
-Dual-mode 0-cost card. Draw counts differ by mode to prevent abuse:
-- Below threshold: +6 Petrify, draw 2 (base) / draw 3 (upgraded)
-- Above threshold: −4 Petrify, draw 1 (base) / −6 Petrify, draw 2 (upgraded)
-
 ### Death Screen System
 - Messages live in `src/data/deathMessages.js` — edit epitaphs there, not in CombatScreen.js
 - Key lookup chain: `boss_{bossId}` → `petrify_{type}_{id}` → `petrify_{type}` → `petrify` / `hp`

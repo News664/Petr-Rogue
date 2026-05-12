@@ -184,17 +184,40 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   min-height: 100vh; gap: 20px; text-align: center; padding: 40px;
 }
+/* Slideshow wrapper — replaces the static .game-over layout during frame sequence */
+.game-over-slideshow {
+  display: flex; flex-direction: column; align-items: center;
+  min-height: 100vh; gap: 20px; text-align: center; padding: 40px;
+  transition: opacity 0.3s ease;
+}
+.game-over-slideshow.go-fade { opacity: 0; }
+
 .game-over-art {
   width: min(480px, 90vw); aspect-ratio: 3/2;
   background: #111; border-radius: 10px; overflow: hidden;
   border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
 }
-.game-over-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.game-over h1   { font-size: 2.8rem; color: var(--danger); margin: 0; }
+/* In frame mode the art grows to fill more vertical space for dramatic effect */
+.game-over-art.go-frame-mode {
+  width: min(680px, 95vw); aspect-ratio: 16/9;
+}
+.game-over-art img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.6s ease, transform-origin 0s;
+}
+.game-over h1, .game-over-slideshow h1 { font-size: 2.8rem; color: var(--danger); margin: 0; }
 .victory-screen h1 { font-size: 2.8rem; color: var(--accent); }
 .game-over-epitaph { color: var(--text-muted); max-width: 480px; line-height: 1.6; font-style: italic; margin: 0; }
 .game-over p, .victory-screen p { color: var(--text-muted); max-width: 480px; line-height: 1.6; font-style: italic; }
+/* Frame overlay text (pre-frames before final epitaph) */
+.go-frame-text {
+  font-size: 1.25rem; color: #e8d8c0; max-width: 560px;
+  line-height: 1.6; font-style: italic; margin: 0;
+  text-shadow: 0 1px 6px #000;
+}
+.go-hint { font-size: 0.8rem; color: rgba(255,255,255,0.35); margin: 0; }
+.game-over-text { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .game-over-stats {
   display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: center;
   color: var(--text-muted); font-size: 0.85rem;

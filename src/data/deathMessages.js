@@ -80,12 +80,17 @@ function _causeKey(cause) {
   return 'hp';
 }
 
-// Returns { key, title, body } — key is used by the UI to derive the art filename.
+// Returns { key, title, body, frames? }
+// frames: optional array of { text, zoom?, originX?, originY? } for slideshow pre-frames.
+//   zoom defaults to 1 (full image). originX/Y are CSS transform-origin % strings.
+//   The final "frame" is always the full-image title+body view — not stored in frames[].
+// key is used by the UI to derive the art filename.
 export function resolveDeathScreen(cause, charId) {
   const key     = _causeKey(cause);
   const charKey = charId ? `${key}_${charId}` : null;
-  const { title, body } =
+  const entry   =
     (charKey && DEATH_MESSAGES[charKey]) ? DEATH_MESSAGES[charKey] :
     DEATH_MESSAGES[key] ?? DEATH_MESSAGES.hp;
-  return { key, title, body };
+  const { title, body, frames } = entry;
+  return { key, title, body, frames };
 }

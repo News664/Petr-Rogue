@@ -1,3 +1,20 @@
+// ── RewardSystem.js ───────────────────────────────────────────────────────────
+// Post-combat and shop reward generation.
+//
+// Exports:
+//   generateCardRewards(state) → array of 3 card instances
+//   generateRelicReward(state) → one relic instance (or null if pool exhausted)
+//   upgradeCard(card) → true if upgraded, false if already upgraded or no upgrade
+//
+// Card reward rules:
+//   Each slot has a 20% chance to be colorless (from shared pool).
+//   Otherwise drawn from state.player.cardPool (character-specific).
+//   Rarity weights: 60% common / 30% uncommon / 10% rare.
+//
+// upgradeCard applies name, description, shortDescription, effect, and cost
+//   from card.upgrade in-place, then sets card.isUpgraded = true.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { makeCard } from '../data/cards.js';
 import { makeRelic, relicDropPool } from '../data/relics.js';
 
@@ -57,10 +74,11 @@ export function removeCardFromDeck(state, deckIndex) {
 export function upgradeCard(card) {
   if (card.isUpgraded || !card.upgrade) return false;
   const u = card.upgrade;
-  if (u.name)        card.name        = u.name;
-  if (u.description) card.description = u.description;
-  if (u.effect)      card.effect      = u.effect;
-  if (u.cost !== undefined) card.cost = u.cost;
+  if (u.name)             card.name             = u.name;
+  if (u.description)      card.description      = u.description;
+  if (u.shortDescription) card.shortDescription = u.shortDescription;
+  if (u.effect)           card.effect           = u.effect;
+  if (u.cost !== undefined) card.cost           = u.cost;
   card.isUpgraded = true;
   return true;
 }

@@ -1,4 +1,20 @@
-// Pure effect primitives — the only file allowed to mutate entity HP/block/petrify directly
+// ── Effects.js ────────────────────────────────────────────────────────────────
+// Pure effect primitives — the ONLY file allowed to mutate HP/block/petrify directly.
+//
+// Exports:
+//   applyDamage(target, amount, attacker?) → unblocked damage dealt
+//   applyBlock(entity, amount)
+//   gainPetrify(player, amount, source?)  — respects Stone Coat, Attuned, petrifyCap
+//   reducePetrify(player, amount)         — blocked by Anchored status
+//   healPlayer(player, amount)
+//
+// gainPetrify modifier chain:
+//   1. Add source._petrifyPower (enemy Petrify Power stat)
+//   2. Amplify by Attuned stacks
+//   3. Stone Coat absorbs up to (coat stacks) Petrify → converts to Block
+//   4. Add remaining to player.petrify
+//   5. Clamp to player.petrifyCap if set (Obsidian Cap relic sets this on combat start)
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Returns the amount of unblocked damage dealt
 export function applyDamage(target, amount, attacker = null) {

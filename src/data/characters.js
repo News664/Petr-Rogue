@@ -1,3 +1,21 @@
+// ── characters.js ─────────────────────────────────────────────────────────────
+// Playable character definitions and player state factory.
+//
+// Exports:
+//   characterDefs — object keyed by character ID
+//   createPlayerFromCharacter(charId) → full player state object
+//
+// Character def shape:
+//   { id, name, title, hp, energy, startingRelicId, flavor,
+//     starterDeck() → Card[], cardPool[] }
+//
+// Current characters:
+//   mint   — "The Reclaimed" (68 HP) — Petrify-cleanse and conversion
+//   tharja — "The Stone-Kissed" (72 HP) — Petrify as a power source, threshold at ≥50% HP
+//
+// All characters must be female (lore rule).
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { makeCard } from './cards.js';
 import { makeRelic } from './relics.js';
 

@@ -1,3 +1,34 @@
+// ── cards.js ──────────────────────────────────────────────────────────────────
+// All card definitions for every character and the colorless pool.
+//
+// Exports:
+//   cardDefs  — object keyed by card ID; each entry is the base card definition
+//   makeCard(id) → card instance (spread of def + isUpgraded:false)
+//   starterDeck() → default 10-card array (unused when character select is active)
+//   rewardPool[] — fallback reward card IDs (override by character.cardPool)
+//
+// Card object shape:
+//   { id, name, cost, type, targetType, rarity,
+//     description, shortDescription,
+//     effect(state, target), upgrade, exhaust?,
+//     isStatus?, isCurse?, unplayable? }
+//
+// type: 'attack' | 'skill' | 'power' | 'status' | 'curse'
+// targetType: 'enemy' | 'none'
+// rarity: 'common' | 'uncommon' | 'rare' | 'special'
+// upgrade: null | { name?, description?, shortDescription?, effect?, cost? }
+//   — applied in-place by RewardSystem.upgradeCard()
+//
+// Character card pools:
+//   Mint unique: purifying_touch, holy_light, petrify_ward, consecrate, sanctify,
+//                stone_coat, holy_surge, purifying_nova, sacred_ground
+//   Tharja unique: stone_fang, fracture, petrify_lash, petrify_mantle, void_release,
+//                  void_crack, overload, stone_pact, stone_bastion, petrify_shroud
+//   Colorless: bash, gravel_shot, stone_skin, shatter, petrify_surge, purify,
+//              fortify, stone_will, controlled_calcify, stone_channel
+//   Status/curse (unplayable): stasis, torpor, stone_debt, stone_shard, crystal_sliver
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { applyDamage, applyBlock, gainPetrify, reducePetrify, healPlayer } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 import { drawCards } from '../systems/DeckSystem.js';
@@ -347,25 +378,27 @@ export const cardDefs = {
   },
   stone_pact: {
     id: 'stone_pact', name: 'Stone Pact', cost: 0, type: 'skill', targetType: 'none', rarity: 'uncommon',
-    description: 'If Petrify < 50% HP: gain 6 Petrify, draw 2. If Petrify ≥ 50% HP: reduce Petrify by 4, draw 2.',
-    shortDescription: 'Below threshold: +6 Petrify + draw 2. At threshold: −4 Petrify + draw 2.',
+    description: 'If Petrify < 50% HP: gain 6 Petrify, draw 2. If Petrify ≥ 50% HP: reduce Petrify by 4, draw 1.',
+    shortDescription: 'Below threshold: +6 Petrify + draw 2. At threshold: −4 Petrify + draw 1.',
     effect(state) {
       if (state.player.petrify >= state.player.hp * 0.5) {
         reducePetrify(state.player, 4);
+        drawCards(state.combat.deckState, 1, state);
       } else {
         gainPetrify(state.player, 6);
+        drawCards(state.combat.deckState, 2, state);
       }
-      drawCards(state.combat.deckState, 2, state);
     },
-    upgrade: { name: 'Stone Pact+', description: 'If Petrify < 50% HP: gain 6 Petrify, draw 3. If Petrify ≥ 50% HP: reduce Petrify by 6, draw 3.',
-      shortDescription: 'Below threshold: +6 Petrify + draw 3. At threshold: −6 Petrify + draw 3.',
+    upgrade: { name: 'Stone Pact+', description: 'If Petrify < 50% HP: gain 6 Petrify, draw 3. If Petrify ≥ 50% HP: reduce Petrify by 6, draw 2.',
+      shortDescription: 'Below threshold: +6 Petrify + draw 3. At threshold: −6 Petrify + draw 2.',
       effect(state) {
         if (state.player.petrify >= state.player.hp * 0.5) {
           reducePetrify(state.player, 6);
+          drawCards(state.combat.deckState, 2, state);
         } else {
           gainPetrify(state.player, 6);
+          drawCards(state.combat.deckState, 3, state);
         }
-        drawCards(state.combat.deckState, 3, state);
       } },
   },
   stone_bastion: {

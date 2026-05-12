@@ -1,3 +1,24 @@
+// ── relics.js ─────────────────────────────────────────────────────────────────
+// All relic definitions and the drop pool for post-combat rewards.
+//
+// Exports:
+//   relicDefs    — object keyed by relic ID
+//   relicDropPool[] — IDs available as drops (starting relics excluded)
+//   makeRelic(id) → relic instance (spread of def)
+//
+// Relic object shape:
+//   { id, name, description, hooks: { onCombatStart?, onTurnStart?, onTurnEnd?, onCardPlayed? } }
+//   Hooks receive (state) and may mutate state freely.
+//
+// Starting relics (NOT in relicDropPool):
+//   stone_veil   — Mint's relic: gain Stone Coat 4 at combat start
+//   stone_hunger — Tharja's relic: +1 Energy per turn when Petrify ≥ 50% HP
+//
+// Drop pool relics:
+//   stone_heart, gravel_charm, obsidian_cap, cracked_geode,
+//   smooth_stone, saints_tear, brittle_core
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { reducePetrify, applyBlock, gainPetrify } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 

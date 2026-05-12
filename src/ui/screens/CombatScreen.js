@@ -6,6 +6,7 @@ import { navigate } from '../../router.js';
 import { FLOORS, NUM_ACTS } from '../../systems/MapSystem.js';
 import { openDeckViewer } from '../components/DeckViewer.js';
 import { resolveDeathScreen } from '../../data/deathMessages.js';
+import { renderDeathSlideshow } from '../components/DeathSlideshow.js';
 
 let _container = null;
 let _selectedHandIndex = null;
@@ -310,12 +311,6 @@ function _onVictory() {
   }
 }
 
-// ── Game Over ────────────────────────────────────────────────────────────────
-// Messages and key lookup live in src/data/deathMessages.js.
-// Art: assets/game-over/{cause-key-with-hyphens}-{charId}.png → {cause-key}.png → hidden.
-// If the death message entry has `frames`, the screen cycles through them (click to advance)
-// before landing on the final full-image + title + body view.
-
 function _showGameOver(cause) {
   const charId = GameState.player?.characterId ?? null;
   const { key, title, body, frames } = resolveDeathScreen(cause, charId);
@@ -327,78 +322,11 @@ function _showGameOver(cause) {
   const relics     = GameState.player?.relics?.length ?? 0;
   const gold       = GameState.player?.gold ?? 0;
 
-  const baseArtKey = key.replace(/_/g, '-');
-  const charArtKey = charId ? `${baseArtKey}-${charId}` : null;
-  const primarySrc = charArtKey ? `assets/game-over/${charArtKey}.png` : `assets/game-over/${baseArtKey}.png`;
-  const fallbackSrc = charArtKey ? `assets/game-over/${baseArtKey}.png` : null;
-
-  _container.innerHTML = '<div class="game-over game-over-slideshow"></div>';
-  const wrapper = _container.querySelector('.game-over-slideshow');
-
-  // Shared image element — reused across all frames; only transform changes.
-  const artDiv = document.createElement('div');
-  artDiv.className = 'game-over-art';
-  const imgEl = document.createElement('img');
-  imgEl.alt = '';
-  imgEl.src = primarySrc;
-  imgEl.onerror = fallbackSrc
-    ? () => { imgEl.src = fallbackSrc; imgEl.onerror = () => { imgEl.style.display = 'none'; }; }
-    : () => { imgEl.style.display = 'none'; };
-  artDiv.appendChild(imgEl);
-
-  const textDiv = document.createElement('div');
-  textDiv.className = 'game-over-text';
-
-  wrapper.appendChild(artDiv);
-  wrapper.appendChild(textDiv);
-
-  // Build frame list: pre-frames (optional) + final full-image frame.
-  const preFrames = frames ?? [];
-  let frameIndex = 0;
-
-  function _applyFrame() {
-    if (frameIndex < preFrames.length) {
-      const f = preFrames[frameIndex];
-      imgEl.style.transform       = `scale(${f.zoom ?? 1})`;
-      imgEl.style.transformOrigin = `${f.originX ?? '50%'} ${f.originY ?? '50%'}`;
-      artDiv.classList.add('go-frame-mode');
-      textDiv.innerHTML = `
-        <p class="go-frame-text">${f.text}</p>
-        <p class="go-hint">Click to continue</p>`;
-    } else {
-      // Final frame: full image, full epitaph.
-      imgEl.style.transform       = 'scale(1)';
-      imgEl.style.transformOrigin = '50% 50%';
-      artDiv.classList.remove('go-frame-mode');
-      textDiv.innerHTML = `
-        <h1>${title}</h1>
-        <p class="game-over-epitaph">${body}</p>
-        <div class="game-over-stats">
-          <span>Act ${act} · Floor ${floorInAct}</span>
-          <span>Enemies defeated: ${enemies}</span>
-          <span>Relics: ${relics}</span>
-          <span>Gold: ${gold}</span>
-        </div>
-        <button id="restart">Return to Menu</button>`;
-      textDiv.querySelector('#restart').addEventListener('click', () => location.reload());
-    }
-  }
-
-  _applyFrame();
-
-  if (preFrames.length > 0) {
-    wrapper.style.cursor = 'pointer';
-    wrapper.addEventListener('click', (e) => {
-      if (e.target.id === 'restart') return;
-      if (frameIndex >= preFrames.length) return;
-      frameIndex++;
-      wrapper.classList.add('go-fade');
-      setTimeout(() => {
-        _applyFrame();
-        wrapper.classList.remove('go-fade');
-      }, 300);
-    });
-  }
+  renderDeathSlideshow(_container, {
+    key, charId, title, body, frames,
+    stats: { act, floor: floorInAct, enemies, relics, gold },
+    onExit: () => location.reload(),
+  });
 }
 
 function _showRunVictory() {

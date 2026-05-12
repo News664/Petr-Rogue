@@ -1,3 +1,27 @@
+// ── CombatSystem.js ───────────────────────────────────────────────────────────
+// Turn-based combat orchestration: start combat, play cards, run enemy turns.
+//
+// Exports:
+//   startCombat(state, enemyIds) → result
+//   playCard(state, handIndex, targetIndex?) → { ok, event?, cause?, reason? }
+//   endPlayerTurn(state) → result
+//   getEnemyIntent(enemy) → intent object
+//
+// Result events: 'player_turn' | 'victory' | 'game_over' (+ cause)
+//
+// Turn start order (_startPlayerTurn):
+//   1. Reset block and energy
+//   2. tickPlayerStatuses — Numbing fires here (adds Petrify)
+//   3. checkDeathCause — death from status Petrify gain
+//   4. Draw 5 cards (4 if Slowed) — Stone Shard / Stone Debt draw hooks fire
+//   5. triggerRelics('onTurnStart') — Stone Hunger energy, Petrify Shroud block, etc.
+//
+// Torpor: blocks playing a 3rd card per turn when in hand.
+// Stasis: non-status cards in hand cost +1 per Stasis card (max 3).
+// Phase transitions: captured intent executes BEFORE onPhaseCheck takes effect
+//   so that bosses don't blindside players with unannounced phase-opener attacks.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { checkDeathCause } from '../state/Player.js';
 import { createDeckState, drawCards, discardCard, discardHand, exhaustCard } from './DeckSystem.js';
 import { triggerRelics } from './RelicSystem.js';
@@ -160,10 +184,10 @@ function _runEnemyTurn(state) {
     enemy.block = 0;
     tickEnemyStatuses(enemy);
 
-    // HP-threshold phase transitions checked every turn (not only via intent).
-    if (enemy.onPhaseCheck) enemy.onPhaseCheck(enemy, player, state);
-
+    // Capture intent BEFORE phase check so the transition takes effect next turn,
+    // not mid-action (which would blindside the player with an unannounced move).
     const intent     = enemy.intents[enemy.intentIndex];
+    if (enemy.onPhaseCheck) enemy.onPhaseCheck(enemy, player, state);
     const hpBefore   = player.hp;
     const petrBefore = player.petrify;
     combat.lastEnemyAttacker = { id: enemy.id, name: enemy.name, isBoss: enemy.isBoss ?? false };

@@ -1,3 +1,20 @@
+// ── Player.js ─────────────────────────────────────────────────────────────────
+// Player state factory and death-cause checker.
+//
+// Exports:
+//   createPlayer() → generic player state (fallback; prefer createPlayerFromCharacter)
+//   checkDeathCause(player, combat) → cause string | null
+//
+// Death conditions (checked after every meaningful state mutation):
+//   player.petrify >= player.hp  → petrify death (cause includes source type/id)
+//   player.hp <= 0               → hp death
+//
+// cause string format (used by deathMessages.js for key lookup):
+//   'petrify:{type}:{id}'  e.g. 'petrify:enemy:stone_heart'
+//   'petrify:{type}'       e.g. 'petrify:status'
+//   'hp'
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { starterDeck } from '../data/cards.js';
 
 // Generic player creation (used as fallback without character select)

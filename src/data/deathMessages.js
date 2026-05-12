@@ -1,6 +1,18 @@
-// ── Death screen messages ─────────────────────────────────────────────────────
+// ── deathMessages.js ──────────────────────────────────────────────────────────
+// Game-over epitaphs and slideshow frame data for all characters.
 //
-// Keys follow the cause-key lookup chain (most-specific first):
+// Exports:
+//   DEATH_MESSAGES — object keyed by cause key (see lookup chain below)
+//   resolveDeathScreen(cause, charId) → { key, title, body, frames? }
+//
+// Entry shape:
+//   { title, body, frames? }
+//   frames: optional array of pre-frames shown before the final epitaph view.
+//     Each frame: { text, zoom?, originX?, originY? }
+//     zoom defaults to 1. originX/Y are CSS transform-origin % strings.
+//     The final full-image title+body view is NOT stored in frames — it is implicit.
+//
+// Key lookup chain (most-specific first):
 //   boss_{bossId}
 //   petrify_{sourceType}_{sourceId}
 //   petrify_{sourceType}
@@ -18,6 +30,7 @@
 //   1. Append a block of {key}_{charId} entries below (copy any existing block as template).
 //   2. Place art at assets/game-over/{cause-key}-{charId}.png for each cause you want art for.
 //      Missing art files are silently hidden — partial sets are fine.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const DEATH_MESSAGES = {
 
@@ -36,17 +49,98 @@ export const DEATH_MESSAGES = {
 
   // ── Mint ─────────────────────────────────────────────────────────────────
   // Art: assets/game-over/{cause-key}-mint.png
+  // frames: pre-frames shown before the final full-image epitaph (click to advance).
+  //   zoom/originX/originY are CSS transform values targeting the focal element.
 
-  hp_mint:                     { title: 'Fallen',              body: "Mint's wounds proved fatal. The dungeon closes around the fallen and does not mourn — another reclaimed soul, lost again. Somewhere above, the light from the surface grows a little darker." },
-  petrify_mint:                { title: 'Fully Petrified',     body: "Stone crept through Mint's veins until nothing remained. She will stand here in the dark forever — still, silent. She had been freed once. The goddess does not pass through twice." },
-  petrify_enemy_mint:          { title: 'Turned to Stone',     body: "The dungeon's creatures carry the cold in every strike. Each blow moved the stone deeper into Mint. She had survived it once — sealed in silence, waiting. She did not survive it twice." },
-  petrify_status_mint:         { title: 'The Slow Creep',      body: 'No single blow finished Mint. A status left untended, ticking quietly while she fought other things. She had been patient herself — waiting decades in stone. The dungeon out-waited her.' },
-  petrify_curse_mint:          { title: 'A Debt in Stone',     body: 'The curses seemed manageable. Mint had carried stone before — it was part of her, in a way. Together they added up quietly. Stone debts have a way of being collected in full, even from those who have already paid once.' },
-  petrify_self_mint:           { title: 'Your Own Power',      body: 'Mint understood the risk. She had felt this cold before — placed in her by someone else, without her consent. This time she chose it. The stone that claimed her this time was her own.' },
-  petrify_event_mint:          { title: "The Dungeon's Trap",  body: 'The choice seemed reasonable at the time. Mint had already walked blind into one trap in this dungeon — sealed away, frozen, waiting for rescue. The dungeon offered her a second chance and used it.' },
-  boss_obsidian_sentinel_mint: { title: 'The Sentinel Stands', body: "The Obsidian Sentinel offered Mint no answers — only weight, and stone, and a patience older than her curse. She had survived petrification once. The Sentinel does not negotiate with survivors." },
-  boss_petrified_queen_mint:   { title: 'Added to the Court',  body: "The Petrified Queen does not need to speak. Her stillness is command enough. Mint joins her court — frozen, silent, a mirror of the fate she once escaped. No goddess wanders through the Queen's halls." },
-  boss_stone_heart_mint:       { title: 'The Heart Beats On',  body: 'The Heart of the Abyss has beaten longer than memory. It did not even slow as Mint fell. She came here for answers. At the bottom of the world, the Heart offers only silence — and stone.' },
+  hp_mint: {
+    title: 'Fallen',
+    body: "The dungeon does not distinguish between the reclaimed and the rest. She was found again, as all things left in the dark are found — not by stone this time, but by something simpler. She bled. She did not rise.",
+    frames: [
+      { text: 'She fought as if she had nothing left to lose.', zoom: 2.5, originX: '38%', originY: '28%' },
+      { text: 'She did. She always did.',                       zoom: 1.6, originX: '50%', originY: '65%' },
+    ],
+  },
+
+  petrify_mint: {
+    title: 'Remembered by Stone',
+    body: "She had been reclaimed once. The miracle did not repeat. What the stone remembers, it keeps.",
+    frames: [
+      { text: 'It knew her.',                                                                           zoom: 2.5, originX: '50%', originY: '22%' },
+      { text: 'The stone had touched her before, left its memory in the seams of her. Now it followed those old lines back.', zoom: 1.6, originX: '50%', originY: '38%' },
+    ],
+  },
+
+  petrify_enemy_mint: {
+    title: 'The Cold in Every Strike',
+    body: "She had outrun this fate once, with help, with prayer, with something she could not name. This time there was no one at her back. The stone closed over her like a hand that had always known where to reach.",
+    frames: [
+      { text: 'One blow. That was all it took.',                                               zoom: 2.5, originX: '85%', originY: '42%' },
+      { text: 'She had survived worse. She had outrun worse. But survival is not a promise — only a record.', zoom: 1.6, originX: '55%', originY: '47%' },
+    ],
+  },
+
+  petrify_status_mint: {
+    title: 'The Slow Creep',
+    body: "She had walked back from the edge before, step by careful step. This time the edge walked with her. By the time she understood, there was no step left to take.",
+    frames: [
+      { text: 'She felt it before she saw it.',           zoom: 2.5, originX: '50%', originY: '45%' },
+      { text: 'Not the violence of it. The slow kind. The kind that waits.', zoom: 1.6, originX: '50%', originY: '32%' },
+    ],
+  },
+
+  petrify_curse_mint: {
+    title: 'A Debt in Stone',
+    body: "Some doors should not be opened from the inside. She had never believed that. The dungeon, patient as stone, had waited for her to prove it.",
+    frames: [
+      { text: 'She knew the cost when she reached for it.',                        zoom: 2.5, originX: '28%', originY: '75%' },
+      { text: 'She reached anyway. That is the shape of her — always one choice past the safe one.', zoom: 1.6, originX: '52%', originY: '48%' },
+    ],
+  },
+
+  petrify_self_mint: {
+    title: 'What She Had Always Known',
+    body: "The reclaimed carry the stone in them forever — subdued, quiet, waiting. She knew this. She had always known this. She told herself it didn't matter. The stone disagreed.",
+    frames: [
+      { text: 'Her own power. Her own undoing.',                                                zoom: 2.5, originX: '63%', originY: '30%' },
+      { text: 'She had purified the stone from others. She could not always outrun what she had already let in.', zoom: 1.6, originX: '52%', originY: '22%' },
+    ],
+  },
+
+  petrify_event_mint: {
+    title: 'The Price of Reaching',
+    body: "The dungeon offers what you need most at exactly the price you cannot afford. She was brave enough to reach for it. Not quite brave enough to walk away.",
+    frames: [
+      { text: 'She made a choice.',                                                          zoom: 2.5, originX: '75%', originY: '35%' },
+      { text: 'She had made choices before in dark places and lived. She had begun to trust herself too much.', zoom: 1.6, originX: '58%', originY: '45%' },
+    ],
+  },
+
+  boss_obsidian_sentinel_mint: {
+    title: 'The Sentinel Stands',
+    body: "The Obsidian Sentinel does not hate. It does not want. It simply holds its ground until there is no ground left to hold. Mint understood this, at the end. Understanding was not enough.",
+    frames: [
+      { text: 'It was waiting long before she arrived.',                                              zoom: 2.5, originX: '18%', originY: '18%' },
+      { text: 'She had faced stone before. But stone with purpose — stone that holds and does not tire — that was something different.', zoom: 1.6, originX: '38%', originY: '52%' },
+    ],
+  },
+
+  boss_petrified_queen_mint: {
+    title: 'No Room for Pity',
+    body: "Pity is a weight you cannot carry into a fight and win. The Petrified Queen has had centuries to learn this. Mint had only the dungeon. It was not enough.",
+    frames: [
+      { text: 'She saw herself in her. That was the mistake.',                                      zoom: 2.5, originX: '78%', originY: '28%' },
+      { text: 'Another woman taken by stone — who wore it like sovereignty, who had made it her court. Mint had almost pitied her.', zoom: 1.6, originX: '55%', originY: '45%' },
+    ],
+  },
+
+  boss_stone_heart_mint: {
+    title: 'The Heart Remembers',
+    body: "She had been sent back once, purpose attached to the miracle. Perhaps this was the purpose fulfilled — not victory, but witness. She had seen the heart of it. The heart had seen her. Neither survived the meeting unchanged. Only one survived.",
+    frames: [
+      { text: 'At the end, she saw what she had been walking toward.',                                 zoom: 2.0, originX: '50%', originY: '22%' },
+      { text: 'Not a monster. Not a god. The thing at the center of all of it — the source, the answer, the reason she had been reclaimed.', zoom: 1.5, originX: '44%', originY: '78%' },
+    ],
+  },
 
   // ── Tharja ───────────────────────────────────────────────────────────────
   // Art: assets/game-over/{cause-key}-tharja.png

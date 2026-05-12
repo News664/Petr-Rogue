@@ -313,10 +313,12 @@ function _onVictory() {
 // ── Game Over ────────────────────────────────────────────────────────────────
 // Messages and key lookup live in src/data/deathMessages.js.
 // Art: assets/game-over/{cause-key-with-hyphens}-{charId}.png → {cause-key}.png → hidden.
+// If the death message entry has `frames`, the screen cycles through them (click to advance)
+// before landing on the final full-image + title + body view.
 
 function _showGameOver(cause) {
   const charId = GameState.player?.characterId ?? null;
-  const { key, title, body } = resolveDeathScreen(cause, charId);
+  const { key, title, body, frames } = resolveDeathScreen(cause, charId);
 
   const map        = GameState.map;
   const act        = map ? Math.floor(map.currentFloor / 10) + 1 : 1;
@@ -325,30 +327,78 @@ function _showGameOver(cause) {
   const relics     = GameState.player?.relics?.length ?? 0;
   const gold       = GameState.player?.gold ?? 0;
 
-  // Art: try {cause}-{charId}.png first, fall back to {cause}.png, then hide.
   const baseArtKey = key.replace(/_/g, '-');
   const charArtKey = charId ? `${baseArtKey}-${charId}` : null;
-  const artSrc     = charArtKey ? `assets/game-over/${charArtKey}.png` : `assets/game-over/${baseArtKey}.png`;
-  const artFallback = charArtKey
-    ? `this.src='assets/game-over/${baseArtKey}.png';this.onerror=()=>this.style.display='none'`
-    : `this.style.display='none'`;
+  const primarySrc = charArtKey ? `assets/game-over/${charArtKey}.png` : `assets/game-over/${baseArtKey}.png`;
+  const fallbackSrc = charArtKey ? `assets/game-over/${baseArtKey}.png` : null;
 
-  _container.innerHTML = `
-    <div class="game-over">
-      <div class="game-over-art" data-cause="${key}" data-char="${charId ?? ''}">
-        <img src="${artSrc}" alt="" onerror="${artFallback}">
-      </div>
-      <h1>${title}</h1>
-      <p class="game-over-epitaph">${body}</p>
-      <div class="game-over-stats">
-        <span>Act ${act} · Floor ${floorInAct}</span>
-        <span>Enemies defeated: ${enemies}</span>
-        <span>Relics: ${relics}</span>
-        <span>Gold: ${gold}</span>
-      </div>
-      <button id="restart">Return to Menu</button>
-    </div>`;
-  _container.querySelector('#restart').addEventListener('click', () => location.reload());
+  _container.innerHTML = '<div class="game-over game-over-slideshow"></div>';
+  const wrapper = _container.querySelector('.game-over-slideshow');
+
+  // Shared image element — reused across all frames; only transform changes.
+  const artDiv = document.createElement('div');
+  artDiv.className = 'game-over-art';
+  const imgEl = document.createElement('img');
+  imgEl.alt = '';
+  imgEl.src = primarySrc;
+  imgEl.onerror = fallbackSrc
+    ? () => { imgEl.src = fallbackSrc; imgEl.onerror = () => { imgEl.style.display = 'none'; }; }
+    : () => { imgEl.style.display = 'none'; };
+  artDiv.appendChild(imgEl);
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'game-over-text';
+
+  wrapper.appendChild(artDiv);
+  wrapper.appendChild(textDiv);
+
+  // Build frame list: pre-frames (optional) + final full-image frame.
+  const preFrames = frames ?? [];
+  let frameIndex = 0;
+
+  function _applyFrame() {
+    if (frameIndex < preFrames.length) {
+      const f = preFrames[frameIndex];
+      imgEl.style.transform       = `scale(${f.zoom ?? 1})`;
+      imgEl.style.transformOrigin = `${f.originX ?? '50%'} ${f.originY ?? '50%'}`;
+      artDiv.classList.add('go-frame-mode');
+      textDiv.innerHTML = `
+        <p class="go-frame-text">${f.text}</p>
+        <p class="go-hint">Click to continue</p>`;
+    } else {
+      // Final frame: full image, full epitaph.
+      imgEl.style.transform       = 'scale(1)';
+      imgEl.style.transformOrigin = '50% 50%';
+      artDiv.classList.remove('go-frame-mode');
+      textDiv.innerHTML = `
+        <h1>${title}</h1>
+        <p class="game-over-epitaph">${body}</p>
+        <div class="game-over-stats">
+          <span>Act ${act} · Floor ${floorInAct}</span>
+          <span>Enemies defeated: ${enemies}</span>
+          <span>Relics: ${relics}</span>
+          <span>Gold: ${gold}</span>
+        </div>
+        <button id="restart">Return to Menu</button>`;
+      textDiv.querySelector('#restart').addEventListener('click', () => location.reload());
+    }
+  }
+
+  _applyFrame();
+
+  if (preFrames.length > 0) {
+    wrapper.style.cursor = 'pointer';
+    wrapper.addEventListener('click', (e) => {
+      if (e.target.id === 'restart') return;
+      if (frameIndex >= preFrames.length) return;
+      frameIndex++;
+      wrapper.classList.add('go-fade');
+      setTimeout(() => {
+        _applyFrame();
+        wrapper.classList.remove('go-fade');
+      }, 300);
+    });
+  }
 }
 
 function _showRunVictory() {

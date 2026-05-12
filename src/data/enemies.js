@@ -1,3 +1,33 @@
+// ── enemies.js ────────────────────────────────────────────────────────────────
+// All enemy and boss definitions, plus encounter tables for all three acts.
+//
+// Exports:
+//   enemyDefs — object keyed by enemy ID
+//   createEnemyInstance(id) → live enemy object (spread of def + runtime fields)
+//   combatEncounters, eliteEncounters, bossEncounters — Act 1 encounter pools
+//   act2CombatEncounters, act2EliteEncounters, act2BossEncounters — Act 2
+//   act3CombatEncounters, act3EliteEncounters, act3BossEncounters — Act 3
+//
+// Enemy object shape:
+//   { id, name, maxHp, hp, block, intents[], intentIndex, statusEffects,
+//     isBoss?, isSummon?, onPhaseCheck?(enemy,player,state),
+//     _enraged, _phase2done, _strength, _petrifyPower }
+//
+// Intent shape: { label, icon, action(enemy, player, state) }
+//
+// Intent helpers (local): atk, blk, calc, petr, wkn, anchor, crumble,
+//   strengthen, numb, atkP (attack + direct Petrify)
+//
+// Boss phase arrays (defined before enemyDefs so closures can reference them):
+//   _sentinelP2 — Obsidian Sentinel phase 2
+//   _kingP2     — Petrified Queen / Stone Royal Guard phase 2
+//   _heartP2, _heartP3 — The Stone Heart phases 2 and 3
+//
+// Phase transitions: onPhaseCheck fires each enemy turn (before intent executes).
+//   Sets e.intents = newPhase and e.intentIndex = newPhase.length - 1 so that
+//   after the turn's intentIndex increment, the next turn starts at index 0.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { applyDamage, applyBlock, gainPetrify } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 import { addCardToDraw, addCardToHand } from '../systems/DeckSystem.js';
@@ -89,7 +119,7 @@ const _heartP2 = [
       if (!e._phase2done && e.hp <= e.maxHp * 0.33) {
         e._phase2done = true;
         e.intents = _heartP3;
-        e.intentIndex = 0;
+        e.intentIndex = _heartP3.length - 1;
         _log(state, '🌑 The Stone Heart CRACKS — Phase 3!');
       } else {
         applyBlock(e, 24);
@@ -166,7 +196,7 @@ export const enemyDefs = {
       if (!e._enraged && e.hp <= e.maxHp * 0.5) {
         e._enraged = true;
         e.intents = _sentinelP2;
-        e.intentIndex = 0;
+        e.intentIndex = _sentinelP2.length - 1;
         _log(state, '💥 The Obsidian Sentinel AWAKENS — Phase 2!');
       }
     },
@@ -226,7 +256,7 @@ export const enemyDefs = {
       if (!e._enraged && e.hp <= e.maxHp * 0.5) {
         e._enraged = true;
         e.intents = _kingP2;
-        e.intentIndex = 0;
+        e.intentIndex = _kingP2.length - 1;
         _log(state, '👑 The Petrified Queen rises from her throne — Phase 2!');
       }
     },
@@ -290,7 +320,7 @@ export const enemyDefs = {
       if (!e._enraged && e.hp <= e.maxHp * 0.66) {
         e._enraged = true;
         e.intents = _heartP2;
-        e.intentIndex = 0;
+        e.intentIndex = _heartP2.length - 1;
         _log(state, '🌑 The Stone Heart pulses — Phase 2!');
       }
     },

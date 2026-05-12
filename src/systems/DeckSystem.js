@@ -1,3 +1,22 @@
+// ── DeckSystem.js ─────────────────────────────────────────────────────────────
+// Deck / hand / draw-pile / discard-pile / exhaust management.
+//
+// Exports:
+//   HAND_CAP — maximum cards in hand (10)
+//   createDeckState(deck) → deckState object
+//   drawCards(deckState, n, state?) — draws n cards (shuffles discard if draw pile empty)
+//   discardCard(deckState, handIndex) — moves one card to discard
+//   discardHand(deckState, state?) — moves all hand cards to discard
+//   exhaustCard(deckState, handIndex) — removes card permanently (to exhaust pile)
+//   addCardToHand(deckState, card, state?) — adds card directly to hand
+//   addCardToDraw(deckState, card) — shuffles card into draw pile
+//
+// deckState shape:
+//   { hand[], draw[], discard[], exhaust[] }
+//
+// Cards with card.onDraw(state) get that hook fired when drawn (e.g. Stone Shard, Stone Debt).
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const HAND_CAP = 10;
 
 export function createDeckState(cards) {

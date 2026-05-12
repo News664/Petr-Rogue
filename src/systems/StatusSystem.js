@@ -1,3 +1,25 @@
+// ── StatusSystem.js ───────────────────────────────────────────────────────────
+// Status effect registry, application, and tick logic.
+//
+// Exports:
+//   applyStatus(entity, key, stacks) — adds stacks to entity.statusEffects[key]
+//   tickPlayerStatuses(player, state?) — fires on player turn start
+//   tickEnemyStatuses(enemy) — fires on each enemy's action in enemy turn
+//   tickCrumblingOnEnemyTurn(player) — eats player block before enemy acts
+//   formatStatuses(statusEffects) → array of { icon, label, value } for display
+//
+// Key player statuses:
+//   numbing   — gain N Petrify at turn start, then decrement
+//   anchored  — prevents Petrify reduction; decrements per turn
+//   slowed    — draw 1 fewer card; decrements per turn
+//   calcified — unblocked damage also inflicts that amount as Petrify
+//   crumbling — block is eaten at start of enemy phase
+//   attuned   — amplifies all Petrify gain by N stacks
+//   stoneCoat — absorbs up to N incoming Petrify as Block instead
+//   weak      — outgoing damage ×0.75
+//   vulnerable — incoming damage ×1.5
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { gainPetrify } from './Effects.js';
 
 // ── Apply ────────────────────────────────────────────────────────────────────

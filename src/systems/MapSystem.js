@@ -1,3 +1,16 @@
+// ── MapSystem.js ──────────────────────────────────────────────────────────────
+// Run map generation and room-type assignment.
+//
+// Exports:
+//   FLOORS_PER_ACT, NUM_ACTS, FLOORS — layout constants (10 floors × 3 acts = 30)
+//   generateMap() → map structure (array of floor nodes with branching paths)
+//   actForFloor(floor) → 0-based act index
+//   roomTypeForFloor(floor) → room type string
+//
+// Room types: 'combat' | 'elite' | 'boss' | 'rest' | 'shop' | 'event'
+// Boss rooms occur at floors 9, 19, 29 (last floor of each act).
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const FLOORS_PER_ACT = 10;
 export const NUM_ACTS       = 3;
 export const FLOORS         = FLOORS_PER_ACT * NUM_ACTS; // 30

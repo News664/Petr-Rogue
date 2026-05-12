@@ -65,6 +65,28 @@ if the previous session was long. To minimise this:
 - **Start a new session before the window is full.** Once context usage is
   noticeably high, commit and push everything, update CLAUDE.md, then continue
   in a fresh session rather than compressing mid-task.
+- **Read file headers before diving in.** Every `.js` file has a comment block
+  at the top listing its exports, key data shapes, and design notes. Read just
+  lines 1–25 of a file to orient yourself before reading more.
+
+## File Header Convention
+
+Every `.js` source file carries a structured comment block at lines 1–N (before
+the first `import`). Keep these headers current whenever you change a file's
+exports, add new key definitions, or alter a data shape.
+
+Header format:
+```
+// ── FileName.js ──────────────────────────────────...
+// One-line description of what the file owns.
+//
+// Exports:
+//   exportName — what it is / does
+//   ...
+//
+// Key data shape or design notes
+// ─────────────────────────────────────────────────
+```
 
 ## Lore Rules
 
@@ -143,6 +165,18 @@ effects, draw hooks) — not just at turn start.
 Several Tharja cards use `state.player.petrify >= state.player.hp * 0.5` as the
 threshold condition. This uses **current HP**, not maxHp, so the threshold lowers
 as she takes damage (easier to trigger when wounded).
+
+### Boss Phase Transitions
+Phase checks run in `_runEnemyTurn` AFTER intent is captured (not before). This
+means `onPhaseCheck` can change the intent array for next turn without ambushing
+the player with an unannounced attack. Phase arrays are set with
+`e.intentIndex = newPhase.length - 1` so the post-turn increment wraps to 0,
+starting the new phase cleanly on the next enemy action.
+
+### Stone Pact (Tharja)
+Dual-mode 0-cost card. Draw counts differ by mode to prevent abuse:
+- Below threshold: +6 Petrify, draw 2 (base) / draw 3 (upgraded)
+- Above threshold: −4 Petrify, draw 1 (base) / −6 Petrify, draw 2 (upgraded)
 
 ### Death Screen System
 - Messages live in `src/data/deathMessages.js` — edit epitaphs there, not in CombatScreen.js

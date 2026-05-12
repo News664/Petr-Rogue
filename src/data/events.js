@@ -1,3 +1,18 @@
+// ── events.js ─────────────────────────────────────────────────────────────────
+// Non-combat room event definitions.
+//
+// Exports:
+//   eventDefs — object keyed by event ID
+//   pickEvent(state) → event def (randomly selected, avoids repeats via state.seenEvents)
+//
+// Event def shape:
+//   { id, title, description, choices: [{ label, apply(state) }] }
+//   apply(state) runs when the player selects that choice; may mutate player/deck/relics.
+//
+// Events may: add/remove cards, grant/remove relics, heal/damage, apply statuses,
+//   grant gold, add Petrify, or do nothing (flavour choices).
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { gainPetrify, reducePetrify, healPlayer } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 import { makeCard } from './cards.js';

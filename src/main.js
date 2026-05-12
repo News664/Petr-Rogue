@@ -7,6 +7,7 @@ import { RestScreen }            from './ui/screens/RestScreen.js';
 import { ShopScreen }            from './ui/screens/ShopScreen.js';
 import { EventScreen }           from './ui/screens/EventScreen.js';
 import { GalleryScreen }         from './ui/screens/GalleryScreen.js';
+import { GameOverScreen }        from './ui/screens/GameOverScreen.js';
 import { updateStatusBar }       from './ui/components/StatusBar.js';
 
 const container   = document.getElementById('screen-container');
@@ -42,6 +43,7 @@ initRouter(container, {
   ShopScreen,
   EventScreen,
   GalleryScreen,
+  GameOverScreen,
 });
 
 setNavHook(screenName => updateStatusBar(statusBarEl, screenName));

@@ -1,6 +1,13 @@
 import { GameState } from '../../state/GameState.js';
 import { navigate } from '../../router.js';
 
+function _checkEventDeath(player) {
+  if (player.petrify > 0 && player.petrify >= player.hp)
+    return { type: 'petrify', source: player.lastPetrifySource ?? { type: 'event', id: null } };
+  if (player.hp <= 0) return { type: 'hp' };
+  return null;
+}
+
 export const EventScreen = {
   init(el, { event }) {
     _render(el, event);
@@ -40,6 +47,8 @@ function _render(el, event) {
         _showCardPicker(el, event, choice);
       } else {
         choice.effect(GameState);
+        const cause = _checkEventDeath(GameState.player);
+        if (cause) { navigate('GameOverScreen', { cause }); return; }
         navigate('MapScreen');
       }
     });
@@ -73,6 +82,8 @@ function _showCardPicker(el, event, choice) {
     btn.addEventListener('click', () => {
       const deckIndex = Number(btn.dataset.deckIndex);
       choice.onPick(GameState, deckIndex);
+      const cause = _checkEventDeath(GameState.player);
+      if (cause) { navigate('GameOverScreen', { cause }); return; }
       navigate('MapScreen');
     });
   });

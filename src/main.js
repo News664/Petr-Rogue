@@ -6,6 +6,7 @@ import { RewardScreen }          from './ui/screens/RewardScreen.js';
 import { RestScreen }            from './ui/screens/RestScreen.js';
 import { ShopScreen }            from './ui/screens/ShopScreen.js';
 import { EventScreen }           from './ui/screens/EventScreen.js';
+import { GalleryScreen }         from './ui/screens/GalleryScreen.js';
 import { updateStatusBar }       from './ui/components/StatusBar.js';
 
 const container   = document.getElementById('screen-container');
@@ -40,6 +41,7 @@ initRouter(container, {
   RestScreen,
   ShopScreen,
   EventScreen,
+  GalleryScreen,
 });
 
 setNavHook(screenName => updateStatusBar(statusBarEl, screenName));
@@ -55,10 +57,14 @@ function showMenu() {
       <p class="subtitle">A petrification-themed roguelike deckbuilder</p>
       <p class="menu-hint">Build your deck. Manage the stone. Survive.</p>
       <button id="new-run" class="btn-primary">New Run</button>
+      <button id="open-gallery" class="btn-secondary">Game Over Gallery</button>
     </div>
   `;
   document.getElementById('new-run').addEventListener('click', () => {
     navigate('CharacterSelectScreen');
+  });
+  document.getElementById('open-gallery').addEventListener('click', () => {
+    navigate('GalleryScreen');
   });
 }
 

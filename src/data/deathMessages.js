@@ -145,16 +145,95 @@ export const DEATH_MESSAGES = {
   // ── Tharja ───────────────────────────────────────────────────────────────
   // Art: assets/game-over/{cause-key}-tharja.png
 
-  hp_tharja:                     { title: 'Not the Stone',        body: 'Tharja spent so long dancing with petrification that she forgot blades were just as final. The stone did not take her. She finds that darkly funny, wherever she is now.' },
-  petrify_tharja:                { title: 'Too Deep',             body: 'She had felt it building for turns — that heavy, electric weight spreading through her. She chased it further than she should have. The edge found her before she found it. She had time, at the end, to appreciate the irony.' },
-  petrify_enemy_tharja:          { title: 'Outpaced',             body: 'Tharja welcomed the stone on her own terms. She did not welcome someone else pouring it into her faster than she could spend it. There is a difference between controlling the flood and drowning in it.' },
-  petrify_status_tharja:         { title: 'The Slow Burn',        body: 'She knew it was ticking. She left it, because the edge felt good, because it was feeding her. One more turn. Then one more. Tharja gambled on her own endurance. The dungeon collected its chips.' },
-  petrify_curse_tharja:          { title: 'A Debt She Owed',      body: 'She had taken from the stone willingly, turn after turn. The curses were just the stone taking back. Tharja might have respected that, if she had had time to think about it.' },
-  petrify_self_tharja:           { title: 'The Thrill, Fulfilled', body: 'There is a part of Tharja that knew exactly what she was doing. She chose the card. She played the hand. The edge was right there — and she leaned a little too far. She would not call it a mistake. Not entirely.' },
-  petrify_event_tharja:          { title: 'A Bet Gone Wrong',     body: 'The dungeon offered her a deal. Tharja has never been good at turning down deals that involve more power, more stone, more of that electric feeling. This one took more than she could pay back.' },
-  boss_obsidian_sentinel_tharja: { title: 'An Immovable Edge',    body: 'Tharja had felt stronger stone before — inside her own veins. But the Sentinel is not a resource. It does not pulse with dark potential. It is simply weight, and mass, and patience. She found an edge she could not dance along.' },
-  boss_petrified_queen_tharja:   { title: 'A Different Court',    body: 'The Petrified Queen had mastered stone without ever choosing it. Tharja had chosen it her whole life. The Queen looked at her as a curiosity — another fool who welcomed the cold. Then she ended the curiosity, efficiently and without interest.' },
-  boss_stone_heart_tharja:       { title: 'The Source, Untapped', body: 'The Heart of the Abyss pulses with more lithic power than Tharja had ever imagined existed. She felt it calling from the moment she saw it — not as a threat, but as an invitation. She accepted. The Heart did not.' },
+  hp_tharja: {
+    title: 'Not the Stone',
+    body: "The dungeon doesn't always give you the dramatic ending you were aiming for. The book lay open on a chapter she hadn't reached. Tharja finds that darkly funny, wherever she is now.",
+    frames: [
+      { text: 'She spent so long outrunning the stone that she forgot blades were just as final.', zoom: 2.5, originX: '32%', originY: '30%' },
+      { text: 'The research was still open. She hadn\'t finished.',                                zoom: 1.6, originX: '55%', originY: '65%' },
+    ],
+  },
+
+  petrify_tharja: {
+    title: 'Too Deep',
+    body: "She had time, at the end, to appreciate the irony. The thing she'd spent years studying, cultivating, spending like currency — it wasn't spending anymore. It was keeping.",
+    frames: [
+      { text: 'She had felt it building for turns.',                                                              zoom: 2.5, originX: '50%', originY: '20%' },
+      { text: 'That heavy, electric weight spreading through her. She chased it further than she should have. The edge found her before she found it.', zoom: 1.6, originX: '40%', originY: '55%' },
+    ],
+  },
+
+  petrify_enemy_tharja: {
+    title: 'Outpaced',
+    body: "There is a difference between controlling the flood and drowning in it. She knew this. She had written pages on this distinction. The dungeon was not interested in her notes.",
+    frames: [
+      { text: 'She welcomed the stone on her own terms.',              zoom: 2.5, originX: '12%', originY: '40%' },
+      { text: 'Someone else\'s terms were another matter entirely.',   zoom: 1.6, originX: '48%', originY: '48%' },
+    ],
+  },
+
+  petrify_status_tharja: {
+    title: 'The Slow Burn',
+    body: "This is what the edge looks like when you lose. Not a crash — just sitting down, slowly, until there is no standing back up. Tharja gambled on her own endurance. The dungeon had more.",
+    frames: [
+      { text: 'She knew it was ticking.',                                                                    zoom: 2.5, originX: '62%', originY: '42%' },
+      { text: 'She left it because the edge felt good, because it was feeding her. One more turn. Then one more.', zoom: 1.6, originX: '50%', originY: '30%' },
+    ],
+  },
+
+  petrify_curse_tharja: {
+    title: 'A Debt She Owed',
+    body: "Power borrowed accrues interest. The chains were just the ledger being balanced. She might have respected the symmetry of it, if she had time. Knowing it did not loosen the grip.",
+    frames: [
+      { text: 'She had taken from the stone willingly, turn after turn.',  zoom: 2.5, originX: '50%', originY: '50%' },
+      { text: 'The curses were just the stone taking back.',               zoom: 1.6, originX: '50%', originY: '48%' },
+    ],
+  },
+
+  petrify_self_tharja: {
+    title: 'The Thrill, Fulfilled',
+    body: "There is a part of Tharja that knew exactly what she was doing. She chose the card. She played the hand. The edge was right there — and she leaned a little too far. She would not call it a mistake. Not entirely.",
+    frames: [
+      { text: 'Her notes said this was possible.',                                                                           zoom: 2.5, originX: '35%', originY: '55%' },
+      { text: 'She had written: "controlled application is essential." Somewhere in the last few turns, she had stopped applying it with control.', zoom: 1.6, originX: '48%', originY: '45%' },
+    ],
+  },
+
+  petrify_event_tharja: {
+    title: 'A Bet Gone Wrong',
+    body: "This one took more than she could pay back. She stepped forward anyway. That's the thing about Tharja — she always stepped forward.",
+    frames: [
+      { text: 'The dungeon offered her a deal.',                                                                       zoom: 2.5, originX: '62%', originY: '55%' },
+      { text: 'Tharja has never been good at turning down deals that involve more power, more stone, more of that electric feeling.', zoom: 1.6, originX: '52%', originY: '22%' },
+    ],
+  },
+
+  boss_obsidian_sentinel_tharja: {
+    title: 'An Immovable Edge',
+    body: "She found an edge she could not dance along. The book fell from her hands on the way down. She had never dropped her book before. That, she would not have forgiven herself for.",
+    frames: [
+      { text: 'She had felt stronger stone before — inside her own veins.',                              zoom: 2.5, originX: '82%', originY: '45%' },
+      { text: 'But the Sentinel is not a resource. It does not pulse with dark potential. It is simply weight, and mass, and patience.', zoom: 1.6, originX: '55%', originY: '50%' },
+    ],
+  },
+
+  boss_petrified_queen_tharja: {
+    title: 'A Different Court',
+    body: "She died with her book on the floor. She would have hated that. In the Queen's court, every challenger's story ends the same way — frozen, stripped of their purpose, permanent. Even ones who spent their life reaching for exactly this.",
+    frames: [
+      { text: 'The Petrified Queen had mastered stone without ever choosing it.',                              zoom: 2.5, originX: '72%', originY: '28%' },
+      { text: 'Tharja had chosen it her whole life. The Queen looked at her as a curiosity — then, efficiently, ended the curiosity.', zoom: 1.6, originX: '50%', originY: '45%' },
+    ],
+  },
+
+  boss_stone_heart_tharja: {
+    title: 'The Source, Untapped',
+    body: "She accepted. She reached with everything she had — all the stone she had spent, all the turns she had danced along the edge. It wasn't enough. It was never going to be enough. But reaching for it anyway — that was the most Tharja thing she had ever done.",
+    frames: [
+      { text: 'The Heart of the Abyss pulses with more power than she had ever imagined existed.',    zoom: 2.5, originX: '78%', originY: '38%' },
+      { text: 'She felt it calling from the moment she saw it. Not as a threat. As an invitation.',   zoom: 1.6, originX: '55%', originY: '45%' },
+    ],
+  },
 
 };
 

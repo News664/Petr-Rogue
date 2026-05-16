@@ -58,7 +58,7 @@ function _renderList() {
               return `<button class="gallery-item${hasFr ? ' has-frames' : ''}"
                               data-key="${key}" data-charid="${ch.charId ?? ''}">
                 <div class="gallery-thumb">
-                  <img src="${_artSrc(key, ch.charId)}" alt=""
+                  <img src="${_artSrc(key, ch.charId)}" alt="" loading="lazy"
                        onerror="this.style.display='none'">
                 </div>
                 <span>${title}</span>

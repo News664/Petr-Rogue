@@ -1,5 +1,9 @@
 # Petr-Rogue — Project Context for Claude Sessions
 
+## Session Methodology
+
+**Discuss before implementing.** For any non-trivial change — new features, design decisions, coordinate tuning, card numbers, balance changes — draft the proposal and confirm with the user before touching any file. Only skip this step if the user explicitly says "apply directly" or equivalent.
+
 ## Tech Stack
 
 - **Vanilla JS ES modules**, no build step, no bundler

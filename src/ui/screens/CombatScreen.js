@@ -12,6 +12,25 @@ let _container = null;
 let _selectedHandIndex = null;
 let _source = 'combat'; // 'combat' | 'elite' | 'boss'
 
+const _GO_KEYS = [
+  'hp', 'petrify', 'petrify-enemy', 'petrify-status', 'petrify-curse',
+  'petrify-self', 'petrify-event', 'boss-obsidian-sentinel',
+  'boss-petrified-queen', 'boss-stone-heart',
+];
+
+function _preloadImages(charId) {
+  const urls = [
+    `assets/${charId}/sprite.png`,
+    `assets/${charId}/Portrait_0.png`,
+    `assets/${charId}/Portrait_25.png`,
+    `assets/${charId}/Portrait_50.png`,
+    `assets/${charId}/Portrait_75.png`,
+    ..._GO_KEYS.map(k => `assets/game-over/${k}-${charId}.png`),
+    ..._GO_KEYS.map(k => `assets/game-over/${k}.png`),
+  ];
+  urls.forEach(src => { const img = new Image(); img.src = src; });
+}
+
 // Cache of sprite content bounds per charId: { top: 0..1, bottom: 0..1 }
 // top/bottom are the fraction of transparent rows at top and bottom of the sprite.
 const _spriteBounds = {};
@@ -59,6 +78,7 @@ export const CombatScreen = {
     _source = source;
     const startResult = startCombat(GameState, enemyIds);
     if (startResult?.event === 'game_over') { _handleResult(startResult); return; }
+    _preloadImages(GameState.player.characterId ?? 'mint');
     _render();
   },
   teardown() { _container = null; _selectedHandIndex = null; },

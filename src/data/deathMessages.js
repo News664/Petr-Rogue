@@ -75,7 +75,7 @@ export const DEATH_MESSAGES = {
     body: "She had outrun this fate once, with help, with prayer, with something she could not name. This time there was no one at her back. The stone closed over her like a hand that had always known where to reach.",
     frames: [
       { text: 'One blow. That was all it took.',                                               zoom: 2.5, originX: '85%', originY: '42%' },
-      { text: 'She had survived worse. She had outrun worse. But survival is not a promise — only a record.', zoom: 2.0, originX: '42%', originY: '35%' },
+      { text: 'She had survived worse. She had outrun worse. But survival is not a promise — only a record.', zoom: 2.5, originX: '40%', originY: '20%' },
     ],
   },
 
@@ -93,7 +93,7 @@ export const DEATH_MESSAGES = {
     body: "Some doors should not be opened from the inside. She had never believed that. The dungeon, patient as stone, had waited for her to prove it.",
     frames: [
       { text: 'She knew the cost when she reached for it.',                        zoom: 2.5, originX: '28%', originY: '75%' },
-      { text: 'She reached anyway. That is the shape of her — always one choice past the safe one.', zoom: 2.0, originX: '50%', originY: '27%' },
+      { text: 'She reached anyway. That is the shape of her — always one choice past the safe one.', zoom: 2.5, originX: '38%', originY: '20%' },
     ],
   },
 
@@ -111,7 +111,7 @@ export const DEATH_MESSAGES = {
     body: "The dungeon offers what you need most at exactly the price you cannot afford. She was brave enough to reach for it. Not quite brave enough to walk away.",
     frames: [
       { text: 'She made a choice.',                                                          zoom: 2.5, originX: '75%', originY: '35%' },
-      { text: 'She had made choices before in dark places and lived. She had begun to trust herself too much.', zoom: 2.0, originX: '52%', originY: '37%' },
+      { text: 'She had made choices before in dark places and lived. She had begun to trust herself too much.', zoom: 2.5, originX: '45%', originY: '22%' },
     ],
   },
 
@@ -120,7 +120,7 @@ export const DEATH_MESSAGES = {
     body: "The Obsidian Sentinel does not hate. It does not want. It simply holds its ground until there is no ground left to hold. Mint understood this, at the end. Understanding was not enough.",
     frames: [
       { text: 'It was waiting long before she arrived.',                                              zoom: 2.5, originX: '18%', originY: '18%' },
-      { text: 'She had faced stone before. But stone with purpose — stone that holds and does not tire — that was something different.', zoom: 2.0, originX: '56%', originY: '62%' },
+      { text: 'She had faced stone before. But stone with purpose — stone that holds and does not tire — that was something different.', zoom: 2.5, originX: '62%', originY: '42%' },
     ],
   },
 
@@ -129,7 +129,7 @@ export const DEATH_MESSAGES = {
     body: "Pity is a weight you cannot carry into a fight and win. The Petrified Queen has had centuries to learn this. Mint had only the dungeon. It was not enough.",
     frames: [
       { text: 'She saw herself in her. That was the mistake.',                                      zoom: 2.5, originX: '78%', originY: '28%' },
-      { text: 'Another woman taken by stone — who wore it like sovereignty, who had made it her court. Mint had almost pitied her.', zoom: 2.0, originX: '46%', originY: '33%' },
+      { text: 'Another woman taken by stone — who wore it like sovereignty, who had made it her court. Mint had almost pitied her.', zoom: 2.5, originX: '48%', originY: '29%' },
     ],
   },
 
@@ -168,7 +168,7 @@ export const DEATH_MESSAGES = {
     body: "There is a difference between controlling the flood and drowning in it. She knew this. She had written pages on this distinction. The dungeon was not interested in her notes.",
     frames: [
       { text: 'She welcomed the stone on her own terms.',              zoom: 2.5, originX: '12%', originY: '40%' },
-      { text: 'Someone else\'s terms were another matter entirely.',   zoom: 2.0, originX: '50%', originY: '28%' },
+      { text: 'Someone else\'s terms were another matter entirely.',   zoom: 2.5, originX: '38%', originY: '23%' },
     ],
   },
 
@@ -186,7 +186,7 @@ export const DEATH_MESSAGES = {
     body: "Power borrowed accrues interest. The chains were just the ledger being balanced. She might have respected the symmetry of it, if she had time. Knowing it did not loosen the grip.",
     frames: [
       { text: 'She had taken from the stone willingly, turn after turn.',  zoom: 2.5, originX: '50%', originY: '50%' },
-      { text: 'The curses were just the stone taking back.',               zoom: 2.0, originX: '43%', originY: '23%' },
+      { text: 'The curses were just the stone taking back.',               zoom: 2.5, originX: '40%', originY: '19%' },
     ],
   },
 
@@ -195,7 +195,7 @@ export const DEATH_MESSAGES = {
     body: "There is a part of Tharja that knew exactly what she was doing. She chose the card. She played the hand. The edge was right there — and she leaned a little too far. She would not call it a mistake. Not entirely.",
     frames: [
       { text: 'Her notes said this was possible.',                                                                           zoom: 2.5, originX: '35%', originY: '55%' },
-      { text: 'She had written: "controlled application is essential." Somewhere in the last few turns, she had stopped applying it with control.', zoom: 2.0, originX: '55%', originY: '22%' },
+      { text: 'She had written: "controlled application is essential." Somewhere in the last few turns, she had stopped applying it with control.', zoom: 2.5, originX: '50%', originY: '19%' },
     ],
   },
 
@@ -213,7 +213,7 @@ export const DEATH_MESSAGES = {
     body: "She found an edge she could not dance along. The book fell from her hands on the way down. She had never dropped her book before. That, she would not have forgiven herself for.",
     frames: [
       { text: 'She had felt stronger stone before — inside her own veins.',                              zoom: 2.5, originX: '82%', originY: '45%' },
-      { text: 'But the Sentinel is not a resource. It does not pulse with dark potential. It is simply weight, and mass, and patience.', zoom: 2.0, originX: '30%', originY: '32%' },
+      { text: 'But the Sentinel is not a resource. It does not pulse with dark potential. It is simply weight, and mass, and patience.', zoom: 2.5, originX: '32%', originY: '23%' },
     ],
   },
 
@@ -231,7 +231,7 @@ export const DEATH_MESSAGES = {
     body: "She accepted. She reached with everything she had — all the stone she had spent, all the turns she had danced along the edge. It wasn't enough. It was never going to be enough. But reaching for it anyway — that was the most Tharja thing she had ever done.",
     frames: [
       { text: 'The Heart of the Abyss pulses with more power than she had ever imagined existed.',    zoom: 2.5, originX: '78%', originY: '38%' },
-      { text: 'She felt it calling from the moment she saw it. Not as a threat. As an invitation.',   zoom: 2.0, originX: '25%', originY: '28%' },
+      { text: 'She felt it calling from the moment she saw it. Not as a threat. As an invitation.',   zoom: 2.5, originX: '22%', originY: '27%' },
     ],
   },
 

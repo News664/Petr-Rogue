@@ -52,7 +52,12 @@ export function startCombat(state, enemyIds) {
   state.player.lastPetrifySource = null;
   if (!state.enemiesDefeated) state.enemiesDefeated = 0;
   state.combat = {
-    enemies: enemyIds.map(createEnemyInstance),
+    enemies: enemyIds.map((id, i) => {
+      const e = createEnemyInstance(id);
+      // Stagger same-type enemies so they don't act in unison every turn.
+      if (i > 0) e.intentIndex = i % e.intents.length;
+      return e;
+    }),
     deckState: createDeckState(state.player.deck),
     energy: 3,
     maxEnergy: 3,

@@ -11,6 +11,7 @@ import { renderDeathSlideshow } from '../components/DeathSlideshow.js';
 let _container = null;
 let _selectedHandIndex = null;
 let _source = 'combat'; // 'combat' | 'elite' | 'boss'
+let _lastPetrifyStage = 0;
 
 const _GO_KEYS = [
   'hp', 'petrify', 'petrify-enemy', 'petrify-status', 'petrify-curse',
@@ -76,6 +77,7 @@ export const CombatScreen = {
     _container = el;
     _selectedHandIndex = null;
     _source = source;
+    _lastPetrifyStage = 0;
     const startResult = startCombat(GameState, enemyIds);
     if (startResult?.event === 'game_over') { _handleResult(startResult); return; }
     _preloadImages(GameState.player.characterId ?? 'mint');
@@ -233,12 +235,43 @@ function _render() {
         </div>
         <div class="card-detail-panel" id="card-detail"></div>
       </div>
+      <div class="petrify-vignette"></div>
+      <div class="petrify-flash-overlay"></div>
     </div>
   `;
 
   _attachEvents();
+  _applyPetrifyEffects();
   const logEl = _container.querySelector('#log-entries');
   if (logEl) logEl.scrollTop = logEl.scrollHeight;
+}
+
+function _applyPetrifyEffects() {
+  const { player } = GameState;
+  const ratio = Math.min(1, player.petrify / Math.max(1, player.hp));
+  const stage = ratio >= 0.75 ? 3 : ratio >= 0.5 ? 2 : ratio >= 0.25 ? 1 : 0;
+
+  const cs = _container.querySelector('.combat-screen');
+  if (!cs) return;
+  cs.style.setProperty('--petrify-ratio', ratio.toFixed(3));
+
+  const vignette = _container.querySelector('.petrify-vignette');
+  if (vignette) {
+    const inner = (70 - ratio * 40).toFixed(1);
+    const alpha = (ratio * 0.72).toFixed(3);
+    vignette.style.background =
+      `radial-gradient(ellipse at center, transparent ${inner}%, rgba(75,68,58,${alpha}) 100%)`;
+  }
+
+  if (stage > _lastPetrifyStage) {
+    const flash = _container.querySelector('.petrify-flash-overlay');
+    if (flash) {
+      flash.classList.remove('flash-active');
+      void flash.offsetWidth;
+      flash.classList.add('flash-active');
+    }
+  }
+  _lastPetrifyStage = stage;
 }
 
 function _attachEvents() {

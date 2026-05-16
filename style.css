@@ -119,6 +119,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   transform: rotate(var(--rot, 0deg)) translateY(var(--yo, 0px));
   transition: transform 0.18s ease, box-shadow 0.18s ease, z-index 0s;
   z-index: 1;
+  box-shadow: inset 0 0 calc(var(--petrify-ratio, 0) * 22px) rgba(95, 88, 78, calc(var(--petrify-ratio, 0) * 0.62));
 }
 .card:hover:not(.card-disabled) {
   transform: translateY(-52px) scale(1.45) rotate(0deg);
@@ -181,7 +182,23 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .enemy-power-badge { font-size: 0.72rem; background: #2a1a08; border: 1px solid #c8a96e; border-radius: 4px; padding: 1px 5px; cursor: help; }
 
 /* ── Combat Screen ── */
-.combat-screen { display: flex; height: 100vh; overflow: hidden; }
+.combat-screen { display: flex; height: 100vh; overflow: hidden; position: relative; }
+
+/* ── Petrify visual overlay effects ── */
+.petrify-vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+}
+.petrify-flash-overlay {
+  position: absolute; inset: 0; pointer-events: none; z-index: 6;
+  background: transparent;
+}
+.petrify-flash-overlay.flash-active {
+  animation: petrify-flash 0.75s ease-out forwards;
+}
+@keyframes petrify-flash {
+  0%   { background: rgba(168, 158, 140, 0.52); }
+  100% { background: rgba(168, 158, 140, 0); }
+}
 .energy-display { color: var(--energy); }
 .combat-actions { display: flex; justify-content: center; padding: 8px 10px; background: var(--surface); gap: 12px; }
 .deck-counts { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 4px; background: var(--surface); }

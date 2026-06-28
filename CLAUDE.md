@@ -31,16 +31,22 @@ Feature branch pushes work fine via direct git push.
    mcp__github__merge_pull_request({ pullNumber: N, merge_method: 'squash' })
    ```
    Use `squash` — `rebase` sometimes fails with 405.
-4. After the MCP merge, reset local main to avoid "unpushed commits" warnings:
+4. After the MCP merge, reset BOTH local main and the working branch to
+   `origin/main`. Resetting the working branch keeps its history identical to
+   main, so the next PR has no stale commits and merges cleanly (no cherry-pick
+   branch needed):
    ```
-   git fetch origin main && git checkout main && git reset --hard origin/main
-   git checkout <feature-branch>
+   git fetch origin main
+   git checkout main && git reset --hard origin/main
+   git checkout <feature-branch> && git reset --hard origin/main
    ```
+   Then start the next change directly on the working branch.
 
 **If the PR has merge conflicts** (happens when the feature branch contains commits
-already merged to main with different SHAs): create a clean branch from `origin/main`,
-cherry-pick only the genuinely new commits onto it, push that branch, and open the PR
-from there instead.
+already merged to main with different SHAs — avoidable by always resetting the
+working branch to `origin/main` after each merge, per step 4): create a clean
+branch from `origin/main`, cherry-pick only the genuinely new commits onto it,
+push that branch, and open the PR from there instead.
 
 **Branch hygiene:** Keep only two active branches besides `main`:
 - `claude/design-deckbuilding-game-structure-Scwr5` — preserved design archive

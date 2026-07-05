@@ -16,6 +16,9 @@
 //   4. Draw 5 cards (4 if Slowed) — Stone Shard / Stone Debt draw hooks fire
 //   5. triggerRelics('onTurnStart') — Stone Hunger energy, Petrify Shroud block, etc.
 //
+// Combat-scoped player resources (Opal's geodes, Galatea's poise) are reset to 0
+//   in startCombat; power hooks fire onTurnStart, onTurnEnd (before hand discard),
+//   and onCardPlayed.
 // Torpor: blocks playing a 3rd card per turn when in hand.
 // Stasis: non-status cards in hand cost +1 per Stasis card (max 3).
 // Phase transitions: captured intent executes BEFORE onPhaseCheck takes effect
@@ -50,6 +53,8 @@ export function startCombat(state, enemyIds) {
   state.player.block = 0;
   state.player.statusEffects = {};
   state.player.lastPetrifySource = null;
+  state.player.geodes = 0; // Opal resource — combat-scoped
+  state.player.poise = 0;  // Galatea resource — combat-scoped
   if (!state.enemiesDefeated) state.enemiesDefeated = 0;
   state.combat = {
     enemies: enemyIds.map((id, i) => {
@@ -143,6 +148,7 @@ export function playCard(state, handIndex, targetIndex = 0) {
 export function endPlayerTurn(state) {
   _log(state, '— End of your turn —');
   triggerRelics('onTurnEnd', state);
+  _triggerPowers(state, 'onTurnEnd', {}); // fires while hand is still intact (e.g. Pedestal)
   discardHand(state.combat.deckState, state);
   return _runEnemyTurn(state);
 }

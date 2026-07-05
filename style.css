@@ -95,6 +95,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .hud-stats { display: flex; gap: 16px; font-size: 0.85rem; }
 .stat-block { color: #85c1e9; }
 .stat-gold  { color: var(--gold); }
+.stat-geode { color: #6fd6c0; font-weight: bold; cursor: help; }
+.stat-poise { color: #c8b0e0; font-weight: bold; cursor: help; }
 
 /* ── Cards ── */
 .hand-area {

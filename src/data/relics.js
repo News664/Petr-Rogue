@@ -11,8 +11,10 @@
 //   Hooks receive (state) and may mutate state freely.
 //
 // Starting relics (NOT in relicDropPool):
-//   stone_veil   — Mint's relic: gain Stone Coat 4 at combat start
-//   stone_hunger — Tharja's relic: +1 Energy per turn when Petrify ≥ 50% HP
+//   stone_veil       — Mint's relic: gain Stone Coat 4 at combat start
+//   stone_hunger     — Tharja's relic: +1 Energy per turn when Petrify ≥ 50% HP
+//   geode_core       — Opal's relic: gain 2 Geodes at combat start
+//   sculptors_plinth — Galatea's relic: gain 2 Poise at combat start
 //
 // Drop pool relics:
 //   stone_heart, gravel_charm, obsidian_cap, cracked_geode,
@@ -42,6 +44,26 @@ export const relicDefs = {
       onTurnStart(state) {
         if (state.player.petrify >= state.player.hp * 0.5) state.combat.energy += 1;
       },
+    },
+  },
+
+  // ── Opal's starting relic ────────────────────────────────────────────────
+  geode_core: {
+    id: 'geode_core',
+    name: 'Geode Core',
+    description: 'At the start of each combat, gain 2 Geodes.',
+    hooks: {
+      onCombatStart(state) { state.player.geodes = (state.player.geodes ?? 0) + 2; },
+    },
+  },
+
+  // ── Galatea's starting relic ─────────────────────────────────────────────
+  sculptors_plinth: {
+    id: 'sculptors_plinth',
+    name: "Sculptor's Plinth",
+    description: 'At the start of each combat, gain 2 Poise.',
+    hooks: {
+      onCombatStart(state) { state.player.poise = (state.player.poise ?? 0) + 2; },
     },
   },
 

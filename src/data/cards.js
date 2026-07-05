@@ -763,8 +763,8 @@ export const cardDefs = {
     id: 'composure', name: 'Composure', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
     description: 'Gain 6 Block. Gain 2 Poise.',
     effect(state) { applyBlock(state.player, 6); gainPoise(state, 2); },
-    upgrade: { name: 'Composure+', description: 'Gain 9 Block. Gain 2 Poise.',
-      effect(state) { applyBlock(state.player, 9); gainPoise(state, 2); } },
+    upgrade: { name: 'Composure+', description: 'Gain 8 Block. Gain 2 Poise.',
+      effect(state) { applyBlock(state.player, 8); gainPoise(state, 2); } },
   },
   brace: {
     id: 'brace', name: 'Brace', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', retained: true,

@@ -10,8 +10,10 @@
 //     starterDeck() → Card[], cardPool[] }
 //
 // Current characters:
-//   mint   — "The Reclaimed" (68 HP) — Petrify-cleanse and conversion
-//   tharja — "The Stone-Kissed" (72 HP) — Petrify as a power source, threshold at ≥50% HP
+//   mint    — "The Reclaimed" (68 HP) — Petrify-cleanse and conversion
+//   tharja  — "The Stone-Kissed" (72 HP) — Petrify as a power source, threshold at ≥50% HP
+//   opal    — "The Faceted" (70 HP) — crystallize Petrify into Geodes, spend/scale
+//   galatea — "The Statue" (75 HP) — build Poise + Harden held cards, burst attacks
 //
 // All characters must be female (lore rule).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,6 +71,56 @@ export const characterDefs = {
       'petrify_shroud',
     ],
   },
+
+  opal: {
+    id: 'opal',
+    name: 'Opal',
+    title: 'The Faceted',
+    flavor: 'Where others see a curse, Opal sees ore. She learned to draw the creeping stone out of her own flesh before it could root — and, refusing to waste it, to cut it into faceted geodes she carries like coin. Petrification is not her enemy. It is her supply. She came to the dungeon because it is the richest vein she has ever found.',
+    hp: 70,
+    energy: 3,
+    startingRelicId: 'geode_core',
+    starterDeck() {
+      return [
+        'strike', 'strike', 'strike',
+        'defend', 'defend', 'defend',
+        'ore_strike', 'ore_strike',
+        'crystallize', 'facet_strike',
+      ].map(makeCard);
+    },
+    cardPool: [
+      'bash', 'gravel_shot', 'stone_skin', 'shatter', 'petrify_surge',
+      'purify', 'fortify', 'stone_will', 'controlled_calcify',
+      'ore_strike', 'crystallize', 'facet_strike', 'geode_ward', 'splinter',
+      'shatter_burst', 'prismatic_core', 'mother_lode',
+      'grand_geode', 'cataclysm',
+    ],
+  },
+
+  galatea: {
+    id: 'galatea',
+    name: 'Galatea',
+    title: 'The Statue',
+    flavor: 'Legend says she was carved before she drew breath, and something of the marble never left her. Galatea does not flail against the stone that hunts every soul down here — she meets it with its own stillness, gathering her poise motionless, hardening her intent, and then moving exactly once, exactly enough. Patience, for her, is a weapon with an edge.',
+    hp: 75,
+    energy: 3,
+    startingRelicId: 'sculptors_plinth',
+    starterDeck() {
+      return [
+        'strike', 'strike', 'strike',
+        'defend', 'defend', 'defend',
+        'composure', 'composure',
+        'chisel', 'unyielding',
+      ].map(makeCard);
+    },
+    cardPool: [
+      'bash', 'gravel_shot', 'stone_skin', 'shatter',
+      'purify', 'fortify', 'stone_will', 'controlled_calcify',
+      'composure', 'brace', 'chisel', 'unyielding', 'set_in_stone',
+      'monument', 'pedestal', 'weight_of_ages',
+      'living_marble', 'awakening',
+    ],
+  },
 };
 
 export function createPlayerFromCharacter(charDef) {
@@ -78,6 +130,8 @@ export function createPlayerFromCharacter(charDef) {
     maxHp: charDef.hp,
     petrify: 0,
     block: 0,
+    geodes: 0,   // Opal resource (reset each combat by startCombat)
+    poise: 0,    // Galatea resource (reset each combat by startCombat)
     gold: 100,
     deck: charDef.starterDeck(),
     relics: [makeRelic(charDef.startingRelicId)],

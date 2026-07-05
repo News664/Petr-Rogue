@@ -1,7 +1,7 @@
 import { formatStatuses } from '../../systems/StatusSystem.js';
 
 export function renderHUD(player) {
-  const { hp, maxHp, petrify, block, gold, statusEffects } = player;
+  const { hp, maxHp, petrify, block, gold, statusEffects, geodes, poise } = player;
 
   const pctPetrify = Math.min(100, (petrify / maxHp) * 100);
   const pctSafe    = Math.max(0,   ((hp - petrify) / maxHp) * 100);
@@ -25,6 +25,8 @@ export function renderHUD(player) {
       </div>
       <div class="hud-stats">
         ${block > 0 ? `<span class="stat-block">🛡️ ${block}</span>` : ''}
+        ${geodes > 0 ? `<span class="stat-geode" data-tooltip="Geodes: crystallized Petrify. Spent or scaled by Opal's cards.">💎 ${geodes}</span>` : ''}
+        ${poise > 0 ? `<span class="stat-poise" data-tooltip="Poise: Galatea's gathered focus. Spent by her attacks for scaling damage.">◈ ${poise}</span>` : ''}
         <span class="stat-gold">💰 ${gold}</span>
         ${statuses ? `<span class="hud-statuses">${statuses}</span>` : ''}
       </div>

@@ -16,11 +16,9 @@ import { GameState } from '../../state/GameState.js';
 import { generateMap } from '../../systems/MapSystem.js';
 import { navigate } from '../../router.js';
 
-// Placeholder tiles shown after the playable roster (design teasers).
-const LOCKED = [
-  { name: 'Opal',    title: 'The Faceted',    flavor: 'She does not fear the stone, nor merely endure it — she mines it. Petrification, to her, is raw ore: something to be cut, banked, and spent.' },
-  { name: 'Galatea', title: 'The Statue',     flavor: 'Carved before she was born, or so the story goes. She fights with the patience of marble — gathering her poise in perfect stillness, then striking once, decisively.' },
-];
+// Placeholder tiles shown after the playable roster (design teasers for
+// not-yet-implemented characters). Empty for now — Opal and Galatea are live.
+const LOCKED = [];
 
 let _el = null;
 let _selectedId = null;

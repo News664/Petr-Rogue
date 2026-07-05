@@ -11,8 +11,9 @@
 //   Otherwise drawn from state.player.cardPool (character-specific).
 //   Rarity weights: 60% common / 30% uncommon / 10% rare.
 //
-// upgradeCard applies name, description, shortDescription, effect, and cost
-//   from card.upgrade in-place, then sets card.isUpgraded = true.
+// upgradeCard applies name, description, shortDescription, effect, cost, and the
+//   lifecycle hooks onRetain/onCombatStart/onDraw from card.upgrade in-place,
+//   then sets card.isUpgraded = true.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { makeCard } from '../data/cards.js';
@@ -79,6 +80,11 @@ export function upgradeCard(card) {
   if (u.shortDescription) card.shortDescription = u.shortDescription;
   if (u.effect)           card.effect           = u.effect;
   if (u.cost !== undefined) card.cost           = u.cost;
+  // Lifecycle hooks may also change on upgrade (e.g. Galatea's Harden cards
+  // raise their Harden amount, which lives in onRetain/onCombatStart).
+  if (u.onRetain)         card.onRetain         = u.onRetain;
+  if (u.onCombatStart)    card.onCombatStart    = u.onCombatStart;
+  if (u.onDraw)           card.onDraw           = u.onDraw;
   card.isUpgraded = true;
   return true;
 }

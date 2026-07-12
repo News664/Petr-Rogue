@@ -30,6 +30,20 @@ import { createDeckState, drawCards, discardCard, discardHand, exhaustCard } fro
 import { triggerRelics } from './RelicSystem.js';
 import { tickPlayerStatuses, tickEnemyStatuses, tickCrumblingOnEnemyTurn } from './StatusSystem.js';
 import { createEnemyInstance } from '../data/enemies.js';
+import { petrifyStage, petrifyMilestoneLine } from '../data/petrifyFlavor.js';
+
+// Logs a character-voice line the first time Petrify crosses 25/50/75% upward
+// this combat. combat._petrifyStageSeen is seeded at combat start so carried-over
+// Petrify doesn't re-announce thresholds already passed on entry.
+function _checkPetrifyMilestone(state) {
+  const { player, combat } = state;
+  const stage = petrifyStage(player);
+  if (stage > (combat._petrifyStageSeen ?? 0)) {
+    const line = petrifyMilestoneLine(player.characterId, stage);
+    if (line) _log(state, line);
+    combat._petrifyStageSeen = stage;
+  }
+}
 
 const LOG_LIMIT = 40;
 
@@ -74,6 +88,9 @@ export function startCombat(state, enemyIds) {
     cardsPlayedThisTurn: 0,
     lastEnemyAttacker: null,
   };
+  // Seed milestone tracking to the stage the player enters combat at (Petrify
+  // carries across fights within an act), so only fresh advances announce.
+  state.combat._petrifyStageSeen = petrifyStage(state.player);
   triggerRelics('onCombatStart', state);
   for (const card of state.player.deck) {
     if (card.onCombatStart) card.onCombatStart(state);
@@ -135,6 +152,7 @@ export function playCard(state, handIndex, targetIndex = 0) {
 
   triggerRelics('onCardPlayed', state, { card });
   _triggerPowers(state, 'onCardPlayed', { card });
+  _checkPetrifyMilestone(state);
 
   const cause = checkDeathCause(player, combat);
   if (cause) return { ok: true, event: 'game_over', cause };
@@ -172,6 +190,7 @@ function _startPlayerTurn(state) {
   if (player.petrify > petrifyBefore) {
     _log(state, `Numbing: gained ${player.petrify - petrifyBefore} Petrify. (now ${player.petrify})`);
   }
+  _checkPetrifyMilestone(state);
 
   const cause = checkDeathCause(player, combat);
   if (cause) return { event: 'game_over', cause };
@@ -212,6 +231,7 @@ function _runEnemyTurn(state) {
     if (dmg  > 0) msg += ` (${dmg} dmg to you)`;
     if (petr > 0) msg += ` (+${petr} Petrify)`;
     _log(state, msg);
+    _checkPetrifyMilestone(state);
 
     const cause = checkDeathCause(player, combat);
     if (cause) return { event: 'game_over', cause };

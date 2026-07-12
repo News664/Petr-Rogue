@@ -30,6 +30,9 @@ function _render(source) {
   _container.innerHTML = `
     <div class="reward-screen">
       <h2>${sourceLabel}</h2>
+      ${source === 'boss' ? `
+        <p class="boss-reset-beat">The guardian crumbles. For the first time in this descent, the stone in your veins goes quiet — the grey recedes, your wounds close. You are yourself again.</p>
+      ` : ''}
       ${_relic ? `
         <div class="relic-reward">
           <h3>✨ Relic obtained</h3>

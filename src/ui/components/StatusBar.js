@@ -1,5 +1,6 @@
 import { GameState } from '../../state/GameState.js';
 import { openDeckViewer } from './DeckViewer.js';
+import { petrifyStage } from '../../data/petrifyFlavor.js';
 
 const HIDE_ON = new Set(['MenuScreen', 'CharacterSelectScreen']);
 
@@ -18,8 +19,21 @@ export function updateStatusBar(el, screenName) {
   const pctMissing = Math.max(0,   100 - pctPetrify - pctSafe);
   const danger     = petrify > 0 && (hp - petrify) <= 10;
 
+  // Petrify portrait: shown between combats so the act-long stone creep is
+  // visible on the map/rest/event screens. Hidden in combat (the combat panel
+  // is the live one there). Falls back to hidden if the art is missing.
+  const showPortrait = screenName !== 'CombatScreen';
+  const stage  = petrifyStage(player);
+  const charId = player.characterId ?? 'mint';
+  const portraitHtml = showPortrait ? `
+    <div class="sbar-portrait${danger ? ' sbar-portrait-danger' : ''}">
+      <img src="assets/${charId}/Portrait_${stage}.png" alt=""
+           onerror="this.parentElement.style.display='none'">
+    </div>` : '';
+
   el.innerHTML = `
     <div class="sbar-inner${danger ? ' sbar-danger' : ''}">
+      ${portraitHtml}
       <div class="sbar-vitals">
         <div class="sbar-bar">
           <div class="bar-petrify" style="width:${pctPetrify}%"></div>

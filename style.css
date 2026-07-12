@@ -315,6 +315,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   gap: 20px; padding: 40px 20px; text-align: center; min-height: 100vh;
 }
 .reward-screen h2 { font-size: 2rem; color: var(--accent); }
+.boss-reset-beat {
+  max-width: 620px; margin: 2px auto 8px; color: #cdbfa8;
+  font-style: italic; line-height: 1.6; text-align: center;
+}
 .reward-cards, .shop-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
 /* ── Rest Screen ── */
@@ -455,11 +459,17 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 #status-bar { width: 100%; }
 #status-bar.hidden { display: none; }
 .sbar-inner {
-  display: flex; align-items: flex-start; gap: 8px 12px;
+  display: flex; align-items: center; gap: 8px 12px;
   padding: 6px 14px; background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap;
 }
 .sbar-danger { border-bottom-color: var(--danger); }
 .sbar-vitals { flex: 1; min-width: 180px; }
+.sbar-portrait {
+  width: 34px; height: 44px; flex-shrink: 0; overflow: hidden;
+  border-radius: 3px; background: var(--surface2); border: 1px solid var(--border);
+}
+.sbar-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.sbar-portrait-danger { border-color: var(--danger); box-shadow: 0 0 6px #c0392b80; }
 .sbar-bar { display: flex; height: 10px; border-radius: 2px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 3px; }
 .sbar-labels { display: flex; gap: 10px; font-size: 0.75rem; flex-wrap: wrap; }
 .sbar-relics { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -551,7 +561,26 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   background: var(--surface); border-right: 1px solid var(--border);
   padding: 10px 8px 8px; gap: 6px; overflow: hidden;
 }
-.portrait-img-wrap { width: 100%; flex: 1; min-height: 0; overflow: hidden; border-radius: 4px; background: var(--surface2); }
+.portrait-img-wrap { width: 100%; flex: 1; min-height: 0; overflow: hidden; border-radius: 4px; background: var(--surface2); position: relative; }
+/* Per-gain Petrify ripple over the combat portrait */
+.portrait-ripple {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at center, rgba(150,140,125,0.55) 0%, rgba(120,112,100,0.15) 55%, transparent 75%);
+}
+.portrait-ripple.ripple-active { animation: portrait-ripple 0.55s ease-out; }
+@keyframes portrait-ripple {
+  0%   { opacity: 0; transform: scale(0.7); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+/* Pulsing stone seam at the sprite's petrification boundary */
+.petrify-seam {
+  position: absolute; inset: 0; pointer-events: none;
+  mask-size: 100% 100%; mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%; -webkit-mask-repeat: no-repeat;
+  animation: petrify-seam-pulse 1.8s ease-in-out infinite;
+}
+@keyframes petrify-seam-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
 .portrait-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; border-radius: 4px; transition: opacity 0.4s; }
 .portrait-pct { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-align: center; min-height: 16px; flex-shrink: 0; }
 .portrait-warn   { color: var(--petrify); }

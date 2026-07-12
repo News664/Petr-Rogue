@@ -12,6 +12,7 @@ let _container = null;
 let _selectedHandIndex = null;
 let _source = 'combat'; // 'combat' | 'elite' | 'boss'
 let _lastPetrifyStage = 0;
+let _lastPetrify = 0; // exact value, for the per-gain portrait ripple
 
 const _GO_KEYS = [
   'hp', 'petrify', 'petrify-enemy', 'petrify-status', 'petrify-curse',
@@ -78,6 +79,7 @@ export const CombatScreen = {
     _selectedHandIndex = null;
     _source = source;
     _lastPetrifyStage = 0;
+    _lastPetrify = GameState.player.petrify ?? 0; // seed so carried Petrify doesn't ripple on entry
     const startResult = startCombat(GameState, enemyIds);
     if (startResult?.event === 'game_over') { _handleResult(startResult); return; }
     _preloadImages(GameState.player.characterId ?? 'mint');
@@ -106,6 +108,7 @@ function _renderPortrait(player) {
              src="assets/${charId}/Portrait_${stage}.png"
              alt="portrait"
              onerror="this.style.visibility='hidden'">
+        <div class="portrait-ripple"></div>
       </div>
       <div class="portrait-pct ${cls}">${pct > 0 ? `Petrify ${pct}%` : ''}</div>
     </div>
@@ -132,11 +135,24 @@ function _renderSpriteArea(player) {
     `mask-image:url(${spriteUrl})`,
     `-webkit-mask-image:url(${spriteUrl})`,
   ].join(';');
+
+  // Pulsing seam at the stone boundary — reads as an actively creeping front.
+  // Full-size, masked to the figure; a thin bright band drawn at clipTop.
+  const ct = clipTop.toFixed(1);
+  const seamStyle = [
+    `mask-image:url(${spriteUrl})`,
+    `-webkit-mask-image:url(${spriteUrl})`,
+    `background:linear-gradient(to bottom, transparent calc(${ct}% - 4px), rgba(214,202,180,0.75) ${ct}%, transparent calc(${ct}% + 4px))`,
+  ].join(';');
+  const seamHtml = pct > 0.001
+    ? `<div class="petrify-seam" style="${seamStyle}"></div>`
+    : '';
   return `
     <div class="player-sprite-area">
       <div class="sprite-wrap">
         <img class="sprite-img" src="${spriteUrl}" alt="" onerror="this.style.visibility='hidden'">
         <div class="petrify-mask" style="${maskStyle}"></div>
+        ${seamHtml}
       </div>
     </div>
   `;
@@ -272,6 +288,17 @@ function _applyPetrifyEffects() {
     }
   }
   _lastPetrifyStage = stage;
+
+  // Per-gain ripple on the portrait: fire whenever Petrify rose since last render.
+  if (player.petrify > _lastPetrify) {
+    const ripple = _container.querySelector('.portrait-ripple');
+    if (ripple) {
+      ripple.classList.remove('ripple-active');
+      void ripple.offsetWidth;
+      ripple.classList.add('ripple-active');
+    }
+  }
+  _lastPetrify = player.petrify;
 }
 
 function _attachEvents() {

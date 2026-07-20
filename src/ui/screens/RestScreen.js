@@ -62,11 +62,14 @@ function _renderUpgradePicker(el) {
       <p style="color:var(--text-muted)">Choose one card to upgrade permanently.</p>
       <div class="upgrade-list">
         ${upgradeable.map(({ card, i }) => `
-          <button class="upgrade-item" data-index="${i}">
-            <span class="upgrade-from">${card.name}</span>
-            <span class="upgrade-arrow">→</span>
-            <span class="upgrade-to">${card.upgrade.name ?? card.name + '+'}</span>
-            <span class="upgrade-desc">${card.upgrade.description ?? ''}</span>
+          <button class="upgrade-item upgrade-preview" data-index="${i}">
+            <span class="upgrade-title">
+              <span class="upgrade-from">${card.name}</span>
+              <span class="upgrade-arrow">→</span>
+              <span class="upgrade-to">${card.upgrade.name ?? card.name + '+'}</span>
+            </span>
+            <span class="upgrade-diff-row"><span class="upgrade-diff-label">Now</span> ${card.description}</span>
+            <span class="upgrade-diff-row upgrade-diff-after"><span class="upgrade-diff-label">After</span> ${card.upgrade.description ?? card.description}</span>
           </button>
         `).join('')}
       </div>

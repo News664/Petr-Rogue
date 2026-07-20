@@ -133,6 +133,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   box-shadow: 0 0 0 3px var(--accent), 0 16px 36px #000000b0;
   z-index: 20;
 }
+/* Short (landscape phone) viewports: shrink the card lift/zoom so the enlarged
+   card doesn't cover the HUD/stats above the hand. */
+@media (max-height: 560px) {
+  .card:hover:not(.card-disabled) { transform: translateY(-22px) scale(1.15) rotate(0deg); }
+  .card.card-selected             { transform: translateY(-26px) scale(1.15) rotate(0deg); }
+}
 .card-art {
   width: 100%; height: clamp(44px, 5.5vw, 62px);
   overflow: hidden; border-radius: 4px 4px 0 0;
@@ -438,6 +444,18 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .upgrade-arrow { color: var(--accent); font-size: 1.1rem; }
 .upgrade-to    { font-weight: bold; color: var(--accent); }
 .upgrade-desc  { grid-column: 1 / -1; font-size: 0.75rem; color: var(--text-muted); }
+
+/* Rest-site upgrade preview: before → after diff */
+.upgrade-item.upgrade-preview {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+}
+.upgrade-title { display: flex; align-items: center; gap: 8px; }
+.upgrade-diff-row { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+.upgrade-diff-after { color: var(--text); }
+.upgrade-diff-label {
+  display: inline-block; min-width: 44px; font-size: 0.62rem; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--accent); font-weight: bold;
+}
 
 /* ── Reward screen relic section ── */
 .relic-reward { display: flex; flex-direction: column; align-items: center; gap: 8px; }

@@ -18,6 +18,14 @@ import { applyStatus } from '../systems/StatusSystem.js';
 import { makeCard } from './cards.js';
 import { makeRelic, relicDropPool } from './relics.js';
 
+// Queue a status to be applied at the start of the NEXT combat. Statuses applied
+// directly out of combat are wiped by startCombat's reset; pendingStatuses survive
+// it (see CombatSystem.startCombat). Use this for event-granted Numbing etc.
+function _queueStatus(player, key, amount) {
+  player.pendingStatuses = { ...(player.pendingStatuses ?? {}) };
+  player.pendingStatuses[key] = (player.pendingStatuses[key] ?? 0) + amount;
+}
+
 // Each event has:
 //   acts:     number[]  — which acts it can appear in (1-indexed)
 //   tone:     'positive' | 'neutral' | 'negative'
@@ -169,7 +177,7 @@ export const eventDefs = [
       {
         label: 'Push through (Numbing 3)',
         description: 'Gain Numbing 3 — gain 3 Petrify at the start of your next three turns.',
-        effect(state) { applyStatus(state.player, 'numbing', 3); },
+        effect(state) { _queueStatus(state.player, 'numbing', 3); },
       },
       {
         label: 'Wait it out (lose 10 HP)',
@@ -188,8 +196,8 @@ export const eventDefs = [
     text: 'In the corner stands a statue that was once a person — her expression frozen mid-scream. In her stone hand, you notice a card and a small pouch of gold.',
     choices: [
       {
-        label: 'Take the card (add Calcify)',
-        description: 'Add Calcify to your deck.',
+        label: 'Take the card (add Stone Channel)',
+        description: 'Add Stone Channel to your deck.',
         effect(state) { state.player.deck.push(makeCard('stone_channel')); },
       },
       {
@@ -199,7 +207,7 @@ export const eventDefs = [
       },
       {
         label: 'Take both (+6 Petrify)',
-        description: 'Add Calcify. Gain 15 Gold. Gain 6 Petrify.',
+        description: 'Add Stone Channel. Gain 15 Gold. Gain 6 Petrify.',
         effect(state) {
           state.player.deck.push(makeCard('stone_channel'));
           state.player.gold += 15;
@@ -440,7 +448,7 @@ export const eventDefs = [
       {
         label: 'Accept the loop (Numbing 4)',
         description: 'Stop fighting. Gain Numbing 4 — gain 4 Petrify at the start of your next four turns.',
-        effect(state) { applyStatus(state.player, 'numbing', 4); },
+        effect(state) { _queueStatus(state.player, 'numbing', 4); },
       },
     ],
   },

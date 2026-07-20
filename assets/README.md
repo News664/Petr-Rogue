@@ -8,6 +8,34 @@ All specs below are **authoritative** — an automated image-generation workflow
 consumes them, so pixel sizes and transparency requirements must be matched
 exactly.
 
+> **Status board & collaboration rules:** see [`ART_TODO.md`](./ART_TODO.md) for
+> the checklist of art still to generate and the Codex ↔ Claude working split
+> (Codex writes only `assets/**`; Claude owns `src/**` and `sw.js`).
+
+## Art Direction
+
+Keep new art consistent with the existing Mint/Tharja set so the roster feels
+like one game:
+
+- **Mood & palette:** dark, subterranean dungeon; low-key lighting; heavily
+  desaturated, stone-grey tones with muted warm accents. Petrification reads as
+  grey stone creeping over flesh. Avoid bright/saturated colors.
+- **Rendering:** painterly semi-realistic fantasy illustration, soft dramatic
+  lighting, visible stone texture where flesh turns to rock.
+- **Cast:** all playable characters are **female** (lore rule). Each character
+  has a consistent face/costume/silhouette across her avatar, sprite, and all
+  four portrait stages — only the degree of petrification changes between stages.
+- **Petrify stages (`Portrait_0/25/50/75`):** same pose, framing, and crop
+  across the four; stone spreads progressively (0 = full flesh, 75 = mostly
+  stone). Keep the face in the **upper-center** — portraits are top-cropped.
+- **Sprites:** full-body, standing, upright, feet near the bottom edge, on a
+  **fully transparent** background (a stone mask rises over the sprite in combat).
+- **Character notes:** Opal "The Faceted" — a miner/lapidary who cuts stone into
+  faceted geodes (crystalline motifs, gem tones within the grey). Galatea "The
+  Statue" — marble-serene, sculptural, poised; classical-statue overtones.
+- **Card art (`1536×1024`, 3:2):** a single evocative illustration of the card's
+  theme; no text or borders (the UI frames it).
+
 ## Folder tree
 
 ```

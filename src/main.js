@@ -13,6 +13,35 @@ import { updateStatusBar }       from './ui/components/StatusBar.js';
 const container   = document.getElementById('screen-container');
 const statusBarEl = document.getElementById('status-bar');
 
+// Register the offline service worker (auto — warms the cache on any online visit).
+// The menu's "Prepare for Offline Play" button confirms the precache is complete.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* offline play just won't be available */ });
+  });
+}
+
+// Registers the SW (idempotent), waits for it to activate, and reports how many
+// files are cached so the player knows a run can survive offline reloads.
+async function prepareOffline(statusEl) {
+  if (!('serviceWorker' in navigator)) {
+    statusEl.textContent = 'Offline play is not supported in this browser.';
+    return;
+  }
+  statusEl.textContent = 'Caching the game for offline play…';
+  try {
+    await navigator.serviceWorker.register('sw.js');
+    await navigator.serviceWorker.ready;
+    const cache = await caches.open('petr-rogue-v1');
+    const keys  = await cache.keys();
+    statusEl.textContent = keys.length > 0
+      ? `✓ Ready for offline play — ${keys.length} files cached. You can go offline now; the game (and its reloads on victory/defeat) will keep working.`
+      : 'Caching started — reload this page once while online, then check again.';
+  } catch (err) {
+    statusEl.textContent = 'Could not enable offline play: ' + (err?.message ?? err);
+  }
+}
+
 // Global tooltip: fixed-position div so it is never clipped by any overflow ancestor.
 const _tip = document.getElementById('global-tooltip');
 document.addEventListener('mouseover', e => {
@@ -60,6 +89,8 @@ function showMenu() {
       <p class="menu-hint">Build your deck. Manage the stone. Survive.</p>
       <button id="new-run" class="btn-primary">New Run</button>
       <button id="open-gallery" class="btn-secondary">Game Over Gallery</button>
+      <button id="prepare-offline" class="btn-secondary">Prepare for Offline Play</button>
+      <p id="offline-status" class="menu-hint"></p>
     </div>
   `;
   document.getElementById('new-run').addEventListener('click', () => {
@@ -67,6 +98,9 @@ function showMenu() {
   });
   document.getElementById('open-gallery').addEventListener('click', () => {
     navigate('GalleryScreen');
+  });
+  document.getElementById('prepare-offline').addEventListener('click', () => {
+    prepareOffline(document.getElementById('offline-status'));
   });
 }
 

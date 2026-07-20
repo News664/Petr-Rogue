@@ -26,7 +26,7 @@
 //                  void_crack, overload, stone_pact, stone_bastion, petrify_shroud
 //   Opal unique: ore_strike, crystallize, facet_strike, geode_ward, splinter,
 //                shatter_burst, prismatic_core, mother_lode, grand_geode, cataclysm
-//   Galatea unique: composure, brace, chisel, unyielding, set_in_stone, monument,
+//   Galatea unique: composure, brace, chisel, unyielding, hold_fast, monument,
 //                   pedestal, weight_of_ages, living_marble, awakening
 //   Colorless: bash, gravel_shot, stone_skin, shatter, petrify_surge, purify,
 //              fortify, stone_will, controlled_calcify, stone_channel
@@ -248,6 +248,7 @@ export const cardDefs = {
     shortDescription: 'Next 8 Petrify → Block instead.',
     effect(state) { applyStatus(state.player, 'stoneCoat', 8); },
     upgrade: { name: 'Stone Coat+', description: 'Next 14 Petrify you would gain becomes Block instead.',
+      shortDescription: 'Next 14 Petrify → Block instead.',
       effect(state) { applyStatus(state.player, 'stoneCoat', 14); } },
   },
   holy_surge: {
@@ -621,10 +622,10 @@ export const cardDefs = {
 
   ore_strike: {
     id: 'ore_strike', name: 'Ore Strike', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common',
-    description: 'Deal 6 damage. Gain 3 Petrify.',
-    effect(state, target) { applyDamage(target, 6, state.player); gainPetrify(state.player, 3); },
-    upgrade: { name: 'Ore Strike+', description: 'Deal 8 damage. Gain 3 Petrify.',
-      effect(state, target) { applyDamage(target, 8, state.player); gainPetrify(state.player, 3); } },
+    description: 'Deal 7 damage. Gain 3 Petrify.',
+    effect(state, target) { applyDamage(target, 7, state.player); gainPetrify(state.player, 3); },
+    upgrade: { name: 'Ore Strike+', description: 'Deal 9 damage. Gain 3 Petrify.',
+      effect(state, target) { applyDamage(target, 9, state.player); gainPetrify(state.player, 3); } },
   },
   crystallize: {
     id: 'crystallize', name: 'Crystallize', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
@@ -678,17 +679,17 @@ export const cardDefs = {
   },
   shatter_burst: {
     id: 'shatter_burst', name: 'Shatter Burst', cost: 2, type: 'attack', targetType: 'none', rarity: 'uncommon',
-    description: 'Consume all Geodes. Deal 4 damage to ALL enemies for each Geode consumed.',
-    shortDescription: 'Spend all Geodes: 4 dmg to all per Geode.',
+    description: 'Consume all Geodes. Deal 5 damage to ALL enemies for each Geode consumed.',
+    shortDescription: 'Spend all Geodes: 5 dmg to all per Geode.',
     effect(state) {
       const g = spendAllGeodes(state);
-      for (const e of state.combat.enemies) if (e.hp > 0) applyDamage(e, 4 * g, state.player);
+      for (const e of state.combat.enemies) if (e.hp > 0) applyDamage(e, 5 * g, state.player);
     },
-    upgrade: { name: 'Shatter Burst+', description: 'Consume all Geodes. Deal 5 damage to ALL enemies for each Geode consumed.',
-      shortDescription: 'Spend all Geodes: 5 dmg to all per Geode.',
+    upgrade: { name: 'Shatter Burst+', description: 'Consume all Geodes. Deal 6 damage to ALL enemies for each Geode consumed.',
+      shortDescription: 'Spend all Geodes: 6 dmg to all per Geode.',
       effect(state) {
         const g = spendAllGeodes(state);
-        for (const e of state.combat.enemies) if (e.hp > 0) applyDamage(e, 5 * g, state.player);
+        for (const e of state.combat.enemies) if (e.hp > 0) applyDamage(e, 6 * g, state.player);
       } },
   },
   prismatic_core: {
@@ -710,49 +711,51 @@ export const cardDefs = {
   },
   mother_lode: {
     id: 'mother_lode', name: 'Mother Lode', cost: 2, type: 'skill', targetType: 'none', rarity: 'uncommon',
-    description: 'Consume all Geodes. For each Geode consumed, gain 3 Block and reduce Petrify by 2.',
-    shortDescription: 'Spend all Geodes: +3 Block & −2 Petrify each.',
+    description: 'Consume all Geodes. For each Geode consumed, gain 5 Block and reduce Petrify by 2.',
+    shortDescription: 'Spend all Geodes: +5 Block & −2 Petrify each.',
     effect(state) {
       const g = spendAllGeodes(state);
-      applyBlock(state.player, 3 * g);
+      applyBlock(state.player, 5 * g);
       reducePetrify(state.player, 2 * g);
     },
-    upgrade: { name: 'Mother Lode+', description: 'Consume all Geodes. For each Geode consumed, gain 4 Block and reduce Petrify by 2.',
-      shortDescription: 'Spend all Geodes: +4 Block & −2 Petrify each.',
+    upgrade: { name: 'Mother Lode+', description: 'Consume all Geodes. For each Geode consumed, gain 6 Block and reduce Petrify by 2.',
+      shortDescription: 'Spend all Geodes: +6 Block & −2 Petrify each.',
       effect(state) {
         const g = spendAllGeodes(state);
-        applyBlock(state.player, 4 * g);
+        applyBlock(state.player, 6 * g);
         reducePetrify(state.player, 2 * g);
       } },
   },
   grand_geode: {
-    id: 'grand_geode', name: 'Grand Geode', cost: 2, type: 'power', targetType: 'none', rarity: 'rare',
+    id: 'grand_geode', name: 'Grand Geode', cost: 1, type: 'power', targetType: 'none', rarity: 'rare',
     description: 'Whenever you gain Geodes, gain 1 additional Geode.',
     effect(state) {
       state.combat._geodeBonus = (state.combat._geodeBonus ?? 0) + 1;
       state.combat.activePowers.push({ name: 'Grand Geode', hooks: {} });
     },
-    upgrade: { name: 'Grand Geode+', cost: 1, description: 'Whenever you gain Geodes, gain 1 additional Geode.',
+    upgrade: { name: 'Grand Geode+', cost: 1, description: 'Gain 3 Geodes. Then, whenever you gain Geodes, gain 1 additional Geode.',
+      shortDescription: 'Gain 3 Geodes. +1 per Geode gain after.',
       effect(state) {
         state.combat._geodeBonus = (state.combat._geodeBonus ?? 0) + 1;
+        gainGeodes(state, 3);
         state.combat.activePowers.push({ name: 'Grand Geode+', hooks: {} });
       } },
   },
   cataclysm: {
     id: 'cataclysm', name: 'Cataclysm', cost: 3, type: 'attack', targetType: 'enemy', rarity: 'rare',
-    description: 'Deal 8 damage. Then consume all Geodes; deal 6 damage per Geode to the target.',
-    shortDescription: 'Deal 8, then spend all Geodes: 6 dmg each.',
+    description: 'Deal 8 damage. Then consume all Geodes; deal 8 damage per Geode to the target.',
+    shortDescription: 'Deal 8, then spend all Geodes: 8 dmg each.',
     effect(state, target) {
       applyDamage(target, 8, state.player);
       const g = spendAllGeodes(state);
-      if (g > 0 && target.hp > 0) applyDamage(target, 6 * g, state.player);
+      if (g > 0 && target.hp > 0) applyDamage(target, 8 * g, state.player);
     },
-    upgrade: { name: 'Cataclysm+', description: 'Deal 10 damage. Then consume all Geodes; deal 7 damage per Geode to the target.',
-      shortDescription: 'Deal 10, then spend all Geodes: 7 dmg each.',
+    upgrade: { name: 'Cataclysm+', description: 'Deal 10 damage. Then consume all Geodes; deal 9 damage per Geode to the target.',
+      shortDescription: 'Deal 10, then spend all Geodes: 9 dmg each.',
       effect(state, target) {
         applyDamage(target, 10, state.player);
         const g = spendAllGeodes(state);
-        if (g > 0 && target.hp > 0) applyDamage(target, 7 * g, state.player);
+        if (g > 0 && target.hp > 0) applyDamage(target, 9 * g, state.player);
       } },
   },
 
@@ -768,25 +771,25 @@ export const cardDefs = {
   },
   brace: {
     id: 'brace', name: 'Brace', cost: 1, type: 'skill', targetType: 'none', rarity: 'common', retained: true,
-    description: 'Gain 5 Block. Harden 3 (each turn this stays in your hand, its Block rises by 3).',
+    description: 'Gain 5 Block. Harden 3 (each turn this stays in your hand, its Block rises by 3; resets when played).',
     shortDescription: 'Gain 5 Block. Harden 3.',
-    effect(state) { applyBlock(state.player, 5 + (this._harden || 0)); },
+    effect(state) { applyBlock(state.player, 5 + (this._harden || 0)); this._harden = 0; this.shortDescription = 'Gain 5 Block. Harden 3.'; },
     onRetain() { this._harden = (this._harden || 0) + 3; this.shortDescription = `Gain ${5 + this._harden} Block. Harden 3.`; return false; },
     onCombatStart() { this._harden = 0; this.shortDescription = 'Gain 5 Block. Harden 3.'; },
-    upgrade: { name: 'Brace+', description: 'Gain 7 Block. Harden 4 (each turn this stays in your hand, its Block rises by 4).', shortDescription: 'Gain 7 Block. Harden 4.',
-      effect(state) { applyBlock(state.player, 7 + (this._harden || 0)); },
+    upgrade: { name: 'Brace+', description: 'Gain 7 Block. Harden 4 (each turn this stays in your hand, its Block rises by 4; resets when played).', shortDescription: 'Gain 7 Block. Harden 4.',
+      effect(state) { applyBlock(state.player, 7 + (this._harden || 0)); this._harden = 0; this.shortDescription = 'Gain 7 Block. Harden 4.'; },
       onRetain() { this._harden = (this._harden || 0) + 4; this.shortDescription = `Gain ${7 + this._harden} Block. Harden 4.`; return false; },
       onCombatStart() { this._harden = 0; this.shortDescription = 'Gain 7 Block. Harden 4.'; } },
   },
   chisel: {
     id: 'chisel', name: 'Chisel', cost: 1, type: 'attack', targetType: 'enemy', rarity: 'common', retained: true,
-    description: 'Deal 5 damage. Harden 4 (each turn this stays in your hand, its damage rises by 4).',
+    description: 'Deal 5 damage. Harden 4 (each turn this stays in your hand, its damage rises by 4; resets when played).',
     shortDescription: 'Deal 5. Harden 4.',
-    effect(state, target) { applyDamage(target, 5 + (this._harden || 0), state.player); },
+    effect(state, target) { applyDamage(target, 5 + (this._harden || 0), state.player); this._harden = 0; this.shortDescription = 'Deal 5. Harden 4.'; },
     onRetain() { this._harden = (this._harden || 0) + 4; this.shortDescription = `Deal ${5 + this._harden}. Harden 4.`; return false; },
     onCombatStart() { this._harden = 0; this.shortDescription = 'Deal 5. Harden 4.'; },
-    upgrade: { name: 'Chisel+', description: 'Deal 6 damage. Harden 5 (each turn this stays in your hand, its damage rises by 5).', shortDescription: 'Deal 6. Harden 5.',
-      effect(state, target) { applyDamage(target, 6 + (this._harden || 0), state.player); },
+    upgrade: { name: 'Chisel+', description: 'Deal 6 damage. Harden 5 (each turn this stays in your hand, its damage rises by 5; resets when played).', shortDescription: 'Deal 6. Harden 5.',
+      effect(state, target) { applyDamage(target, 6 + (this._harden || 0), state.player); this._harden = 0; this.shortDescription = 'Deal 6. Harden 5.'; },
       onRetain() { this._harden = (this._harden || 0) + 5; this.shortDescription = `Deal ${6 + this._harden}. Harden 5.`; return false; },
       onCombatStart() { this._harden = 0; this.shortDescription = 'Deal 6. Harden 5.'; } },
   },
@@ -807,28 +810,28 @@ export const cardDefs = {
         applyDamage(target, 6 + 5 * spent, state.player);
       } },
   },
-  set_in_stone: {
-    id: 'set_in_stone', name: 'Set in Stone', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
-    description: 'Gain 5 Petrify. Gain 4 Poise.',
-    effect(state) { gainPetrify(state.player, 5); gainPoise(state, 4); },
-    upgrade: { name: 'Set in Stone+', description: 'Gain 5 Petrify. Gain 6 Poise.',
-      effect(state) { gainPetrify(state.player, 5); gainPoise(state, 6); } },
+  hold_fast: {
+    id: 'hold_fast', name: 'Hold Fast', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
+    description: 'Reduce Petrify by 3. Gain 3 Poise.',
+    effect(state) { reducePetrify(state.player, 3); gainPoise(state, 3); },
+    upgrade: { name: 'Hold Fast+', description: 'Reduce Petrify by 5. Gain 4 Poise.',
+      effect(state) { reducePetrify(state.player, 5); gainPoise(state, 4); } },
   },
   monument: {
     id: 'monument', name: 'Monument', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
-    description: 'Consume all Poise. Deal 3 damage for each Poise consumed.',
-    shortDescription: 'Spend all Poise: deal 3 each.',
+    description: 'Consume all Poise. Deal 4 damage for each Poise consumed.',
+    shortDescription: 'Spend all Poise: deal 4 each.',
     effect(state, target) {
       const p = state.player.poise ?? 0;
       state.player.poise = 0;
-      applyDamage(target, 3 * p, state.player);
+      applyDamage(target, 4 * p, state.player);
     },
-    upgrade: { name: 'Monument+', description: 'Consume all Poise. Deal 4 damage for each Poise consumed.',
-      shortDescription: 'Spend all Poise: deal 4 each.',
+    upgrade: { name: 'Monument+', description: 'Consume all Poise. Deal 5 damage for each Poise consumed.',
+      shortDescription: 'Spend all Poise: deal 5 each.',
       effect(state, target) {
         const p = state.player.poise ?? 0;
         state.player.poise = 0;
-        applyDamage(target, 4 * p, state.player);
+        applyDamage(target, 5 * p, state.player);
       } },
   },
   pedestal: {
@@ -852,12 +855,12 @@ export const cardDefs = {
   },
   weight_of_ages: {
     id: 'weight_of_ages', name: 'Weight of Ages', cost: 2, type: 'skill', targetType: 'none', rarity: 'uncommon',
-    description: 'Gain Block equal to your Poise. Then gain 3 Poise.',
-    shortDescription: 'Block = Poise. Then +3 Poise.',
-    effect(state) { applyBlock(state.player, state.player.poise ?? 0); gainPoise(state, 3); },
-    upgrade: { name: 'Weight of Ages+', description: 'Gain Block equal to your Poise. Then gain 4 Poise.',
-      shortDescription: 'Block = Poise. Then +4 Poise.',
-      effect(state) { applyBlock(state.player, state.player.poise ?? 0); gainPoise(state, 4); } },
+    description: 'Gain 5 Block, plus 1 for each Poise you have. Then gain 3 Poise.',
+    shortDescription: 'Gain 5 + 1 per Poise Block. Then +3 Poise.',
+    effect(state) { applyBlock(state.player, 5 + (state.player.poise ?? 0)); gainPoise(state, 3); },
+    upgrade: { name: 'Weight of Ages+', description: 'Gain 7 Block, plus 1 for each Poise you have. Then gain 4 Poise.',
+      shortDescription: 'Gain 7 + 1 per Poise Block. Then +4 Poise.',
+      effect(state) { applyBlock(state.player, 7 + (state.player.poise ?? 0)); gainPoise(state, 4); } },
   },
   living_marble: {
     id: 'living_marble', name: 'Living Marble', cost: 2, type: 'power', targetType: 'none', rarity: 'rare',

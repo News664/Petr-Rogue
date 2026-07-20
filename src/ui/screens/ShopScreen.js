@@ -85,7 +85,7 @@ function _renderRemovePicker() {
       <div class="upgrade-list">
         ${player.deck.map((card, i) => `
           <button class="upgrade-item" data-index="${i}">
-            <span class="upgrade-from">${card.name}${card.isUpgraded ? '+' : ''}</span>
+            <span class="upgrade-from">${card.name}</span>
             <span class="upgrade-desc">${card.description}</span>
           </button>
         `).join('')}

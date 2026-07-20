@@ -85,7 +85,7 @@ export const characterDefs = {
         'strike', 'strike', 'strike',
         'defend', 'defend', 'defend',
         'ore_strike', 'ore_strike',
-        'crystallize', 'facet_strike',
+        'crystallize', 'geode_ward',
       ].map(makeCard);
     },
     cardPool: [
@@ -116,7 +116,7 @@ export const characterDefs = {
     cardPool: [
       'bash', 'gravel_shot', 'stone_skin', 'shatter',
       'purify', 'fortify', 'stone_will', 'controlled_calcify',
-      'composure', 'brace', 'chisel', 'unyielding', 'set_in_stone',
+      'composure', 'brace', 'chisel', 'unyielding', 'hold_fast',
       'monument', 'pedestal', 'weight_of_ages',
       'living_marble', 'awakening',
     ],

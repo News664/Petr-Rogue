@@ -28,7 +28,7 @@
 import { checkDeathCause } from '../state/Player.js';
 import { createDeckState, drawCards, discardCard, discardHand, exhaustCard } from './DeckSystem.js';
 import { triggerRelics } from './RelicSystem.js';
-import { tickPlayerStatuses, tickEnemyStatuses, tickCrumblingOnEnemyTurn } from './StatusSystem.js';
+import { tickPlayerStatuses, tickEnemyStatuses, tickCrumblingOnEnemyTurn, applyStatus } from './StatusSystem.js';
 import { createEnemyInstance } from '../data/enemies.js';
 import { petrifyStage, petrifyMilestoneLine } from '../data/petrifyFlavor.js';
 
@@ -66,6 +66,12 @@ function _checkVictory(combat) {
 export function startCombat(state, enemyIds) {
   state.player.block = 0;
   state.player.statusEffects = {};
+  // Statuses queued by out-of-combat events (e.g. Numbing) survive the reset:
+  // apply them now, after the wipe, so they take effect this combat.
+  if (state.player.pendingStatuses) {
+    for (const [k, v] of Object.entries(state.player.pendingStatuses)) applyStatus(state.player, k, v);
+    state.player.pendingStatuses = null;
+  }
   state.player.lastPetrifySource = null;
   state.player.geodes = 0; // Opal resource — combat-scoped
   state.player.poise = 0;  // Galatea resource — combat-scoped
@@ -86,6 +92,7 @@ export function startCombat(state, enemyIds) {
     log: [],
     activePowers: [],
     cardsPlayedThisTurn: 0,
+    attacksPlayedThisTurn: 0, // for Galatea's Sculptor's Plinth (no-Attack turns)
     lastEnemyAttacker: null,
   };
   // Seed milestone tracking to the stage the player enters combat at (Petrify
@@ -124,6 +131,7 @@ export function playCard(state, handIndex, targetIndex = 0) {
 
   combat.energy -= effectiveCost;
   combat.cardsPlayedThisTurn++;
+  if (card.type === 'attack') combat.attacksPlayedThisTurn = (combat.attacksPlayedThisTurn ?? 0) + 1;
   const target = card.targetType === 'enemy' ? combat.enemies[targetIndex] : null;
 
   const petrifyBefore = player.petrify;
@@ -182,6 +190,7 @@ function _startPlayerTurn(state) {
   combat.phase = 'player';
   combat.turn++;
   combat.cardsPlayedThisTurn = 0;
+  combat.attacksPlayedThisTurn = 0;
   player.block = 0;
   combat.energy = combat.maxEnergy;
 

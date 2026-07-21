@@ -49,7 +49,7 @@ Unique: `stone_fang`, `fracture`, `petrify_lash`, `petrify_mantle`,
 `void_release`, `void_crack`, `overload`, `stone_pact`, `stone_bastion`,
 `petrify_shroud`
 
-### opal — "The Faceted" — **needs art** (`assets/cards/opal/`)
+### emma — "The Faceted" — **needs art** (`assets/cards/emma/`)
 
 Basics: `strike`, `defend`
 Unique (new): `ore_strike`, `crystallize`, `facet_strike`, `geode_ward`,

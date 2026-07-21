@@ -24,7 +24,7 @@ export const PETRIFY_MILESTONES = {
     50: 'Half of her is beautifully, terribly still. This is the edge she came for.',
     75: 'So close to the source now. She wonders how far is too far — and leans in.',
   },
-  opal: {
+  emma: {
     25: 'Fresh ore, seaming up her arm. Good. She lets it come.',
     50: 'A rich vein, humming under her skin — if she cuts it in time.',
     75: 'So much ore she can barely move. Cut it now, or become the mine.',

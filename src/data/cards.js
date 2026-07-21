@@ -24,7 +24,7 @@
 //                stone_coat, holy_surge, purifying_nova, sacred_ground
 //   Tharja unique: stone_fang, fracture, petrify_lash, petrify_mantle, void_release,
 //                  void_crack, overload, stone_pact, stone_bastion, petrify_shroud
-//   Opal unique: ore_strike, crystallize, facet_strike, geode_ward, splinter,
+//   Emma unique: ore_strike, crystallize, facet_strike, geode_ward, splinter,
 //                shatter_burst, prismatic_core, mother_lode, grand_geode, cataclysm
 //   Galatea unique: composure, brace, chisel, unyielding, hold_fast, monument,
 //                   pedestal, weight_of_ages, living_marble, awakening
@@ -33,7 +33,7 @@
 //   Status/curse (unplayable): stasis, torpor, stone_debt, stone_shard, crystal_sliver
 //
 // Custom resources (stored on player, reset each combat by startCombat):
-//   player.geodes — Opal: crystallized Petrify; spent/scaled by her cards.
+//   player.geodes — Emma: crystallized Petrify; spent/scaled by her cards.
 //     gainGeodes(state, n) respects combat._geodeBonus (Grand Geode).
 //   player.poise  — Galatea: focus; spent by attacks for scaling.
 //     gainPoise(state, n) respects combat._poiseBlock (Living Marble).
@@ -49,7 +49,7 @@ import { applyStatus } from '../systems/StatusSystem.js';
 import { drawCards } from '../systems/DeckSystem.js';
 
 // ── Custom resource helpers ────────────────────────────────────────────────
-// Geodes (Opal) and Poise (Galatea) live on the player and reset each combat.
+// Geodes (Emma) and Poise (Galatea) live on the player and reset each combat.
 
 function gainGeodes(state, n) {
   if (n <= 0) { state.player.geodes = Math.max(0, (state.player.geodes ?? 0) + n); return; }
@@ -617,7 +617,7 @@ export const cardDefs = {
     upgrade: null,
   },
 
-  // ── Opal — "The Faceted" (Geode economy) ─────────────────────────────────
+  // ── Emma — "The Faceted" (Geode economy) ─────────────────────────────────
   // Loop: gain Petrify (Ore Strike) → crystallize it into Geodes → spend/scale.
 
   ore_strike: {

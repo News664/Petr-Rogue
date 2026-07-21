@@ -12,7 +12,7 @@
 // Current characters:
 //   mint    — "The Reclaimed" (68 HP) — Petrify-cleanse and conversion
 //   tharja  — "The Stone-Kissed" (72 HP) — Petrify as a power source, threshold at ≥50% HP
-//   opal    — "The Faceted" (70 HP) — crystallize Petrify into Geodes, spend/scale
+//   emma    — "The Faceted" (70 HP) — crystallize Petrify into Geodes, spend/scale
 //   galatea — "The Statue" (75 HP) — build Poise + Harden held cards, burst attacks
 //
 // All characters must be female (lore rule).
@@ -72,11 +72,11 @@ export const characterDefs = {
     ],
   },
 
-  opal: {
-    id: 'opal',
-    name: 'Opal',
+  emma: {
+    id: 'emma',
+    name: 'Emma',
     title: 'The Faceted',
-    flavor: 'Where others see a curse, Opal sees ore. She learned to draw the creeping stone out of her own flesh before it could root — and, refusing to waste it, to cut it into faceted geodes she carries like coin. Petrification is not her enemy. It is her supply. She came to the dungeon because it is the richest vein she has ever found.',
+    flavor: 'Where others see a curse, Emma sees ore. She learned to draw the creeping stone out of her own flesh before it could root — and, refusing to waste it, to cut it into faceted geodes she carries like coin. Petrification is not her enemy. It is her supply. She came to the dungeon because it is the richest vein she has ever found.',
     hp: 70,
     energy: 3,
     startingRelicId: 'geode_core',
@@ -130,7 +130,7 @@ export function createPlayerFromCharacter(charDef) {
     maxHp: charDef.hp,
     petrify: 0,
     block: 0,
-    geodes: 0,   // Opal resource (reset each combat by startCombat)
+    geodes: 0,   // Emma resource (reset each combat by startCombat)
     poise: 0,    // Galatea resource (reset each combat by startCombat)
     gold: 100,
     deck: charDef.starterDeck(),

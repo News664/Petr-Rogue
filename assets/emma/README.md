@@ -1,9 +1,9 @@
-# Opal — "The Faceted"
+# Emma — "The Faceted"
 
-Character art for `opal`. **Status: needs art** — this folder is empty; every
-file below must be generated. Opal is a newly added character. Female (lore rule).
+Character art for `emma`. **Status: needs art** — this folder is empty; every
+file below must be generated. Emma is a newly added character. Female (lore rule).
 
-Place all files in `assets/opal/`.
+Place all files in `assets/emma/`.
 
 | File            | Size (px)  | Aspect  | Transparency          | Content                                                                                     |
 |-----------------|------------|---------|-----------------------|---------------------------------------------------------------------------------------------|
@@ -22,5 +22,5 @@ keep the face in the upper-center.
 `Portrait_100.png` is **NOT USED** — do not generate it (the game-over screen
 fires before full petrification renders).
 
-Opal also needs card art (`assets/cards/opal/`) and game-over art
-(`assets/game-over/{cause-key}-opal.png`) — see those folders' READMEs.
+Emma also needs card art (`assets/cards/emma/`) and game-over art
+(`assets/game-over/{cause-key}-emma.png`) — see those folders' READMEs.

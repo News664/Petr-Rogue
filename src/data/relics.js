@@ -13,7 +13,7 @@
 // Starting relics (NOT in relicDropPool):
 //   stone_veil       — Mint's relic: gain Stone Coat 4 at combat start
 //   stone_hunger     — Tharja's relic: +1 Energy per turn when Petrify ≥ 50% HP
-//   geode_core       — Opal's relic: gain 2 Geodes at combat start
+//   geode_core       — Emma's relic: gain 2 Geodes at combat start
 //   sculptors_plinth — Galatea's relic: +3 Poise at end of any turn with no Attack played
 //
 // Drop pool relics:
@@ -47,7 +47,7 @@ export const relicDefs = {
     },
   },
 
-  // ── Opal's starting relic ────────────────────────────────────────────────
+  // ── Emma's starting relic ────────────────────────────────────────────────
   geode_core: {
     id: 'geode_core',
     name: 'Geode Core',

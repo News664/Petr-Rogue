@@ -155,7 +155,7 @@ assets/
   void_crack, overload, stone_pact, stone_bastion, petrify_shroud
 - Starter deck: 4× strike, 3× defend, 2× stone_fang, 1× petrify_lash
 
-### Opal — "The Faceted" (70 HP, 3 Energy)
+### Emma — "The Faceted" (70 HP, 3 Energy)
 - Starting relic: **Geode Core** — gain 2 Geodes at combat start
 - Resource: **Geodes** (`player.geodes`) — crystallize Petrify into Geodes, then
   spend/scale them. Non-consuming scalers (facet_strike, geode_ward) bank value;

@@ -41,8 +41,8 @@ Base keys (from `DEATH_MESSAGES` in `src/data/deathMessages.js`):
 Character-specific art currently exists for **mint** and **tharja** — one file
 per cause key above (e.g. `hp-mint.png`, `boss-stone-heart-tharja.png`).
 
-**opal** and **galatea** need art for each cause key, as
-`{cause-key}-opal.png` and `{cause-key}-galatea.png` respectively. A missing file
+**emma** and **galatea** need art for each cause key, as
+`{cause-key}-emma.png` and `{cause-key}-galatea.png` respectively. A missing file
 silently falls back to the generic `{cause-key}.png` (which does not yet exist),
 then hides — partial sets are acceptable but a full set per character is ideal.
 

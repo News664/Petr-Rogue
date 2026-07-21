@@ -77,4 +77,35 @@ purify, fortify, stone_will, controlled_calcify, stone_channel`.
 
 ## Open questions
 
-_(Codex: leave spec questions here; Claude will answer inline.)_
+### Rename proposal
+
+Suggest renaming the playable character **Opal** to **Emma** throughout the
+project.
+
+If approved, this should be treated as a project-wide rename, including:
+
+- asset folders
+- asset filenames
+- code identifiers
+- gameplay text
+- UI text
+- documentation
+
+This is currently a proposal only. Do not perform the rename until confirmed.
+
+---
+
+### Documentation mismatch
+
+`assets/cards/README.md` still documents the Galatea card
+`set_in_stone.png`.
+
+However, the current implementation consistently uses
+`hold_fast.png` in:
+
+- `assets/ART_TODO.md`
+- `src/data/cards.js`
+- `src/data/characters.js`
+
+The README should be updated so all documentation matches the current
+implementation.

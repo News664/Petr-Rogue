@@ -19,7 +19,7 @@ To keep the two workstreams from colliding:
 - Missing art degrades gracefully in-game (hidden), so partial batches are safe
   to merge. Use the checkboxes to show what's done vs. pending.
 - Leave a note under **Open questions** below if a spec is unclear; Claude will
-  answer there rather than editing your files.
+  answer in ART_ANSWERS.md rather than editing this file.
 
 Sizes (see folder READMEs for full detail): avatar `1122×1402` (4:5, opaque);
 sprite `1024×1536` (2:3, **RGBA transparent**); `Portrait_0/25/50/75` `963×1634`
@@ -83,5 +83,3 @@ None
 
 ---
 
-The README should be updated so all documentation matches the current
-implementation.

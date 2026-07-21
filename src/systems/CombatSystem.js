@@ -16,7 +16,7 @@
 //   4. Draw 5 cards (4 if Slowed) — Stone Shard / Stone Debt draw hooks fire
 //   5. triggerRelics('onTurnStart') — Stone Hunger energy, Petrify Shroud block, etc.
 //
-// Combat-scoped player resources (Opal's geodes, Galatea's poise) are reset to 0
+// Combat-scoped player resources (Emma's geodes, Galatea's poise) are reset to 0
 //   in startCombat; power hooks fire onTurnStart, onTurnEnd (before hand discard),
 //   and onCardPlayed.
 // Torpor: blocks playing a 3rd card per turn when in hand.
@@ -73,7 +73,7 @@ export function startCombat(state, enemyIds) {
     state.player.pendingStatuses = null;
   }
   state.player.lastPetrifySource = null;
-  state.player.geodes = 0; // Opal resource — combat-scoped
+  state.player.geodes = 0; // Emma resource — combat-scoped
   state.player.poise = 0;  // Galatea resource — combat-scoped
   if (!state.enemiesDefeated) state.enemiesDefeated = 0;
   state.combat = {

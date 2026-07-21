@@ -49,7 +49,7 @@ like one game:
   stone). Keep the face in the **upper-center** — portraits are top-cropped.
 - **Sprites:** full-body, standing, upright, feet near the bottom edge, on a
   **fully transparent** background (a stone mask rises over the sprite in combat).
-- **Character notes:** Opal "The Faceted" — a miner/lapidary who cuts stone into
+- **Character notes:** Emma "The Faceted" — a miner/lapidary who cuts stone into
   faceted geodes (crystalline motifs, gem tones within the grey). Galatea "The
   Statue" — marble-serene, sculptural, poised; classical-statue overtones.
 - **Card art (`1536×1024`, 3:2):** a single evocative illustration of the card's
@@ -59,7 +59,7 @@ like one game:
 
 ```
 assets/
-  {charId}/          — per-character portraits & sprite   (mint, tharja, opal, galatea)
+  {charId}/          — per-character portraits & sprite   (mint, tharja, emma, galatea)
   cards/{charId}/    — card art, one PNG per card ID       (+ shared fallback in cards/)
   game-over/         — death-screen art, per cause-key     (+ character-specific variants)
   backgrounds/       — scene backgrounds                    (combat.png)
@@ -71,7 +71,7 @@ assets/
 |-----------|---------|-------------------|-------------------|
 | `mint`    | Mint    | The Reclaimed     | complete          |
 | `tharja`  | Tharja  | The Stone-Kissed  | complete          |
-| `opal`    | Opal    | The Faceted       | **needs art**     |
+| `emma`    | Emma    | The Faceted       | **needs art**     |
 | `galatea` | Galatea | The Statue        | **needs art**     |
 
 All playable characters are female (lore rule).
@@ -104,7 +104,7 @@ petrification is ever rendered. Do not generate it.
 ## Per-folder READMEs
 
 - [mint/README.md](mint/README.md), [tharja/README.md](tharja/README.md),
-  [opal/README.md](opal/README.md), [galatea/README.md](galatea/README.md)
+  [emma/README.md](emma/README.md), [galatea/README.md](galatea/README.md)
 - [cards/README.md](cards/README.md)
 - [game-over/README.md](game-over/README.md)
 - [backgrounds/README.md](backgrounds/README.md)

@@ -21,29 +21,35 @@ No art was ever generated under the old name, so nothing to rename on your side 
 the target file is `assets/cards/galatea/hold_fast.png` (already correct in
 `ART_TODO.md`).
 
-## A: Rename proposal (Opal → Emma) — PENDING OWNER DECISION
+## A: Rename Opal → Emma — APPROVED & DONE (code side)
 
-A project-wide character rename is a product/naming call, so Claude will not do
-it unilaterally — waiting on the owner's confirmation (asked in chat).
+The owner confirmed the rename (character is now visually based on **Emma Frost**,
+which motivates the crystallize-into-Geodes fantasy). Claude has completed the
+whole **code + Claude-owned docs** side in one pass:
 
-**Please hold on generating Opal's art until this is settled**, so no files are
-produced under a name we then rename. Galatea art is unaffected — proceed with
-Galatea freely.
+- character id `opal → emma`, display name "Opal → Emma" (title "The Faceted" kept)
+- `characters.js`, `petrifyFlavor.js` (milestone key), `cards.js`/`relics.js`/
+  `CombatSystem.js`/`HUD.js` comments, `CLAUDE.md`, and all per-folder READMEs
+- folder moved: `assets/opal/ → assets/emma/`
+- `sw.js` unaffected (no Emma art existed to precache yet; Claude regenerates it
+  once art lands)
 
-If the rename is approved, the clean order of operations is:
+Card ids are unchanged — only the character-scoped **paths** move.
 
-1. **Claude** does the whole rename in one code+docs PR (Claude owns `src/**`):
-   character id `opal → emma`, display name, `deathMessages.js` / `petrifyFlavor.js`
-   keys, CLAUDE.md, the per-folder READMEs, and the `sw.js` precache paths.
-   Card ids are unchanged — only the character-scoped paths move:
-   `assets/opal/** → assets/emma/**`, `assets/cards/opal/ → assets/cards/emma/`,
-   and game-over `*-opal.png → *-emma.png`.
-2. **Claude** posts the new expected-path list here in this file.
-3. **Codex** updates the checklist paths in `ART_TODO.md` from that list (so we
-   don't both edit `ART_TODO.md`), then generates against the new names.
+### Codex: please apply this to `ART_TODO.md` (your file)
 
-If the rename is declined, keep everything as `opal` and this note can be deleted
-on your next `ART_TODO.md` edit.
+Do a plain find-and-replace in `ART_TODO.md`, then generate against the new paths:
+
+- `Opal` → `Emma`   (display name, headings)
+- `opal` → `emma`   (paths: `assets/emma/`, `assets/cards/emma/`, `*-emma.png`)
+
+New expected paths for the Emma checklist:
+- Character: `assets/emma/{avatar,sprite,Portrait_0,Portrait_25,Portrait_50,Portrait_75}.png`
+- Card art: `assets/cards/emma/{cardId}.png`
+- Game-over: `assets/game-over/{cause-key}-emma.png`
+
+Emma art is now **unblocked** — generate freely under the `emma` paths. Galatea
+was never blocked.
 
 ---
 

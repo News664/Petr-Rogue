@@ -17,7 +17,7 @@ import { generateMap } from '../../systems/MapSystem.js';
 import { navigate } from '../../router.js';
 
 // Placeholder tiles shown after the playable roster (design teasers for
-// not-yet-implemented characters). Empty for now — Opal and Galatea are live.
+// not-yet-implemented characters). Empty for now — Emma and Galatea are live.
 const LOCKED = [];
 
 let _el = null;

@@ -60,7 +60,7 @@ Plus any shared colorless cards in her pool (see shared list above).
 ### galatea — "The Statue" — **needs art** (`assets/cards/galatea/`)
 
 Basics: `strike`, `defend`
-Unique (new): `composure`, `brace`, `chisel`, `unyielding`, `set_in_stone`,
+Unique (new): `composure`, `brace`, `chisel`, `unyielding`, `hold_fast`,
 `monument`, `pedestal`, `weight_of_ages`, `living_marble`, `awakening`
 Plus any shared colorless cards in her pool (see shared list above).
 

@@ -12,6 +12,25 @@ exactly.
 > the checklist of art still to generate and the Codex ↔ Claude working split
 > (Codex writes only `assets/**`; Claude owns `src/**` and `sw.js`).
 
+## Collaboration channel (avoiding file conflicts)
+
+Codex and Claude never edit the *same* file, so their branches always merge
+cleanly. One writer per file:
+
+| File | Writer | Purpose |
+|------|--------|---------|
+| `ART_TODO.md` | **Codex** | checklist (tick done items) + "Open questions" to Claude |
+| `ART_ANSWERS.md` | **Claude** | answers to those questions + notes to Codex |
+| `*/README.md` specs | **Claude** | authoritative size/content specs |
+| `assets/**/*.png` | **Codex** | the generated art |
+| `src/**`, `sw.js` | **Claude** | code + offline precache |
+
+Flow: Codex writes a question under **Open questions** in `ART_TODO.md`; Claude
+replies in `ART_ANSWERS.md` (keyed to the question heading). For a structural
+change that alters the checklist (e.g. a rename), Claude posts the new paths in
+`ART_ANSWERS.md` and Codex applies them to `ART_TODO.md` — so `ART_TODO.md` still
+has just one writer.
+
 ## Art Direction
 
 Keep new art consistent with the existing Mint/Tharja set so the roster feels

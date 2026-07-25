@@ -31,9 +31,9 @@ sprite `1024×1536` (2:3, **RGBA transparent**); `Portrait_0/25/50/75` `963×163
 ## Emma — "The Faceted"  (needs all art)
 
 **Character** (`assets/emma/`)
-- [ ] `avatar.png`
-- [ ] `sprite.png`  (transparent, full-body, feet near bottom)
-- [ ] `Portrait_0.png`  [ ] `Portrait_25.png`  [ ] `Portrait_50.png`  [ ] `Portrait_75.png`
+- [x] `avatar.png`
+- [x] `sprite.png`  (transparent, full-body, feet near bottom)
+- [x] `Portrait_0.png`  [x] `Portrait_25.png`  [x] `Portrait_50.png`  [x] `Portrait_75.png`
 
 **Card art** (`assets/cards/emma/`) — one `{cardId}.png` each
 - [ ] `strike.png`  [ ] `defend.png`

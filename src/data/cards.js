@@ -206,8 +206,8 @@ export const cardDefs = {
     id: 'petrify_ward', name: 'Petrify Ward', cost: 0, type: 'skill', targetType: 'none', rarity: 'common',
     description: 'Reduce Petrify by 2. Draw 1 card.',
     effect(state) { reducePetrify(state.player, 2); drawCards(state.combat.deckState, 1, state); },
-    upgrade: { name: 'Petrify Ward+', description: 'Reduce Petrify by 3. Draw 2 cards.',
-      effect(state) { reducePetrify(state.player, 3); drawCards(state.combat.deckState, 2, state); } },
+    upgrade: { name: 'Petrify Ward+', description: 'Reduce Petrify by 4. Draw 1 card.',
+      effect(state) { reducePetrify(state.player, 4); drawCards(state.combat.deckState, 1, state); } },
   },
   sanctify: {
     id: 'sanctify', name: 'Sanctify', cost: 1, type: 'skill', targetType: 'none', rarity: 'common',
@@ -385,29 +385,29 @@ export const cardDefs = {
   },
   void_crack: {
     id: 'void_crack', name: 'Void Crack', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
-    description: 'Deal 10 damage, plus 3 per 5 Petrify.',
-    shortDescription: 'Deal 10 + 3 per 5 Petrify.',
-    effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 3, state.player); },
-    upgrade: { name: 'Void Crack+', description: 'Deal 10 damage, plus 4 per 5 Petrify.',
-      shortDescription: 'Deal 10 + 4 per 5 Petrify.',
-      effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 4, state.player); } },
+    description: 'Deal 10 damage, plus 2 per 5 Petrify.',
+    shortDescription: 'Deal 10 + 2 per 5 Petrify.',
+    effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 2, state.player); },
+    upgrade: { name: 'Void Crack+', description: 'Deal 10 damage, plus 3 per 5 Petrify.',
+      shortDescription: 'Deal 10 + 3 per 5 Petrify.',
+      effect(state, target) { applyDamage(target, 10 + Math.floor(state.player.petrify / 5) * 3, state.player); } },
   },
   overload: {
     id: 'overload', name: 'Overload', cost: 2, type: 'attack', targetType: 'enemy', rarity: 'uncommon',
-    description: 'Deal 10 damage. If Petrify ≥ 50% HP, deal 25 instead and gain 5 Petrify.',
-    shortDescription: 'Deal 10 dmg (25 + 5 Petrify if at threshold).',
+    description: 'Deal 10 damage. If Petrify ≥ 50% HP, deal 22 instead and gain 5 Petrify.',
+    shortDescription: 'Deal 10 dmg (22 + 5 Petrify if at threshold).',
     effect(state, target) {
       if (state.player.petrify >= state.player.hp * 0.5) {
-        applyDamage(target, 25, state.player); gainPetrify(state.player, 5);
+        applyDamage(target, 22, state.player); gainPetrify(state.player, 5);
       } else {
         applyDamage(target, 10, state.player);
       }
     },
-    upgrade: { name: 'Overload+', description: 'Deal 12 damage. If Petrify ≥ 50% HP, deal 30 instead and gain 4 Petrify.',
-      shortDescription: 'Deal 12 dmg (30 + 4 Petrify if at threshold).',
+    upgrade: { name: 'Overload+', description: 'Deal 12 damage. If Petrify ≥ 50% HP, deal 26 instead and gain 4 Petrify.',
+      shortDescription: 'Deal 12 dmg (26 + 4 Petrify if at threshold).',
       effect(state, target) {
         if (state.player.petrify >= state.player.hp * 0.5) {
-          applyDamage(target, 30, state.player); gainPetrify(state.player, 4);
+          applyDamage(target, 26, state.player); gainPetrify(state.player, 4);
         } else {
           applyDamage(target, 12, state.player);
         }

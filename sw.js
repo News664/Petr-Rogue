@@ -12,7 +12,7 @@
 // (see scratchpad/gen-sw or the PR that introduced this file).
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CACHE = 'petr-rogue-v1';
+const CACHE = 'petr-rogue-v2';
 
 const ASSETS = [
   './',
@@ -76,6 +76,12 @@ const ASSETS = [
   './assets/cards/tharja/strike.png',
   './assets/cards/tharja/void_crack.png',
   './assets/cards/tharja/void_release.png',
+  './assets/emma/Portrait_0.png',
+  './assets/emma/Portrait_25.png',
+  './assets/emma/Portrait_50.png',
+  './assets/emma/Portrait_75.png',
+  './assets/emma/avatar.png',
+  './assets/emma/sprite.png',
   './assets/game-over/boss-obsidian-sentinel-mint.png',
   './assets/game-over/boss-obsidian-sentinel-tharja.png',
   './assets/game-over/boss-petrified-queen-mint.png',

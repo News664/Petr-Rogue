@@ -14,12 +14,12 @@ To keep the two workstreams from colliding:
   precache (`sw.js`) after each art batch.
 - **Filenames are contractual and case-sensitive.** The code requests these exact
   paths; a mismatch (e.g. `portrait_50.png` vs `Portrait_50.png`) shows as blank.
-- Work on a **separate branch** (e.g. `assets/opal-galatea-art`) → PR to `main`.
+- Work on a **separate branch** (e.g. `assets/emma-galatea-art`) → PR to `main`.
   Binary PNGs under `assets/` won't textually conflict with Claude's `src/` work.
 - Missing art degrades gracefully in-game (hidden), so partial batches are safe
   to merge. Use the checkboxes to show what's done vs. pending.
 - Leave a note under **Open questions** below if a spec is unclear; Claude will
-  answer there rather than editing your files.
+  answer in ART_ANSWERS.md rather than editing this file.
 
 Sizes (see folder READMEs for full detail): avatar `1122×1402` (4:5, opaque);
 sprite `1024×1536` (2:3, **RGBA transparent**); `Portrait_0/25/50/75` `963×1634`
@@ -28,22 +28,22 @@ sprite `1024×1536` (2:3, **RGBA transparent**); `Portrait_0/25/50/75` `963×163
 
 ---
 
-## Opal — "The Faceted"  (needs all art)
+## Emma — "The Faceted"  (needs all art)
 
-**Character** (`assets/opal/`)
-- [ ] `avatar.png`
-- [ ] `sprite.png`  (transparent, full-body, feet near bottom)
-- [ ] `Portrait_0.png`  [ ] `Portrait_25.png`  [ ] `Portrait_50.png`  [ ] `Portrait_75.png`
+**Character** (`assets/emma/`)
+- [x] `avatar.png`
+- [x] `sprite.png`  (transparent, full-body, feet near bottom)
+- [x] `Portrait_0.png`  [x] `Portrait_25.png`  [x] `Portrait_50.png`  [x] `Portrait_75.png`
 
-**Card art** (`assets/cards/opal/`) — one `{cardId}.png` each
+**Card art** (`assets/cards/emma/`) — one `{cardId}.png` each
 - [ ] `strike.png`  [ ] `defend.png`
 - [ ] `ore_strike.png`  [ ] `crystallize.png`  [ ] `facet_strike.png`  [ ] `geode_ward.png`  [ ] `splinter.png`
 - [ ] `shatter_burst.png`  [ ] `prismatic_core.png`  [ ] `mother_lode.png`  [ ] `grand_geode.png`  [ ] `cataclysm.png`
 
-**Game-over art** (`assets/game-over/`) — `{cause-key}-opal.png`
-- [ ] `hp-opal.png`  [ ] `petrify-opal.png`  [ ] `petrify-enemy-opal.png`  [ ] `petrify-status-opal.png`  [ ] `petrify-curse-opal.png`
-- [ ] `petrify-self-opal.png`  [ ] `petrify-event-opal.png`
-- [ ] `boss-obsidian-sentinel-opal.png`  [ ] `boss-petrified-queen-opal.png`  [ ] `boss-stone-heart-opal.png`
+**Game-over art** (`assets/game-over/`) — `{cause-key}-emma.png`
+- [ ] `hp-emma.png`  [ ] `petrify-emma.png`  [ ] `petrify-enemy-emma.png`  [ ] `petrify-status-emma.png`  [ ] `petrify-curse-emma.png`
+- [ ] `petrify-self-emma.png`  [ ] `petrify-event-emma.png`
+- [ ] `boss-obsidian-sentinel-emma.png`  [ ] `boss-petrified-queen-emma.png`  [ ] `boss-stone-heart-emma.png`
 
 ---
 
@@ -77,35 +77,9 @@ purify, fortify, stone_will, controlled_calcify, stone_channel`.
 
 ## Open questions
 
-### Rename proposal
+(Answers will be made in ART_ANSWERS.md, handled solely by Claude. Do not edit that file with Codex)
 
-Suggest renaming the playable character **Opal** to **Emma** throughout the
-project.
-
-If approved, this should be treated as a project-wide rename, including:
-
-- asset folders
-- asset filenames
-- code identifiers
-- gameplay text
-- UI text
-- documentation
-
-This is currently a proposal only. Do not perform the rename until confirmed.
+None
 
 ---
 
-### Documentation mismatch
-
-`assets/cards/README.md` still documents the Galatea card
-`set_in_stone.png`.
-
-However, the current implementation consistently uses
-`hold_fast.png` in:
-
-- `assets/ART_TODO.md`
-- `src/data/cards.js`
-- `src/data/characters.js`
-
-The README should be updated so all documentation matches the current
-implementation.

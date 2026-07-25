@@ -12,7 +12,7 @@
 // (see scratchpad/gen-sw or the PR that introduced this file).
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CACHE = 'petr-rogue-v2';
+const CACHE = 'petr-rogue-v3';
 
 const ASSETS = [
   './',
@@ -23,6 +23,7 @@ const ASSETS = [
   './src/data/deathMessages.js',
   './src/data/enemies.js',
   './src/data/events.js',
+  './src/data/lore.js',
   './src/data/petrifyFlavor.js',
   './src/data/relics.js',
   './src/main.js',

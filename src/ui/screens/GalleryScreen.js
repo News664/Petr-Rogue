@@ -1,5 +1,6 @@
 // ── GalleryScreen.js ──────────────────────────────────────────────────────────
-// Game Over Gallery — lets you browse and preview all death scenes without playing.
+// The Hall of the Petrified — in-world framing for the death-scene gallery.
+// Lets you browse and preview all death scenes without playing.
 // Accessible from the main menu. Uses the same slideshow logic as CombatScreen.
 //
 // Exports:
@@ -44,9 +45,11 @@ function _renderList() {
   _container.innerHTML = `
     <div class="gallery-screen">
       <div class="gallery-header">
-        <h1>Game Over Gallery</h1>
+        <h1>The Hall of the Petrified</h1>
         <button id="gallery-menu-back">← Back to Menu</button>
       </div>
+      <p class="gallery-blurb">Every one of them walked in. The dungeon keeps what it takes —
+      though not always forever, and not always without a story.</p>
       ${CHARS.map(ch => `
         <section class="gallery-section">
           <h2>${ch.label}</h2>

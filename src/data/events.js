@@ -17,6 +17,20 @@ import { gainPetrify, reducePetrify, healPlayer } from '../systems/Effects.js';
 import { applyStatus } from '../systems/StatusSystem.js';
 import { makeCard } from './cards.js';
 import { makeRelic, relicDropPool } from './relics.js';
+import { pickPredecessor } from './lore.js';
+
+// Resolves (once per visit) which predecessor statue this event shows. Cached on
+// state.eventCtx so the body text and the choices always describe the same woman.
+// pickPredecessor never returns the character you are currently playing.
+function _predecessor(state) {
+  if (state.eventCtx?.eventId !== 'petrified_predecessor') {
+    state.eventCtx = {
+      eventId: 'petrified_predecessor',
+      pred: pickPredecessor(state.player.characterId),
+    };
+  }
+  return state.eventCtx.pred;
+}
 
 // Queue a status to be applied at the start of the NEXT combat. Statuses applied
 // directly out of combat are wiped by startCombat's reset; pendingStatuses survive
@@ -213,6 +227,40 @@ export const eventDefs = [
           state.player.gold += 15;
           state.player.lastPetrifySource = { type: 'event', id: 'petrified_adventurer' };
           gainPetrify(state.player, 6);
+        },
+      },
+    ],
+  },
+
+  {
+    id: 'petrified_predecessor',
+    acts: [1, 2, 3], tone: 'neutral', position: 'any',
+    title: 'One Who Came Before',
+    // Dynamic: describes another playable character, never the one you are playing.
+    text(state) {
+      const p = _predecessor(state);
+      if (!p) return 'A statue stands alone in the passage, worn smooth by the dark.';
+      return `${p.text}<br><br>She came down here for her own reasons, the way you did. The dungeon does not distinguish. You have no way to know whether she is dead, or waiting — down here those are not always different things.`;
+    },
+    choices: [
+      {
+        label: 'Take the keepsake',
+        description: 'Gain 25 Gold.',
+        effect(state) { state.player.gold += 25; },
+      },
+      {
+        label: 'Sit with her a while',
+        description: 'Heal 8 HP. Reduce Petrify by 4.',
+        effect(state) { healPlayer(state.player, 8); reducePetrify(state.player, 4); },
+      },
+      {
+        // Petrify-gated: only offered once you are substantially stone yourself.
+        label: 'Press your hand to hers',
+        description: 'Only while heavily petrified. Reduce Petrify by 12. Gain 20 Gold.',
+        requires(state) { return state.player.petrify >= state.player.hp * 0.4; },
+        effect(state) {
+          reducePetrify(state.player, 12);
+          state.player.gold += 20;
         },
       },
     ],

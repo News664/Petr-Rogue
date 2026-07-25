@@ -3,6 +3,7 @@ import { getAvailableNodes, NODE_META, FLOORS, FLOORS_PER_ACT, NUM_ACTS, getAct 
 import { navigate } from '../../router.js';
 import { getEncounters } from '../../data/enemies.js';
 import { eventDefs } from '../../data/events.js';
+import { ACT_INTROS } from '../../data/lore.js';
 
 let _container = null;
 
@@ -18,9 +19,41 @@ const NODE_COLORS = {
 };
 
 export const MapScreen = {
-  init(el) { _container = el; _render(); },
+  init(el) {
+    _container = el;
+    // Show each act's opening narration once per run, before its map.
+    const act = _currentAct();
+    GameState.seenActIntros = GameState.seenActIntros ?? [];
+    if (ACT_INTROS[act] && !GameState.seenActIntros.includes(act)) {
+      GameState.seenActIntros.push(act);
+      _renderActIntro(act);
+      return;
+    }
+    _render();
+  },
   teardown() { _container = null; },
 };
+
+// The act the player is about to play (matches the header logic in _render).
+function _currentAct() {
+  const { map } = GameState;
+  if (!map) return 0;
+  const available = getAvailableNodes(map);
+  if (map.currentCol === null) return getAct(map.currentFloor);
+  return available.length > 0 ? getAct(available[0].floor) : getAct(map.currentFloor);
+}
+
+function _renderActIntro(act) {
+  const intro = ACT_INTROS[act];
+  _container.innerHTML = `
+    <div class="act-intro">
+      <h1>${intro.title}</h1>
+      ${intro.lines.map(l => `<p>${l}</p>`).join('')}
+      <button id="act-intro-continue" class="btn-primary">Descend</button>
+    </div>`;
+  _container.querySelector('#act-intro-continue')
+    .addEventListener('click', () => _render());
+}
 
 function _render() {
   const { map } = GameState;

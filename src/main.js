@@ -88,7 +88,7 @@ function showMenu() {
       <p class="subtitle">A petrification-themed roguelike deckbuilder</p>
       <p class="menu-hint">Build your deck. Manage the stone. Survive.</p>
       <button id="new-run" class="btn-primary">New Run</button>
-      <button id="open-gallery" class="btn-secondary">Game Over Gallery</button>
+      <button id="open-gallery" class="btn-secondary">The Hall of the Petrified</button>
       <button id="prepare-offline" class="btn-secondary">Prepare for Offline Play</button>
       <p id="offline-status" class="menu-hint"></p>
     </div>

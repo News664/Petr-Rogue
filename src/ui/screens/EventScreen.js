@@ -10,18 +10,32 @@ function _checkEventDeath(player) {
 
 export const EventScreen = {
   init(el, { event }) {
+    // Fresh per-visit context (e.g. which predecessor statue this is); dynamic
+    // text() resolves and caches into it, so re-renders stay consistent.
+    GameState.eventCtx = null;
     _render(el, event);
   },
   teardown() {},
 };
 
+// `text` may be a string or a function(state) for events with dynamic bodies.
+// `choice.requires(state)` gates a choice (e.g. petrify-only branches); choices
+// whose predicate is false are not offered at all.
+function _eventText(event) {
+  return typeof event.text === 'function' ? event.text(GameState) : event.text;
+}
+function _visibleChoices(event) {
+  return event.choices.filter(c => typeof c.requires !== 'function' || c.requires(GameState));
+}
+
 function _render(el, event) {
+  const choices = _visibleChoices(event);
   el.innerHTML = `
     <div class="event-screen">
       <h2>❓ ${event.title}</h2>
-      <p class="event-text">${event.text}</p>
+      <p class="event-text">${_eventText(event)}</p>
       <div class="event-choices">
-        ${event.choices.map((c, i) => {
+        ${choices.map((c, i) => {
           const hasPickReq = !!c.needsCardPick;
           const cardType   = c.needsCardPick?.type;
           const hasCards   = hasPickReq
@@ -42,7 +56,8 @@ function _render(el, event) {
 
   el.querySelectorAll('.event-choice:not([disabled])').forEach(btn => {
     btn.addEventListener('click', () => {
-      const choice = event.choices[Number(btn.dataset.index)];
+      // data-index refers to the filtered (visible) list, not event.choices.
+      const choice = choices[Number(btn.dataset.index)];
       if (choice.needsCardPick) {
         _showCardPicker(el, event, choice);
       } else {

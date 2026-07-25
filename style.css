@@ -434,6 +434,25 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .char-roster, .char-detail { max-width: 100%; width: 100%; }
 }
 
+/* ── Act intro narration ── */
+.act-intro {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px;
+  padding: 40px 24px; max-width: 680px; margin: 0 auto; text-align: center;
+}
+.act-intro h1 {
+  color: var(--accent); font-size: 2rem; letter-spacing: 2px; margin-bottom: 6px;
+}
+.act-intro p {
+  color: var(--text-muted); font-style: italic; line-height: 1.75; font-size: 1rem;
+}
+.act-intro .btn-primary { margin-top: 14px; }
+
+.gallery-blurb {
+  color: var(--text-muted); font-style: italic; line-height: 1.6;
+  max-width: 640px; margin: -6px auto 6px; text-align: center; font-size: 0.9rem;
+}
+
 /* ── Upgrade / remove card picker ── */
 .upgrade-list { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 520px; }
 .upgrade-item {

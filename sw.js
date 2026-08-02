@@ -160,13 +160,21 @@ self.addEventListener('fetch', (event) => {
   })());
 });
 
-// Report precache status to the page (used by the "Prepare for Offline Play" button).
+// Report precache status to the page (used by the "Prepare for Offline Play"
+// button). The page must NOT hardcode the cache name — it asks here, so the
+// version can be bumped freely without breaking the readiness check.
+// Replies over the MessageChannel port when provided, else to the source client.
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'STATUS') {
     event.waitUntil((async () => {
       const cache = await caches.open(CACHE);
       const keys = await cache.keys();
-      event.source.postMessage({ type: 'STATUS', cached: keys.length, total: ASSETS.length });
+      const payload = {
+        type: 'STATUS', cache: CACHE, cached: keys.length, total: ASSETS.length,
+      };
+      const port = event.ports && event.ports[0];
+      if (port) port.postMessage(payload);
+      else if (event.source) event.source.postMessage(payload);
     })());
   }
 });

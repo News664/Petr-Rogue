@@ -21,24 +21,65 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Registers the SW (idempotent), waits for it to activate, and reports how many
-// files are cached so the player knows a run can survive offline reloads.
-async function prepareOffline(statusEl) {
+// Asks the active service worker how much of the precache is done. The worker
+// owns the cache name, so the page never hardcodes a version (a mismatch here
+// used to open an empty cache and report 0 forever).
+function _swStatus(worker, timeoutMs = 4000) {
+  return new Promise((resolve, reject) => {
+    const ch = new MessageChannel();
+    const timer = setTimeout(() => { ch.port1.close(); reject(new Error('timeout')); }, timeoutMs);
+    ch.port1.onmessage = (e) => { clearTimeout(timer); ch.port1.close(); resolve(e.data); };
+    worker.postMessage({ type: 'STATUS' }, [ch.port2]);
+  });
+}
+
+// Registers the SW (idempotent), then polls precache progress until it finishes
+// or stops advancing, so the player gets a definite answer before going offline.
+async function prepareOffline(statusEl, btn) {
   if (!('serviceWorker' in navigator)) {
     statusEl.textContent = 'Offline play is not supported in this browser.';
     return;
   }
-  statusEl.textContent = 'Caching the game for offline play…';
+  if (!window.isSecureContext) {
+    statusEl.textContent = 'Offline play needs HTTPS (or localhost). Open the game over https:// and try again.';
+    return;
+  }
+  if (btn) btn.disabled = true;
+  statusEl.textContent = 'Preparing offline play…';
   try {
     await navigator.serviceWorker.register('sw.js');
-    await navigator.serviceWorker.ready;
-    const cache = await caches.open('petr-rogue-v1');
-    const keys  = await cache.keys();
-    statusEl.textContent = keys.length > 0
-      ? `✓ Ready for offline play — ${keys.length} files cached. You can go offline now; the game (and its reloads on victory/defeat) will keep working.`
-      : 'Caching started — reload this page once while online, then check again.';
+    const reg = await navigator.serviceWorker.ready;          // resolves once active
+    const worker = reg.active ?? navigator.serviceWorker.controller;
+    if (!worker) throw new Error('service worker did not activate');
+
+    let last = -1, stalled = 0;
+    for (let i = 0; i < 90; i++) {                            // ~90s ceiling
+      const { cached = 0, total = 0 } = await _swStatus(worker).catch(() => ({}));
+      if (total && cached >= total) {
+        statusEl.textContent =
+          `✓ Ready for offline play — all ${cached} files cached. You can go offline now; ` +
+          'new runs and the reloads on victory/defeat will keep working.';
+        return;
+      }
+      statusEl.textContent = total
+        ? `Caching for offline play… ${cached} / ${total} files.`
+        : 'Caching for offline play…';
+      stalled = (cached === last) ? stalled + 1 : 0;
+      last = cached;
+      // Downloads finished but a few files never landed — report honestly.
+      if (stalled >= 8 && cached > 0) {
+        statusEl.textContent =
+          `Cached ${cached} of ${total} files and stopped advancing. The game should still ` +
+          'run offline, but a few images may be missing. Reload while online to retry.';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    statusEl.textContent = `Still caching (${last} files so far). Leave this page open a little longer, then press again.`;
   } catch (err) {
     statusEl.textContent = 'Could not enable offline play: ' + (err?.message ?? err);
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -99,8 +140,9 @@ function showMenu() {
   document.getElementById('open-gallery').addEventListener('click', () => {
     navigate('GalleryScreen');
   });
-  document.getElementById('prepare-offline').addEventListener('click', () => {
-    prepareOffline(document.getElementById('offline-status'));
+  const offlineBtn = document.getElementById('prepare-offline');
+  offlineBtn.addEventListener('click', () => {
+    prepareOffline(document.getElementById('offline-status'), offlineBtn);
   });
 }
 
